@@ -1,0 +1,17 @@
+{
+  "description": "Triple Triad card data. Ranks: top, right, bottom, left (1-10, 10=A).",
+  "cards": [
+    {"id":"geezard","name":"Geezard","level":1,"top":1,"right":5,"bottom":4,"left":1,"element":null},
+    {"id":"funguar","name":"Funguar","level":1,"top":5,"right":3,"bottom":1,"left":1,"element":null},
+    {"id":"bite_bug","name":"Bite Bug","level":1,"top":1,"right":3,"bottom":3,"left":5,"element":null},
+    {"id":"red_bat","name":"Red Bat","level":1,"top":6,"right":2,"bottom":1,"left":1,"element":null},
+    {"id":"blobra","name":"Blobra","level":1,"top":2,"right":3,"bottom":1,"left":5,"element":null},
+    {"id":"gayla","name":"Gayla","level":1,"top":2,"right":1,"bottom":4,"left":4,"element":"Lightning"},
+    {"id":"gesper","name":"Gesper","level":1,"top":1,"right":5,"bottom":4,"left":2,"element":null},
+    {"id":"fastitocalon_f","name":"Fastitocalon-F","level":1,"top":3,"right":5,"bottom":2,"left":1,"element":"Earth"},
+    {"id":"blood_soul","name":"Blood Soul","level":1,"top":2,"right":1,"bottom":1,"left":6,"element":null},
+    {"id":"caterchipillar","name":"Caterchipillar","level":1,"top":2,"right":3,"bottom":1,"left":5,"element":null},
+    {"id":"cockatrice","name":"Cockatrice","level":1,"top":2,"right":1,"bottom":4,"left":4,"element":"Lightning"},
+    {"id":"bomb","name":"Bomb","level":4,"top":2,"right":7,"bottom":6,"left":3,"element":"Fire"}
+  ]
+}

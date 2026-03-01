@@ -17,18 +17,18 @@ Recreate the Triple Triad minigame from Final Fantasy VIII as documented on the 
 
 ## Current focus
 
-Phase 1: Research and understanding.
+Phase 2: Implementation of original game mechanics (web app scaffold and deck builder).
 
 ## Phases / Milestones
 
 ### Phase 1: Research and understanding
 
-- [ ] Research and document Triple Triad: read wiki and linked pages (e.g. Final Fantasy VIII Triple Triad cards), extract game flow, all cards with original stats, special rules and regional rules, trade rules; write clear docs (e.g. `docs/game-mechanics.md`, `docs/cards.md`, `docs/rules.md`) for development. (todo: .cursor/todos/triple_triad_phase1_research_todo.md)
+- [x] Research and document Triple Triad: read wiki and linked pages (e.g. Final Fantasy VIII Triple Triad cards), extract game flow, all cards with original stats, special rules and regional rules, trade rules; write clear docs (e.g. `docs/game-mechanics.md`, `docs/cards.md`, `docs/rules.md`) for development. (todo: .cursor/todos/triple_triad_phase1_research_todo.md) — done
 - [ ] (Add more as you discover)
 
 ### Phase 2: Implementation of original game mechanics
 
-- [ ] Web app scaffold and deck builder: set up stack (e.g. Vite + React/TS), Docker, env; implement deck builder (select 5 from collection, view cards with ranks/elements).
+- [ ] Web app scaffold and deck builder: set up stack (e.g. Vite + React/TS), Docker, env; implement deck builder (select 5 from collection, view cards with ranks/elements). (todo: .cursor/todos/triple_triad_phase2_web_scaffold_deck_builder_todo.md)
 - [ ] Two-player play: rooms/lobbies (create/join), matchmaking or room codes, real-time game state sync so two people can play a full match.
 - [ ] AI opponent: three difficulty levels (easy, medium, hard) with appropriate play intelligence; integrate into same game flow as human vs human.
 - [ ] (Add more as you discover)

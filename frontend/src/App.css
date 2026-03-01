@@ -1,0 +1,132 @@
+.app {
+  min-height: 100vh;
+  padding: 1rem;
+  background: #1a1a2e;
+  color: #eee;
+}
+
+.deck-builder h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.5rem;
+}
+
+.deck-summary {
+  margin: 0 0 1rem;
+  opacity: 0.9;
+}
+
+.deck-builder section {
+  margin-bottom: 2rem;
+}
+
+.deck-builder h2 {
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+}
+
+.deck-slots {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.deck-slot {
+  min-width: 100px;
+}
+
+.empty-slot {
+  border: 1px dashed #555;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  color: #666;
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.75rem;
+}
+
+.card-view {
+  background: #16213e;
+  border-radius: 8px;
+  padding: 0.5rem;
+  position: relative;
+  min-height: 100px;
+}
+
+.card-view.compact {
+  min-height: 80px;
+  padding: 0.35rem;
+}
+
+.card-view.selected {
+  box-shadow: 0 0 0 2px #4a9;
+}
+
+.card-name {
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+}
+
+.card-level {
+  font-size: 0.7rem;
+  opacity: 0.8;
+  margin-bottom: 0.15rem;
+}
+
+.card-element {
+  font-size: 0.65rem;
+  color: #9cf;
+  margin-bottom: 0.35rem;
+}
+
+.card-ranks {
+  position: relative;
+  height: 2rem;
+}
+
+.card-ranks .rank {
+  position: absolute;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.card-ranks .top {
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.card-ranks .right {
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.card-ranks .bottom {
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.card-ranks .left {
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.card-view.compact .card-ranks {
+  height: 1.5rem;
+}
+
+.card-view.compact .card-ranks .rank {
+  font-size: 0.65rem;
+}

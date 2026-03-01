@@ -1,0 +1,13 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "${WEB_PORT:-5173}:5173"
+    environment:
+      - VITE_PORT=5173
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: npm run dev
