@@ -28,7 +28,7 @@ Phase 2: Implementation of original game mechanics (web app scaffold and deck bu
 
 ### Phase 2: Implementation of original game mechanics
 
-- [ ] Web app scaffold and deck builder: set up stack (e.g. Vite + React/TS), Docker, env; implement deck builder (select 5 from collection, view cards with ranks/elements). (todo: .cursor/todos/triple_triad_phase2_web_scaffold_deck_builder_todo.md)
+- [x] Web app scaffold and deck builder: set up stack (e.g. Vite + React/TS), Docker, env; implement deck builder (select 5 from collection, view cards with ranks/elements). (todo: .cursor/todos/triple_triad_phase2_web_scaffold_deck_builder_todo.md) — done
 - [ ] Two-player play: rooms/lobbies (create/join), matchmaking or room codes, real-time game state sync so two people can play a full match.
 - [ ] AI opponent: three difficulty levels (easy, medium, hard) with appropriate play intelligence; integrate into same game flow as human vs human.
 - [ ] (Add more as you discover)
