@@ -5,6 +5,65 @@
   color: #eee;
 }
 
+.app-nav {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.app-nav button {
+  padding: 0.5rem 1rem;
+  background: #16213e;
+  border: 1px solid #333;
+  color: #eee;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.app-nav button.active {
+  border-color: #4a9;
+  background: #1a3a4a;
+}
+
+.play-page section {
+  margin-bottom: 1rem;
+}
+
+.play-page input {
+  margin-right: 0.5rem;
+  padding: 0.4rem;
+  width: 6ch;
+  text-transform: uppercase;
+}
+
+.play-page .error {
+  color: #f88;
+}
+
+.play-page .room-code {
+  font-size: 1.2rem;
+}
+
+.play-page .or {
+  margin: 0.5rem 0;
+  opacity: 0.8;
+}
+
+.game-board-container {
+  margin-top: 1rem;
+}
+
+.game-status p.won { color: #6f6; }
+.game-status p.lost { color: #f66; }
+
+.board-card { padding: 0.25rem; font-size: 0.75rem; }
+.board-card.owner-0 { color: #6cf; }
+.board-card.owner-1 { color: #f96; }
+.board-card-name { display: block; }
+.board-cell-empty { opacity: 0.5; font-size: 1.5rem; }
+.game-hand { margin-top: 1rem; }
+.game-hand .hint { font-size: 0.85rem; opacity: 0.9; margin-top: 0.5rem; }
+
 .deck-builder h1 {
   margin: 0 0 0.5rem;
   font-size: 1.5rem;

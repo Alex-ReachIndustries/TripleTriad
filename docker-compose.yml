@@ -1,4 +1,14 @@
 services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "${API_PORT:-3000}:3000"
+    environment:
+      - API_PORT=3000
+    command: node server.js
+
   frontend:
     build:
       context: ./frontend
@@ -7,6 +17,8 @@ services:
       - "${WEB_PORT:-5173}:5173"
     environment:
       - VITE_PORT=5173
+      - VITE_WS_URL=ws://localhost:3000
+      - VITE_API_URL=http://localhost:3000
     volumes:
       - ./frontend:/app
       - /app/node_modules

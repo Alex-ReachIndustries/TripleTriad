@@ -29,18 +29,25 @@ Phase 2: Implementation of original game mechanics (web app scaffold and deck bu
 ### Phase 2: Implementation of original game mechanics
 
 - [x] Web app scaffold and deck builder: set up stack (e.g. Vite + React/TS), Docker, env; implement deck builder (select 5 from collection, view cards with ranks/elements). (todo: .cursor/todos/triple_triad_phase2_web_scaffold_deck_builder_todo.md) — done
-- [ ] Two-player play: rooms/lobbies (create/join), matchmaking or room codes, real-time game state sync so two people can play a full match.
+- [ ] Two-player play: rooms/lobbies (create/join), matchmaking or room codes, real-time game state sync so two people can play a full match. (todo: .cursor/todos/triple_triad_phase2_two_player_todo.md)
 - [ ] AI opponent: three difficulty levels (easy, medium, hard) with appropriate play intelligence; integrate into same game flow as human vs human.
 - [ ] (Add more as you discover)
 
-### Phase 3: Expansion (single-player mode)
+### Phase 3: UI/UX overhaul
+
+- [ ] Visual and interaction polish: apply a cohesive Triple Triad/FFVIII-inspired theme (typography, color palette, card and board styling); add subtle animations and clear feedback so the app feels polished and readable.
+- [ ] Usability and accessibility: improve navigation, focus management, contrast and labels; ensure layout works across viewport sizes and input methods (keyboard, touch).
+- [ ] UI/UX design guidelines document: write `docs/ui-ux-guidelines.md` (or equivalent) defining visual language, component patterns, and do's/don'ts for use when implementing Phase 4 (Expansion) and beyond so single-player and future features stay consistent.
+- [ ] (Add more as you discover)
+
+### Phase 4: Expansion (single-player mode)
 
 - [ ] Single-player world mode: Exact map from FFVIII, locations unlock in story order; rule transfer mechanic; gain/lose cards from matches (starter deck protected); basic plot and progression.
 - [ ] Characters and story: FFVIII characters in appropriate locations with in-character dialogue; story beats leading through locations.
 - [ ] Economy: money (gil), shops to buy cards, paid tournaments with card prizes.
 - [ ] (Add more as you discover)
 
-### Phase 4: Porting to Android
+### Phase 5: Porting to Android
 
 - [ ] Port to Android: standalone APK build (e.g. Capacitor/TWA or React Native), mobile-friendly UI/UX targeting Pixel 9 Pro XL; ensure system UI does not overlap in-game UI (safe areas, fullscreen).
 - [ ] (Add more as you discover)
