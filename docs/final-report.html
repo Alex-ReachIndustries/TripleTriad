@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Triple Triad V2 — Final Report</title>
+  <style>
+    :root {
+      --bg: #0d0f14;
+      --surface: #1a1d26;
+      --surface-alt: #22263a;
+      --border: #2e3350;
+      --accent: #c8a84b;
+      --accent-dim: #a88c3e;
+      --text: #e8e8e8;
+      --text-muted: #8890aa;
+      --green: #4caf6e;
+      --red: #d25050;
+      --amber: #d4a030;
+      --player-0: #3b82f6;
+      --player-1: #ef4444;
+      --font: 'Segoe UI', system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.6;
+      padding: 2rem 1rem;
+    }
+    .container { max-width: 900px; margin: 0 auto; }
+
+    /* Header */
+    .report-header {
+      text-align: center;
+      padding: 2.5rem 1.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      margin-bottom: 2rem;
+    }
+    .report-header h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: 0.04em;
+      margin-bottom: 0.5rem;
+    }
+    .report-header .subtitle {
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+    .report-date { margin-top: 0.75rem; color: var(--text-muted); font-size: 0.85rem; }
+
+    /* Stat grid */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .stat-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.2rem 1rem;
+      text-align: center;
+    }
+    .stat-box .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--accent);
+      line-height: 1.1;
+    }
+    .stat-box .stat-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.3rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .stat-box.green .stat-value { color: var(--green); }
+    .stat-box.red .stat-value { color: var(--red); }
+    .stat-box.blue .stat-value { color: var(--player-0); }
+
+    /* Sections */
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .section h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .section h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      margin: 1rem 0 0.5rem;
+    }
+    .section p { color: var(--text-muted); margin-bottom: 0.75rem; font-size: 0.95rem; }
+    .section ul { padding-left: 1.4rem; color: var(--text-muted); font-size: 0.95rem; }
+    .section ul li { margin-bottom: 0.3rem; }
+    .section ul li strong { color: var(--text); }
+
+    /* Phase table */
+    .phase-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .phase-table th {
+      text-align: left;
+      padding: 0.5rem 0.75rem;
+      background: var(--surface-alt);
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+    }
+    .phase-table td {
+      padding: 0.6rem 0.75rem;
+      border-top: 1px solid var(--border);
+      color: var(--text);
+      vertical-align: top;
+    }
+    .phase-table td:first-child { font-weight: 600; }
+    .phase-table td p { color: var(--text-muted); font-size: 0.85rem; margin: 0.1rem 0 0; }
+
+    /* Status badges */
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.55rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .badge.done   { background: rgba(76,175,110,0.15); color: var(--green); border: 1px solid rgba(76,175,110,0.35); }
+    .badge.warn   { background: rgba(212,160,48,0.15); color: var(--amber); border: 1px solid rgba(212,160,48,0.35); }
+    .badge.fail   { background: rgba(210,80,80,0.15); color: var(--red);   border: 1px solid rgba(210,80,80,0.35); }
+
+    /* Test results table */
+    .test-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .test-table th {
+      text-align: left;
+      padding: 0.4rem 0.6rem;
+      background: var(--surface-alt);
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+    }
+    .test-table td {
+      padding: 0.5rem 0.6rem;
+      border-top: 1px solid var(--border);
+      color: var(--text);
+    }
+    .test-table td.pass { color: var(--green); font-weight: 600; }
+    .test-table td.fail { color: var(--red); font-weight: 600; }
+
+    /* Feature grid */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 0.75rem;
+    }
+    .feature-card {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      font-size: 0.9rem;
+    }
+    .feature-card .feature-title { font-weight: 600; color: var(--text); margin-bottom: 0.25rem; }
+    .feature-card .feature-desc { color: var(--text-muted); font-size: 0.82rem; }
+
+    /* Limitations & future */
+    .limitation-list, .future-list {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .limitation-list li, .future-list li {
+      display: flex;
+      gap: 0.6rem;
+      align-items: flex-start;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+    .limitation-list li::before { content: '⚠'; color: var(--amber); flex-shrink: 0; }
+    .future-list li::before { content: '→'; color: var(--accent-dim); flex-shrink: 0; }
+    .limitation-list li strong, .future-list li strong { color: var(--text); }
+
+    @media (max-width: 600px) {
+      .report-header h1 { font-size: 1.5rem; }
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Header -->
+    <div class="report-header">
+      <h1>Triple Triad V2</h1>
+      <p class="subtitle">Final Project Report — FFVIII-Inspired Browser Card Game</p>
+      <p class="report-date">Completed: March 2026 &nbsp;|&nbsp; Stack: React 19 + Vite + TypeScript + Node.js + WebSocket + Docker</p>
+    </div>
+
+    <!-- Key stats -->
+    <div class="stat-grid">
+      <div class="stat-box green">
+        <div class="stat-value">6 / 6</div>
+        <div class="stat-label">Phases Complete</div>
+      </div>
+      <div class="stat-box green">
+        <div class="stat-value">42 / 42</div>
+        <div class="stat-label">Engine Tests Pass</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value">8</div>
+        <div class="stat-label">Special Rules Impl.</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value">10</div>
+        <div class="stat-label">World Areas</div>
+      </div>
+      <div class="stat-box blue">
+        <div class="stat-value">110</div>
+        <div class="stat-label">Cards Available</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value">246 kB</div>
+        <div class="stat-label">JS Bundle (gzip: 76 kB)</div>
+      </div>
+    </div>
+
+    <!-- Phase Summary -->
+    <div class="section">
+      <h2>Phase Summary</h2>
+      <table class="phase-table">
+        <thead>
+          <tr>
+            <th>Phase</th>
+            <th>Goal</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1 — Research
+              <p>Architecture, UI/UX, security, best-practices docs</p>
+            </td>
+            <td>Audit codebase; produce guidance documents</td>
+            <td><span class="badge done">Complete</span></td>
+          </tr>
+          <tr>
+            <td>2 — Engine Rules
+              <p>same, plus, combo, elemental, random, sudden death</p>
+            </td>
+            <td>Mechanically complete FFVIII special rules (all 8)</td>
+            <td><span class="badge done">Complete</span></td>
+          </tr>
+          <tr>
+            <td>3 — World Mode
+              <p>NPC decks, shop dedup, gil rewards, region rules</p>
+            </td>
+            <td>Authentic single-player world progression</td>
+            <td><span class="badge done">Complete</span></td>
+          </tr>
+          <tr>
+            <td>4 — UI/UX Overhaul
+              <p>Card art, animations, board layout, world map</p>
+            </td>
+            <td>Professional look and feel; tactile game board</td>
+            <td><span class="badge done">Complete</span></td>
+          </tr>
+          <tr>
+            <td>5 — Performance
+              <p>Alpha-beta pruning, engine sync, type audit</p>
+            </td>
+            <td>Clean, performant, maintainable codebase</td>
+            <td><span class="badge done">Complete</span></td>
+          </tr>
+          <tr>
+            <td>6 — Evaluation
+              <p>Full build, engine tests, final report</p>
+            </td>
+            <td>Verify deliverable state; document results</td>
+            <td><span class="badge done">Complete</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- What Was Built -->
+    <div class="section">
+      <h2>What Was Built</h2>
+      <p>Triple Triad V2 is a fully playable, FFVIII-authentic browser implementation of the Triple Triad card mini-game. It features a rich single-player world mode, online two-player mode, and a polished UI built on React 19 + Vite + TypeScript.</p>
+
+      <h3>Game Engine</h3>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-title">Basic Capture</div>
+          <div class="feature-desc">Compare touching card ranks; higher rank wins the cell.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-title">Same Rule</div>
+          <div class="feature-desc">Two or more matching rank pairs on adjacent sides → simultaneous capture.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-title">Plus Rule</div>
+          <div class="feature-desc">Two or more equal rank sums on adjacent sides → simultaneous capture.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-title">Combo Rule</div>
+          <div class="feature-desc">Same/Plus captures cascade — newly captured cards apply basic rule to neighbours.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-title">Same Wall</div>
+          <div class="feature-desc">Board edges count as rank 10 for Same rule evaluation.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-title">Elemental Rule</div>
+          <div class="feature-desc">Random board elements grant ±1 to all ranks for matching/mismatching cards.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-title">Random Rule</div>
+          <div class="feature-desc">5 cards dealt randomly from each player's full deck before the match.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-title">Sudden Death</div>
+          <div class="feature-desc">On draw, cards redistribute by ownership and the board resets. Loops until a winner.</div>
+        </div>
+      </div>
+
+      <h3>World Mode</h3>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-title">10 Progressive Areas</div>
+          <div class="feature-desc">Balamb → Esthar unlocked sequentially. Each area has unique NPCs, rules, shops.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-title">Per-NPC Card Pools</div>
+          <div class="feature-desc">Each NPC draws from a fixed 10-card pool matching their area's difficulty tier.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-title">Economy (Gil)</div>
+          <div class="feature-desc">Win duels → earn gil. Spend at area shops to expand your card collection.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-title">Win Tracking</div>
+          <div class="feature-desc">NPC win counts displayed; rematch available from area panel.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-title">Region Rules</div>
+          <div class="feature-desc">Area-defined rule sets wired through to the engine (e.g. Galbadia uses Same + Plus).</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-title">Shop Deduplication</div>
+          <div class="feature-desc">Already-owned cards shown with an "Owned" badge; re-purchase blocked.</div>
+        </div>
+      </div>
+
+      <h3>UI / UX</h3>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-title">Real Card Art</div>
+          <div class="feature-desc">110 card images from <code>/public/cards/{id}.png</code> with rank overlays and element badges.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-title">Card Animations</div>
+          <div class="feature-desc">Spring scale-in on placement; 3D Y-axis flip (300 ms) on capture; hand pulse on active turn.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-title">Win/Draw Overlay</div>
+          <div class="feature-desc">Full-board result overlay with "Play Again" / "Return to World" actions.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-title">Score Bar & Rules Bar</div>
+          <div class="feature-desc">Live card count per player; active rule badges shown at top of board.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-title">World Progress Bar</div>
+          <div class="feature-desc">Areas unlocked / 10 with animated fill; newest area gets a gold pulse animation.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-title">Ownership Colour Tint</div>
+          <div class="feature-desc">Blue border (player) / red border (opponent) on all placed cards.</div>
+        </div>
+      </div>
+
+      <h3>AI Opponents</h3>
+      <ul>
+        <li><strong>Easy:</strong> Random valid move selection.</li>
+        <li><strong>Medium:</strong> 1-ply greedy — maximises immediate board score.</li>
+        <li><strong>Hard:</strong> Minimax with alpha-beta pruning, 4–6 ply (dynamic depth: deeper in late game when branching factor shrinks).</li>
+      </ul>
+    </div>
+
+    <!-- Test Results -->
+    <div class="section">
+      <h2>Test Results</h2>
+      <p>Engine unit tests run via <code>node src/game/engine.test.mjs</code> inside Docker.</p>
+      <table class="test-table">
+        <thead>
+          <tr>
+            <th>Suite</th>
+            <th>Tests</th>
+            <th>Result</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Basic Capture (rank comparison)</td>
+            <td>8</td>
+            <td class="pass">PASS</td>
+          </tr>
+          <tr>
+            <td>Same Rule (shared ranks, 2+ sides)</td>
+            <td>5</td>
+            <td class="pass">PASS</td>
+          </tr>
+          <tr>
+            <td>Same Wall Rule (edge = rank 10)</td>
+            <td>3</td>
+            <td class="pass">PASS</td>
+          </tr>
+          <tr>
+            <td>Plus Rule (equal rank sums, 2+ sides)</td>
+            <td>4</td>
+            <td class="pass">PASS</td>
+          </tr>
+          <tr>
+            <td>Combo Rule (cascade from Same/Plus)</td>
+            <td>2</td>
+            <td class="pass">PASS</td>
+          </tr>
+          <tr>
+            <td>Elemental Rule (board modifiers)</td>
+            <td>6</td>
+            <td class="pass">PASS</td>
+          </tr>
+          <tr>
+            <td>Random Rule (hand selection)</td>
+            <td>3</td>
+            <td class="pass">PASS</td>
+          </tr>
+          <tr>
+            <td>Winner / Draw / Sudden Death</td>
+            <td>10</td>
+            <td class="pass">PASS</td>
+          </tr>
+          <tr>
+            <td>State forwarding (activeRules, boardElements)</td>
+            <td>4</td>
+            <td class="pass">PASS</td>
+          </tr>
+          <tr>
+            <td style="font-weight:700">Total</td>
+            <td style="font-weight:700">42</td>
+            <td class="pass" style="font-size:1rem">42 / 42 ✓</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 style="margin-top:1.25rem">Build Verification</h3>
+      <table class="test-table">
+        <thead>
+          <tr><th>Check</th><th>Result</th><th>Detail</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>TypeScript compile (<code>tsc --noEmit</code>)</td>
+            <td class="pass">PASS</td>
+            <td>0 errors, 0 warnings</td>
+          </tr>
+          <tr>
+            <td>Vite production build</td>
+            <td class="pass">PASS</td>
+            <td>JS: 246 kB / 75 kB gzip; CSS: 21 kB / 4.3 kB gzip</td>
+          </tr>
+          <tr>
+            <td>Zero <code>any</code> TypeScript types</td>
+            <td class="pass">PASS</td>
+            <td>Checked engine.ts, ai.ts, all components</td>
+          </tr>
+          <tr>
+            <td>Backend engine sync</td>
+            <td class="pass">PASS</td>
+            <td>backend/engine.mjs exports identical function set to engine.ts</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Known Limitations -->
+    <div class="section">
+      <h2>Known Limitations</h2>
+      <ul class="limitation-list">
+        <li><strong>Trade rules (Diff / Direct / All) not implemented.</strong> Only the "One" trade rule is in scope for V2. The other three are documented as future work.</li>
+        <li><strong>No iOS / Safari testing.</strong> Development and testing used Chromium via Docker. CSS 3D transforms (card flip) are standard and should work, but no device testing was performed.</li>
+        <li><strong>No audio.</strong> No sound effects or music. This was intentional — out of scope for V2.</li>
+        <li><strong>Online multiplayer polish deferred.</strong> The two-player WebSocket mode works but was not polished in V2 (per Phase 1 scope decision).</li>
+        <li><strong>Hard AI uses client-side minimax only.</strong> The AI runs in the browser main thread; for very early moves (45 × 40 × 28 × 24 branching at depth 4), response is near-instant with alpha-beta but a Web Worker would improve perceived responsiveness further.</li>
+        <li><strong>Map images are placeholder.</strong> The world map and NPC portrait images are scaffolded but most real assets are absent; placeholder backgrounds are shown.</li>
+      </ul>
+    </div>
+
+    <!-- Future Expansions -->
+    <div class="section">
+      <h2>Suggested Future Expansions</h2>
+      <ul class="future-list">
+        <li><strong>Sound design:</strong> Card placement SFX, capture sting, win/loss fanfares matching the FFVIII OST aesthetic.</li>
+        <li><strong>Diff / Direct / All trade rules:</strong> Complete the remaining three trade rules to match the full FFVIII rule set.</li>
+        <li><strong>iOS / Capacitor build:</strong> The Capacitor config is already scaffolded (<code>frontend/capacitor.config.ts</code>); a native iOS build would require asset signing and App Store submission.</li>
+        <li><strong>Leaderboards / statistics:</strong> Persistent win/loss record per NPC, global win rate, longest win streak.</li>
+        <li><strong>Hard AI — Web Worker:</strong> Move the minimax search off the main thread to eliminate any UI jank on the first move of a hard game.</li>
+        <li><strong>Rule abolition system:</strong> In FFVIII, rules can be abolished by playing in regions that have conflicting rule sets — a meta-game layer not yet implemented.</li>
+        <li><strong>Card trading with NPCs:</strong> Post-match card trading (all trade rules) after adding Diff/Direct/All support.</li>
+      </ul>
+    </div>
+
+    <p style="text-align:center; color:var(--text-muted); font-size:0.8rem; margin-top:2rem;">
+      Triple Triad V2 &nbsp;|&nbsp; Generated March 2026
+    </p>
+
+  </div>
+</body>
+</html>

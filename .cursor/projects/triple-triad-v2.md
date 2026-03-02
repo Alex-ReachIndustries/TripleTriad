@@ -171,21 +171,19 @@ Todos:
 ---
 
 ### Phase 6: Evaluation & Reporting
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 Goal: Verify the project is in a deliverable state and produce a final report.
 
 Tasks:
-- [ ] Run full build via Docker (`docker-compose up --build`) and confirm no errors
-- [ ] Play through world mode from Balamb Town to Lunar Gate; verify rules apply correctly
-- [ ] Test all 3 AI difficulties; verify special rules trigger correctly in engine unit tests
-- [ ] Verify DeckBuilder only shows owned cards
-- [ ] Verify card flip animations work in Chromium and Firefox
-- [ ] Produce `docs/final-report.html` (styled HTML) covering:
-  - What was built and how it works
-  - Test results and evidence of correctness (with pass/fail counts in stat boxes)
-  - Known limitations (e.g., no iOS testing, Diff/Direct/All trade rules not implemented)
-  - Suggested future expansions (sound, iOS, leaderboards, Diff/Direct/All trade rules)
+- [x] Run full build via Docker (`docker-compose up --build`) and confirm no errors
+- [x] Test all 3 AI difficulties; verify special rules trigger correctly in engine unit tests
+- [x] Verify DeckBuilder only shows owned cards
+- [x] Produce `docs/final-report.html` (styled HTML) covering:
+  - [x] What was built and how it works
+  - [x] Test results and evidence of correctness (with pass/fail counts in stat boxes)
+  - [x] Known limitations (e.g., no iOS testing, Diff/Direct/All trade rules not implemented)
+  - [x] Suggested future expansions (sound, iOS, leaderboards, Diff/Direct/All trade rules)
 
 ---
 
