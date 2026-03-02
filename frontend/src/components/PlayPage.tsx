@@ -1,26 +1,66 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import type { GameState } from '../game'
 import type { Card } from '../types/card'
+import type { Area } from '../types/world'
+import { createGame, placeCard, continueSuddenDeath, getAiMove } from '../game'
+import type { Difficulty } from '../game'
 import { createRoom, joinRoom, getWsUrl } from '../api/client'
 import cardsData from '../data/cards.json'
+import { getRegionById, formatRules, getAreaDeckPool } from '../data/world'
 import { GameBoard } from './GameBoard'
 import { CardView } from './CardView'
 
 const allCards: Card[] = cardsData.cards as Card[]
 const DECK_SIZE = 5
 
-type Screen = 'home' | 'lobby' | 'game'
+/** Winner: 0 = player, 1 = opponent, 'draw' = tie. */
+export type WorldMatchResult = 0 | 1 | 'draw'
 
-export function PlayPage() {
-  const [screen, setScreen] = useState<Screen>('home')
+export interface PlayPageProps {
+  worldChallengeLocation?: Area | null
+  /** When set, player is in a paid tournament; win grants this card id. */
+  tournamentPrize?: string | null
+  /** Called when a world challenge or tournament match ends; receives winner (0 = player won). */
+  onWorldMatchEnd?: (winner: WorldMatchResult) => void
+  onLeaveWorldChallenge?: () => void
+}
+
+function pickRandomDeck(pool: Card[], size: number): Card[] {
+  const shuffled = [...pool].sort(() => Math.random() - 0.5)
+  return shuffled.slice(0, size)
+}
+
+type Screen = 'home' | 'lobby' | 'game' | 'vs-ai-setup'
+type GameMode = 'online' | 'vs-ai'
+
+export function PlayPage({ worldChallengeLocation = null, tournamentPrize = null, onWorldMatchEnd, onLeaveWorldChallenge }: PlayPageProps = {}) {
+  const [screen, setScreen] = useState<Screen>(worldChallengeLocation || tournamentPrize ? 'vs-ai-setup' : 'home')
+  const [gameMode, setGameMode] = useState<GameMode>('online')
   const [code, setCode] = useState('')
   const [joinCode, setJoinCode] = useState('')
   const [roomId, setRoomId] = useState<string | null>(null)
   const [player, setPlayer] = useState<0 | 1 | null>(null)
   const [deck, setDeck] = useState<Card[]>([])
   const [gameState, setGameState] = useState<GameState | null>(null)
+  const [localGameState, setLocalGameState] = useState<GameState | null>(null)
+  const [difficulty, setDifficulty] = useState<Difficulty>('medium')
   const [ws, setWs] = useState<WebSocket | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const aiScheduledRef = useRef(false)
+
+  useEffect(() => {
+    if (worldChallengeLocation || tournamentPrize) {
+      setGameMode('vs-ai')
+      setScreen('vs-ai-setup')
+    }
+  }, [worldChallengeLocation, tournamentPrize])
+
+  useEffect(() => {
+    if (localGameState?.phase === 'ended' && gameMode === 'vs-ai' && (worldChallengeLocation || tournamentPrize) && onWorldMatchEnd) {
+      const winner = localGameState.winner ?? 'draw'
+      onWorldMatchEnd(winner)
+    }
+  }, [localGameState?.phase, localGameState?.winner, gameMode, worldChallengeLocation, tournamentPrize, onWorldMatchEnd])
 
   const toggleDeck = useCallback((card: Card) => {
     setDeck((prev) => {
@@ -97,15 +137,78 @@ export function PlayPage() {
     [ws]
   )
 
+  const handlePlayVsAi = useCallback(() => {
+    setError(null)
+    setGameMode('vs-ai')
+    setScreen('vs-ai-setup')
+  }, [])
+
+  const handleStartVsAi = useCallback(() => {
+    if (deck.length !== DECK_SIZE) return
+    setError(null)
+    const aiPool = worldChallengeLocation
+      ? getAreaDeckPool(worldChallengeLocation.id, allCards)
+      : allCards
+    const aiDeck = pickRandomDeck(aiPool, DECK_SIZE)
+    const firstPlayer = Math.random() < 0.5 ? 0 : 1
+    const region = worldChallengeLocation
+      ? getRegionById(worldChallengeLocation.regionId)
+      : null
+    const activeRules = region?.rules ?? []
+    const initial = createGame(deck, aiDeck, firstPlayer, activeRules)
+    setLocalGameState(initial)
+    setScreen('game')
+  }, [deck, worldChallengeLocation])
+
+  const handleLocalPlace = useCallback(
+    (cardIndex: number, row: number, col: number) => {
+      if (!localGameState || localGameState.turn !== 0 || localGameState.phase !== 'playing') return
+      setLocalGameState(placeCard(localGameState, 0, cardIndex, row, col))
+    },
+    [localGameState]
+  )
+
+  useEffect(() => {
+    if (gameMode !== 'vs-ai' || screen !== 'game' || !localGameState) return
+    if (localGameState.phase !== 'playing' || localGameState.turn !== 1) {
+      aiScheduledRef.current = false
+      return
+    }
+    if (aiScheduledRef.current) return
+    aiScheduledRef.current = true
+    const id = setTimeout(() => {
+      try {
+        const move = getAiMove(localGameState, difficulty)
+        setLocalGameState(placeCard(localGameState, 1, move.cardIndex, move.row, move.col))
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'AI move failed')
+      } finally {
+        aiScheduledRef.current = false
+      }
+    }, 500)
+    return () => clearTimeout(id)
+  }, [gameMode, screen, localGameState, difficulty])
+
+  // Sudden Death: after board full draw, auto-continue to new round after a brief pause
+  useEffect(() => {
+    if (gameMode !== 'vs-ai' || !localGameState || localGameState.phase !== 'sudden_death') return
+    const id = setTimeout(() => {
+      setLocalGameState(continueSuddenDeath(localGameState))
+    }, 1200)
+    return () => clearTimeout(id)
+  }, [gameMode, localGameState])
+
   if (screen === 'home') {
     return (
       <div className="play-page">
         <h1>Play Triple Triad</h1>
         {error && <p className="error">{error}</p>}
-        <section>
+        <section aria-label="Play options">
           <button type="button" onClick={handleCreate}>Create room</button>
           <p className="or">— or —</p>
+          <label htmlFor="join-room-code" className="visually-hidden">Room code to join</label>
           <input
+            id="join-room-code"
             type="text"
             placeholder="Room code"
             value={joinCode}
@@ -113,7 +216,73 @@ export function PlayPage() {
             maxLength={6}
           />
           <button type="button" onClick={handleJoin}>Join room</button>
+          <p className="or">— or —</p>
+          <button type="button" onClick={handlePlayVsAi}>Play vs AI</button>
         </section>
+      </div>
+    )
+  }
+
+  if (screen === 'vs-ai-setup') {
+    return (
+      <div className="play-page lobby">
+        <h1>Play vs AI</h1>
+        {(worldChallengeLocation || tournamentPrize) && (
+          <div className="world-challenge-note" role="status">
+            {tournamentPrize ? (
+              <p><strong>Tournament!</strong> Win to win a prize card.</p>
+            ) : worldChallengeLocation ? (
+              <>
+                <p>Playing at <strong>{worldChallengeLocation.name}</strong></p>
+                {getRegionById(worldChallengeLocation.regionId) && (
+                  <p className="world-region-rules">
+                    Region rules: {formatRules(getRegionById(worldChallengeLocation.regionId)!.rules)}. Trade: {getRegionById(worldChallengeLocation.regionId)!.tradeRule}.
+                  </p>
+                )}
+              </>
+            ) : null}
+          </div>
+        )}
+        <button type="button" className="back" onClick={() => { setScreen('home'); setGameMode('online'); onLeaveWorldChallenge?.() }}>
+          ← Back
+        </button>
+        <p>
+          <label>Difficulty: </label>
+          <select value={difficulty} onChange={(e) => setDifficulty(e.target.value as Difficulty)}>
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+        </p>
+        <p>Choose 5 cards, then click Start game.</p>
+        <div className="lobby-deck">
+          {Array.from({ length: DECK_SIZE }, (_, i) => (
+            <div key={i} className="deck-slot">
+              {deck[i] ? (
+                <CardView card={deck[i]} selected onSelect={() => toggleDeck(deck[i])} compact />
+              ) : (
+                <div className="empty-slot">Empty</div>
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="card-grid" style={{ marginTop: 8 }}>
+          {allCards.map((card) => (
+            <CardView
+              key={card.id}
+              card={card}
+              selected={deck.some((c) => c.id === card.id)}
+              onSelect={() => toggleDeck(card)}
+            />
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={handleStartVsAi}
+          disabled={deck.length !== DECK_SIZE}
+        >
+          Start game ({deck.length}/{DECK_SIZE})
+        </button>
       </div>
     )
   }
@@ -158,7 +327,30 @@ export function PlayPage() {
     )
   }
 
-  if (screen === 'game' && gameState && player !== null) {
+  if (screen === 'game' && gameMode === 'vs-ai' && localGameState) {
+    return (
+      <div className="play-page game">
+        {(worldChallengeLocation || tournamentPrize) && (
+          <div className="world-challenge-note">
+            {tournamentPrize ? <p>Tournament — win for a prize card!</p> : worldChallengeLocation ? (
+              <>
+                <p>At {worldChallengeLocation.name}</p>
+                {getRegionById(worldChallengeLocation.regionId) && (
+                  <p className="world-region-rules">{formatRules(getRegionById(worldChallengeLocation.regionId)!.rules)}</p>
+                )}
+              </>
+            ) : null}
+          </div>
+        )}
+        <button type="button" className="back" onClick={() => { setScreen('home'); setGameMode('online'); setLocalGameState(null); onLeaveWorldChallenge?.() }}>
+          ← Back to menu
+        </button>
+        <GameBoard state={localGameState} myPlayer={0} onPlace={handleLocalPlace} />
+      </div>
+    )
+  }
+
+  if (screen === 'game' && gameMode === 'online' && gameState && player !== null) {
     return (
       <div className="play-page game">
         <GameBoard state={gameState} myPlayer={player} onPlace={sendPlace} />
