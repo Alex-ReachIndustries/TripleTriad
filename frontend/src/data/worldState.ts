@@ -3,6 +3,9 @@
  * Persisted to localStorage so progress survives refresh.
  */
 
+import type { SavedDeck } from './deckManager'
+import { createStarterDeck, parseSavedDecks } from './deckManager'
+
 const STORAGE_KEY = 'tripletriad-world'
 
 /** Card ids that the player owns (for world mode deck building and trade). */
@@ -15,6 +18,10 @@ export interface WorldPlayerState {
   gil: number
   /** Win count per area id. Used to show rematch badges. */
   npcWins: Record<string, number>
+  /** Named saved decks. Starter deck always exists at index 0. */
+  savedDecks: SavedDeck[]
+  /** ID of the last deck the player used in a duel. */
+  lastDeckId: string | null
 }
 
 /** 5 starter cards – always protected (count can never drop below 1). */
@@ -34,6 +41,8 @@ function defaultState(): WorldPlayerState {
     inventory,
     gil: DEFAULT_GIL,
     npcWins: {},
+    savedDecks: [createStarterDeck(STARTER_DECK_IDS)],
+    lastDeckId: 'starter',
   }
 }
 
@@ -95,7 +104,9 @@ export function loadWorldState(): WorldPlayerState {
           )
         : {}
     )
-    return { unlockedOrder, inventory, gil, npcWins }
+    const savedDecks = parseSavedDecks(o.savedDecks, STARTER_DECK_IDS)
+    const lastDeckId = typeof o.lastDeckId === 'string' ? o.lastDeckId : 'starter'
+    return { unlockedOrder, inventory, gil, npcWins, savedDecks, lastDeckId }
   } catch {
     return defaultState()
   }
