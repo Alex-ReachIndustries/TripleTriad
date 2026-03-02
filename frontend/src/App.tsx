@@ -54,7 +54,10 @@ function App() {
         const gilReward = !prize && winner === 0 && area
           ? (getAreaById(area.id)?.gilReward ?? 0)
           : 0
-        return { ...afterTrade, unlockedOrder, gil: afterTrade.gil + gilReward }
+        const npcWins = !prize && winner === 0 && area
+          ? { ...afterTrade.npcWins, [area.id]: (afterTrade.npcWins[area.id] ?? 0) + 1 }
+          : afterTrade.npcWins
+        return { ...afterTrade, unlockedOrder, gil: afterTrade.gil + gilReward, npcWins }
       })
     },
     [allCardIds, tournamentPrize, worldChallengeLocation]
@@ -68,6 +71,7 @@ function App() {
   const handleBuyCard = useCallback((cardId: string, price: number) => {
     setWorldState((prev) => {
       if (prev.gil < price) return prev
+      if (prev.collection.includes(cardId)) return prev  // already owned
       return { ...prev, gil: prev.gil - price, collection: [...prev.collection, cardId] }
     })
   }, [])
@@ -165,18 +169,21 @@ function App() {
           <WorldPage
             unlockedOrder={worldState.unlockedOrder}
             gil={worldState.gil}
+            collection={worldState.collection}
+            npcWins={worldState.npcWins}
             onChallenge={handleWorldChallenge}
             onBuyCard={handleBuyCard}
             onEnterTournament={handleEnterTournament}
           />
         )}
-        {tab === 'deck' && <DeckBuilder />}
+        {tab === 'deck' && <DeckBuilder collection={worldState.collection} />}
         {tab === 'duel' && (
           <PlayPage
             worldChallengeLocation={worldChallengeLocation}
             tournamentPrize={tournamentPrize}
             onWorldMatchEnd={handleWorldMatchEnd}
             onLeaveWorldChallenge={handleLeaveWorldChallenge}
+            worldPlayerCollection={worldState.collection}
           />
         )}
       </main>

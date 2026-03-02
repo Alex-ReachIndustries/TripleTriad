@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import type { GameState } from '../game'
 import type { Card } from '../types/card'
 import type { Area } from '../types/world'
@@ -23,6 +23,8 @@ export interface PlayPageProps {
   /** Called when a world challenge or tournament match ends; receives winner (0 = player won). */
   onWorldMatchEnd?: (winner: WorldMatchResult) => void
   onLeaveWorldChallenge?: () => void
+  /** Player's owned card ids. When in world challenge mode, only show these in the deck picker. */
+  worldPlayerCollection?: string[]
 }
 
 function pickRandomDeck(pool: Card[], size: number): Card[] {
@@ -33,7 +35,7 @@ function pickRandomDeck(pool: Card[], size: number): Card[] {
 type Screen = 'home' | 'lobby' | 'game' | 'vs-ai-setup'
 type GameMode = 'online' | 'vs-ai'
 
-export function PlayPage({ worldChallengeLocation = null, tournamentPrize = null, onWorldMatchEnd, onLeaveWorldChallenge }: PlayPageProps = {}) {
+export function PlayPage({ worldChallengeLocation = null, tournamentPrize = null, onWorldMatchEnd, onLeaveWorldChallenge, worldPlayerCollection }: PlayPageProps = {}) {
   const [screen, setScreen] = useState<Screen>(worldChallengeLocation || tournamentPrize ? 'vs-ai-setup' : 'home')
   const [gameMode, setGameMode] = useState<GameMode>('online')
   const [code, setCode] = useState('')
@@ -47,6 +49,14 @@ export function PlayPage({ worldChallengeLocation = null, tournamentPrize = null
   const [ws, setWs] = useState<WebSocket | null>(null)
   const [error, setError] = useState<string | null>(null)
   const aiScheduledRef = useRef(false)
+
+  // In world/tournament mode, only show owned cards in the vs-ai deck picker
+  const displayCards = useMemo(() => {
+    if ((worldChallengeLocation || tournamentPrize) && worldPlayerCollection && worldPlayerCollection.length > 0) {
+      return allCards.filter((c) => worldPlayerCollection.includes(c.id))
+    }
+    return allCards
+  }, [worldChallengeLocation, tournamentPrize, worldPlayerCollection])
 
   useEffect(() => {
     if (worldChallengeLocation || tournamentPrize) {
@@ -267,7 +277,7 @@ export function PlayPage({ worldChallengeLocation = null, tournamentPrize = null
           ))}
         </div>
         <div className="card-grid" style={{ marginTop: 8 }}>
-          {allCards.map((card) => (
+          {displayCards.map((card) => (
             <CardView
               key={card.id}
               card={card}

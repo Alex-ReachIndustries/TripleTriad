@@ -6,9 +6,17 @@ import cardsData from '../data/cards.json'
 const DECK_SIZE = 5
 const allCards: Card[] = cardsData.cards as Card[]
 
-export function DeckBuilder() {
+interface DeckBuilderProps {
+  /** Card ids owned by the player. If provided, only these cards are shown. */
+  collection?: string[]
+}
+
+export function DeckBuilder({ collection: collectionIds }: DeckBuilderProps = {}) {
   const [deck, setDeck] = useState<Card[]>([])
-  const collection = useMemo(() => allCards, [])
+  const collection = useMemo(() => {
+    if (!collectionIds || collectionIds.length === 0) return allCards
+    return allCards.filter((c) => collectionIds.includes(c.id))
+  }, [collectionIds])
 
   const toggleInDeck = (card: Card) => {
     setDeck((prev) => {
