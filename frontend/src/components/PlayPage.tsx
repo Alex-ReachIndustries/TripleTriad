@@ -265,6 +265,9 @@ export function PlayPage({ worldChallengeLocation = null, tournamentPrize = null
           </select>
         </p>
         <p>Choose 5 cards, then click Start game.</p>
+        {(worldChallengeLocation || tournamentPrize) && (
+          <p className="lobby-deck-label">Your deck ({deck.length}/{DECK_SIZE}):</p>
+        )}
         <div className="lobby-deck">
           {Array.from({ length: DECK_SIZE }, (_, i) => (
             <div key={i} className="deck-slot">

@@ -22,8 +22,11 @@ interface WorldPageProps {
 
 export function WorldPage({ unlockedOrder, gil, collection, npcWins, onChallenge, onBuyCard, onEnterTournament }: WorldPageProps) {
   const areas = getAreas()
+  const totalAreas = areas.length
   const [selected, setSelected] = useState<Area | null>(null)
   const [hoveredAreaId, setHoveredAreaId] = useState<string | null>(null)
+
+  const progressPct = Math.round(((unlockedOrder + 1) / totalAreas) * 100)
 
   return (
     <div className="world-page">
@@ -31,7 +34,16 @@ export function WorldPage({ unlockedOrder, gil, collection, npcWins, onChallenge
         <h1>World Map</h1>
         <p className="world-gil" aria-live="polite">Gil: <strong>{gil}</strong></p>
       </div>
-      <p className="world-intro">Click a marker on the map to view an area. Win matches to unlock new areas. Each area has NPCs: card duels, shops, and tournaments.</p>
+
+      {/* Progress indicator */}
+      <div className="world-progress" aria-label={`Progress: ${unlockedOrder + 1} of ${totalAreas} areas unlocked`}>
+        <span className="world-progress-label">Areas: {unlockedOrder + 1} / {totalAreas}</span>
+        <div className="world-progress-track" role="progressbar" aria-valuenow={progressPct} aria-valuemin={0} aria-valuemax={100} aria-label="World progression">
+          <div className="world-progress-fill" style={{ width: `${progressPct}%` }} />
+        </div>
+      </div>
+
+      <p className="world-intro">Click a marker on the map to view an area. Win matches to unlock new areas.</p>
       <section className="world-map-section" aria-label="World map">
         <div className="world-map-container">
           <img
@@ -41,6 +53,7 @@ export function WorldPage({ unlockedOrder, gil, collection, npcWins, onChallenge
           />
           {areas.map((area) => {
             const unlocked = area.order <= unlockedOrder
+            const isNewest = unlocked && area.order === unlockedOrder && unlockedOrder > 0
             const region = getRegionById(area.regionId)
             const spots = getSpots(area.id)
             const hasShop = spots.some((s) => s.type === 'shop')
@@ -56,7 +69,7 @@ export function WorldPage({ unlockedOrder, gil, collection, npcWins, onChallenge
               >
                 <button
                   type="button"
-                  className={`world-map-marker ${selected?.id === area.id ? 'selected' : ''} ${unlocked ? '' : 'locked'}`}
+                  className={`world-map-marker ${selected?.id === area.id ? 'selected' : ''} ${unlocked ? '' : 'locked'} ${isNewest ? 'is-new' : ''}`}
                   onClick={() => unlocked && setSelected(area)}
                   disabled={!unlocked}
                   aria-pressed={selected?.id === area.id}
@@ -66,7 +79,9 @@ export function WorldPage({ unlockedOrder, gil, collection, npcWins, onChallenge
                   onBlur={() => setHoveredAreaId(null)}
                 >
                   <span className="world-map-marker-dot" aria-hidden />
-                  <span className="world-map-marker-label">{unlocked ? area.name : '???'}</span>
+                  <span className="world-map-marker-label">
+                    {unlocked ? area.name : <>🔒 ???</>}
+                  </span>
                 </button>
                 {showTooltip && (
                   <div
@@ -97,13 +112,15 @@ export function WorldPage({ unlockedOrder, gil, collection, npcWins, onChallenge
             if (!region) return null
             return (
               <>
-                <p><strong>Region:</strong> {region.name}</p>
-                <p><strong>Rules:</strong> {formatRules(region.rules)}</p>
-                <p><strong>Trade:</strong> {region.tradeRule}</p>
+                <div className="detail-region-info">
+                  <span><strong>Region:</strong> {region.name}</span>
+                  <span><strong>Rules:</strong> {formatRules(region.rules)}</span>
+                  <span><strong>Trade:</strong> {region.tradeRule}</span>
+                </div>
 
                 {characters.length > 0 && (
-                  <div className="location-characters" aria-label="Characters at this area">
-                    <h3 className="location-characters-heading">Here you meet</h3>
+                  <div className="detail-section" aria-label="Characters at this area">
+                    <h3 className="detail-section-heading">👥 Characters</h3>
                     <ul className="character-dialogue-list">
                       {characters.map((ch) => (
                         <li key={ch.id} className="character-dialogue">
@@ -129,18 +146,20 @@ export function WorldPage({ unlockedOrder, gil, collection, npcWins, onChallenge
                     const tournament = getTournamentAtLocation(spot.id)
                     if (!tournament) return null
                     return (
-                      <div key={spot.id} className="world-tournament location-detail-tournament" aria-label="Tournament">
-                        <h3 className="location-characters-heading">Tournament</h3>
-                        <p>Entry: {tournament.entryFee} gil. Win one match to win a prize card.</p>
-                        <button
-                          type="button"
-                          className="challenge-button tournament-entry"
-                          onClick={() => onEnterTournament(spot)}
-                          disabled={gil < tournament.entryFee}
-                          aria-label={`Enter tournament for ${tournament.entryFee} gil. ${gil < tournament.entryFee ? 'Not enough gil.' : ''}`}
-                        >
-                          Enter tournament ({tournament.entryFee} gil)
-                        </button>
+                      <div key={spot.id} className="detail-section" aria-label="Tournament">
+                        <h3 className="detail-section-heading">🏆 Tournament</h3>
+                        <div className="world-tournament">
+                          <p>Entry: {tournament.entryFee} gil. Win one match to win a prize card.</p>
+                          <button
+                            type="button"
+                            className="challenge-button tournament-entry"
+                            onClick={() => onEnterTournament(spot)}
+                            disabled={gil < tournament.entryFee}
+                            aria-label={`Enter tournament for ${tournament.entryFee} gil. ${gil < tournament.entryFee ? 'Not enough gil.' : ''}`}
+                          >
+                            Enter tournament ({tournament.entryFee} gil)
+                          </button>
+                        </div>
                       </div>
                     )
                   }
@@ -148,8 +167,8 @@ export function WorldPage({ unlockedOrder, gil, collection, npcWins, onChallenge
                     const shop = getShopAtLocation(spot.id)
                     if (!shop || shop.items.length === 0) return null
                     return (
-                      <div key={spot.id} className="location-shop" aria-label="Shop">
-                        <h3 className="location-characters-heading">Shop</h3>
+                      <div key={spot.id} className="detail-section" aria-label="Shop">
+                        <h3 className="detail-section-heading">🛒 Shop</h3>
                         <ul className="shop-list">
                           {shop.items.map((item) => {
                             const owned = collection.includes(item.cardId)
@@ -180,30 +199,33 @@ export function WorldPage({ unlockedOrder, gil, collection, npcWins, onChallenge
                   if (spot.type === 'duel') {
                     const wins = npcWins[selected.id] ?? 0
                     return (
-                      <div key={spot.id} className="location-opponent-block">
-                        <div className="location-opponent">
-                          {spot.opponentImagePath && (
-                            <img
-                              src={spot.opponentImagePath}
-                              alt=""
-                              className="opponent-portrait"
-                              onError={(e) => { e.currentTarget.style.display = 'none' }}
-                            />
-                          )}
-                          <p>Opponent: {spot.opponentName ?? 'Local player'}</p>
-                          {wins > 0 && (
-                            <span className="npc-win-badge" aria-label={`Won ${wins} time${wins !== 1 ? 's' : ''}`}>
-                              W: {wins}
-                            </span>
-                          )}
+                      <div key={spot.id} className="detail-section">
+                        <h3 className="detail-section-heading">⚔ Challenge</h3>
+                        <div className="location-opponent-block">
+                          <div className="location-opponent">
+                            {spot.opponentImagePath && (
+                              <img
+                                src={spot.opponentImagePath}
+                                alt=""
+                                className="opponent-portrait"
+                                onError={(e) => { e.currentTarget.style.display = 'none' }}
+                              />
+                            )}
+                            <p>Opponent: {spot.opponentName ?? 'Local player'}</p>
+                            {wins > 0 && (
+                              <span className="npc-win-badge" aria-label={`Won ${wins} time${wins !== 1 ? 's' : ''}`}>
+                                W: {wins}
+                              </span>
+                            )}
+                          </div>
+                          <button
+                            type="button"
+                            className="challenge-button"
+                            onClick={() => onChallenge(selected)}
+                          >
+                            {wins > 0 ? 'Rematch' : 'Challenge'}
+                          </button>
                         </div>
-                        <button
-                          type="button"
-                          className="challenge-button"
-                          onClick={() => onChallenge(selected)}
-                        >
-                          {wins > 0 ? 'Rematch' : 'Challenge'}
-                        </button>
                       </div>
                     )
                   }

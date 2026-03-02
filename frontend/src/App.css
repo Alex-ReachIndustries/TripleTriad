@@ -745,6 +745,35 @@
 .world-header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 1rem; margin-bottom: 0.5rem; }
 .world-gil { margin: 0; font-size: 1.1rem; color: var(--accent-dim); }
 .world-gil strong { color: var(--accent); }
+
+/* Progress bar */
+.world-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+.world-progress-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.world-progress-track {
+  flex: 1;
+  max-width: 280px;
+  height: 6px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.world-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+  transition: width 600ms ease;
+}
 .world-tournament { margin-bottom: 1.5rem; padding: 1rem; background: var(--surface-alt); border-radius: 10px; border: 1px solid var(--border); }
 .location-detail .world-tournament { margin-bottom: 1rem; }
 .world-tournament p { margin: 0.25rem 0; color: var(--text); }
@@ -814,8 +843,9 @@
 }
 .world-map-marker.locked {
   cursor: not-allowed;
-  opacity: 0.7;
+  opacity: 0.55;
   color: var(--text-muted);
+  filter: grayscale(0.9);
 }
 .world-map-marker:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
 .world-map-marker-tooltip {
@@ -901,3 +931,72 @@
 .world-challenge-note { color: var(--accent-dim); font-size: 0.9rem; margin-bottom: 0.75rem; }
 .world-challenge-note p { margin: 0.2rem 0; }
 .world-region-rules { font-size: 0.85rem; color: var(--text-muted); }
+
+/* Newest-area pulse animation */
+@keyframes marker-pulse {
+  0%   { transform: scale(1);    box-shadow: none; }
+  50%  { transform: scale(1.08); box-shadow: 0 0 0 4px var(--accent); }
+  100% { transform: scale(1);    box-shadow: none; }
+}
+.world-map-marker.is-new {
+  animation: marker-pulse 2s ease-in-out 3;
+  border-color: var(--accent);
+}
+
+/* Area panel section layout */
+.detail-section {
+  margin-bottom: 1rem;
+}
+.detail-section-heading {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin: 0 0 0.5rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.25rem;
+}
+.detail-region-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+.detail-region-info strong { color: var(--text); }
+
+/* NPC / shop badges */
+.npc-win-badge {
+  font-size: 0.75rem;
+  padding: 0.1rem 0.45rem;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--accent-dim);
+  white-space: nowrap;
+}
+.shop-owned-badge {
+  font-size: 0.75rem;
+  padding: 0.1rem 0.4rem;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text-muted);
+}
+
+/* Lobby deck label (challenge setup) */
+.lobby-deck-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin: 0 0 0.35rem;
+}
+
+/* Accessibility: disable pulse for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .world-map-marker.is-new {
+    animation: none;
+  }
+}
