@@ -294,19 +294,69 @@
 
 .game-board-wrap {
   position: relative;
-  display: inline-block;
-  max-width: 320px;
+  max-width: 480px;
   width: 100%;
 }
 
-.game-status {
-  margin-bottom: 0.75rem;
-  font-weight: 600;
+/* Score bar */
+.score-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  max-width: 480px;
 }
-.game-status p { margin: 0; }
-.game-status p.won { color: var(--success); }
-.game-status p.lost { color: var(--error); }
-.game-status p:not(.won):not(.lost) { color: var(--text-muted); }
+.score-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+.score-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.score-value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  font-family: var(--font);
+  line-height: 1;
+}
+.score-block-player .score-value  { color: var(--player-0); }
+.score-block-opponent .score-value { color: var(--player-1); }
+.score-center {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: var(--font);
+  text-align: center;
+}
+.score-turn-text { font-weight: 600; }
+
+/* Active rules bar */
+.rules-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 0.5rem;
+  max-width: 480px;
+}
+.rule-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: rgba(201, 162, 39, 0.12);
+  border: 1px solid rgba(201, 162, 39, 0.35);
+  border-radius: 4px;
+  padding: 2px 7px;
+  font-family: var(--font);
+}
 
 .game-board {
   background: var(--surface);
@@ -321,6 +371,7 @@
   background: var(--surface-alt);
   transition: background-color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
   overflow: hidden;
+  min-height: 120px;
 }
 .board-cell.has-card {
   background: var(--surface);
@@ -362,9 +413,19 @@
 }
 
 .board-cell-empty { opacity: 0.5; font-size: 1.5rem; color: var(--text-muted); }
-.game-hand { margin-top: 1rem; border-radius: 8px; padding: 0.4rem; }
+.game-hand { margin-top: 1rem; border-radius: 8px; padding: 0.4rem; max-width: 480px; }
 .game-hand h3 { font-family: var(--font); margin-bottom: 0.5rem; color: var(--text); }
 .game-hand .hint { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; }
+.hand-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  width: 100%;
+}
+.hand-card-btn {
+  min-height: 44px;
+  min-width: 0;
+}
 
 /* ── Placement animation ── */
 @keyframes card-place {
@@ -462,9 +523,10 @@
   .app { padding: 0.5rem; }
   .game-board-container { max-width: 100%; }
   .game-board { max-width: 100% !important; }
-  .game-hand > div { justify-content: center; }
+  .game-board-wrap { max-width: 100%; }
   .card-view { min-width: 0; }
-  .board-cell { min-height: 72px !important; }
+  .board-cell { min-height: 80px !important; }
+  .score-bar, .rules-bar, .game-hand { max-width: 100%; }
   .world-page { padding: 0 0 1.5rem; }
   .world-map-container { max-width: 100%; }
   .world-header { gap: 0.5rem; }

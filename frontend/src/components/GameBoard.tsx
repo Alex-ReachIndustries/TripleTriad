@@ -19,6 +19,12 @@ export function GameBoard({ state, myPlayer, onPlace, onPlayAgain, onReturnToWor
 
   const isMyTurn = state.phase === 'playing' && state.turn === myPlayer
   const hand = state.hands[myPlayer]
+  const opponentId: PlayerId = myPlayer === 0 ? 1 : 0
+
+  // Score: hand cards + board cards owned by each player
+  const boardCells = state.board.flat()
+  const myScore = hand.length + boardCells.filter((c) => c?.owner === myPlayer).length
+  const opponentScore = state.hands[opponentId].length + boardCells.filter((c) => c?.owner === opponentId).length
 
   // Placement animation: detect card going from null → non-null on the board
   useEffect(() => {
@@ -72,11 +78,34 @@ export function GameBoard({ state, myPlayer, onPlace, onPlayAgain, onReturnToWor
 
   return (
     <div className="game-board-container">
-      {state.phase !== 'ended' && (
-        <div className="game-status" role="status" aria-live="polite" aria-atomic="true">
-          <p>{isMyTurn ? 'Your turn' : "Opponent's turn"}</p>
+      {/* Score bar */}
+      <div className="score-bar" aria-label={`Scores: You ${myScore}, Opponent ${opponentScore}`}>
+        <div className="score-block score-block-player">
+          <span className="score-label">You</span>
+          <span className="score-value">{myScore}</span>
+        </div>
+        <div className="score-center">
+          {state.phase !== 'ended' && (
+            <span className="score-turn-text" role="status" aria-live="polite" aria-atomic="true">
+              {isMyTurn ? 'Your turn' : "Opponent's turn"}
+            </span>
+          )}
+        </div>
+        <div className="score-block score-block-opponent">
+          <span className="score-label">Opponent</span>
+          <span className="score-value">{opponentScore}</span>
+        </div>
+      </div>
+
+      {/* Active rules indicator */}
+      {state.activeRules.length > 0 && (
+        <div className="rules-bar" aria-label={`Active rules: ${state.activeRules.join(', ')}`}>
+          {state.activeRules.map((rule) => (
+            <span key={rule} className="rule-badge">{rule}</span>
+          ))}
         </div>
       )}
+
       <div className="game-board-wrap">
         <div
           className="game-board"
@@ -86,7 +115,6 @@ export function GameBoard({ state, myPlayer, onPlace, onPlayAgain, onReturnToWor
             display: 'grid',
             gridTemplateColumns: `repeat(${COLS}, 1fr)`,
             gap: 4,
-            maxWidth: 320,
           }}
         >
           {Array.from({ length: ROWS * COLS }, (_, i) => {
@@ -109,11 +137,7 @@ export function GameBoard({ state, myPlayer, onPlace, onPlayAgain, onReturnToWor
                     handleCellClick(row, col)
                   }
                 }}
-                style={{
-                  minHeight: 80,
-                  borderRadius: 8,
-                  cursor: playable ? 'pointer' : 'default',
-                }}
+                style={{ borderRadius: 8, cursor: playable ? 'pointer' : 'default' }}
               >
                 {cell ? (
                   <CardView card={cell.card} owner={cell.owner} compact showName={false} />
@@ -154,13 +178,14 @@ export function GameBoard({ state, myPlayer, onPlace, onPlayAgain, onReturnToWor
 
       <section className={`game-hand${isMyTurn ? ' is-my-turn' : ''}`} aria-labelledby="hand-heading">
         <h3 id="hand-heading">Your hand</h3>
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <div className="hand-cards-grid">
           {hand.map((card, idx) => (
             <div
               key={`${card.id}-${idx}`}
               role="button"
               tabIndex={isMyTurn ? 0 : -1}
               aria-label={`Card ${idx + 1}: ${card.name}. ${selectedCardIndex === idx ? 'Selected. Click a board cell to place.' : 'Click to select, then click a board cell to place.'}`}
+              className="hand-card-btn"
               onClick={() => isMyTurn && setSelectedCardIndex(idx)}
               onKeyDown={(e) => {
                 if (isMyTurn && (e.key === 'Enter' || e.key === ' ')) {
@@ -168,7 +193,7 @@ export function GameBoard({ state, myPlayer, onPlace, onPlayAgain, onReturnToWor
                   setSelectedCardIndex(idx)
                 }
               }}
-              style={{ cursor: isMyTurn ? 'pointer' : 'default', minHeight: 44, minWidth: 44 }}
+              style={{ cursor: isMyTurn ? 'pointer' : 'default' }}
             >
               <CardView
                 card={card}
