@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react'
 import type { Area, Spot } from './types/world'
-import { loadWorldState, saveWorldState, applyTradeRuleOne } from './data/worldState'
+import { loadWorldState, saveWorldState, applyTradeRuleOne, addToInventory, removeFromInventory, getOwnedCardIds, isStarterCard } from './data/worldState'
 import { getTournamentAtLocation } from './data/shops'
 import { getAreaById } from './data/world'
 import cardsData from './data/cards.json'
@@ -36,13 +36,13 @@ function App() {
   const handleWorldMatchEnd = useCallback(
     (winner: 0 | 1 | 'draw') => {
       const prize = tournamentPrize
-      const area = worldChallengeLocation  // capture before clearing
+      const area = worldChallengeLocation
       setTournamentPrize(null)
       setWorldChallengeLocation(null)
       setWorldState((prev) => {
         let next = prev
         if (prize && winner === 0) {
-          next = { ...next, collection: [...next.collection, prize] }
+          next = { ...next, inventory: addToInventory(next.inventory, prize) }
         }
         const afterTrade = prize
           ? next
@@ -71,8 +71,16 @@ function App() {
   const handleBuyCard = useCallback((cardId: string, price: number) => {
     setWorldState((prev) => {
       if (prev.gil < price) return prev
-      if (prev.collection.includes(cardId)) return prev  // already owned
-      return { ...prev, gil: prev.gil - price, collection: [...prev.collection, cardId] }
+      return { ...prev, gil: prev.gil - price, inventory: addToInventory(prev.inventory, cardId) }
+    })
+  }, [])
+
+  const handleSellCard = useCallback((cardId: string, sellPrice: number) => {
+    setWorldState((prev) => {
+      const count = prev.inventory[cardId] ?? 0
+      const minCount = isStarterCard(cardId) ? 1 : 0
+      if (count <= minCount) return prev // Can't sell
+      return { ...prev, gil: prev.gil + sellPrice, inventory: removeFromInventory(prev.inventory, cardId) }
     })
   }, [])
 
@@ -93,6 +101,9 @@ function App() {
   const handleBackToHome = useCallback(() => {
     setView('home')
   }, [])
+
+  // Derive owned card IDs from inventory for components that need string[]
+  const ownedCardIds = getOwnedCardIds(worldState.inventory)
 
   if (view === 'title') {
     return (
@@ -169,21 +180,22 @@ function App() {
           <WorldPage
             unlockedOrder={worldState.unlockedOrder}
             gil={worldState.gil}
-            collection={worldState.collection}
+            inventory={worldState.inventory}
             npcWins={worldState.npcWins}
             onChallenge={handleWorldChallenge}
             onBuyCard={handleBuyCard}
+            onSellCard={handleSellCard}
             onEnterTournament={handleEnterTournament}
           />
         )}
-        {tab === 'deck' && <DeckBuilder collection={worldState.collection} />}
+        {tab === 'deck' && <DeckBuilder inventory={worldState.inventory} />}
         {tab === 'duel' && (
           <PlayPage
             worldChallengeLocation={worldChallengeLocation}
             tournamentPrize={tournamentPrize}
             onWorldMatchEnd={handleWorldMatchEnd}
             onLeaveWorldChallenge={handleLeaveWorldChallenge}
-            worldPlayerCollection={worldState.collection}
+            worldPlayerInventory={worldState.inventory}
           />
         )}
       </main>

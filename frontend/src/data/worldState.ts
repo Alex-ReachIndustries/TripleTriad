@@ -1,5 +1,5 @@
 /**
- * World mode player state: collection and story progress.
+ * World mode player state: inventory and story progress.
  * Persisted to localStorage so progress survives refresh.
  */
 
@@ -9,29 +9,39 @@ const STORAGE_KEY = 'tripletriad-world'
 export interface WorldPlayerState {
   /** Highest location order unlocked (0 = first location only). */
   unlockedOrder: number
-  /** Card ids in the player's collection. Starter deck is protected from loss. */
-  collection: string[]
+  /** Multi-copy card inventory: cardId → count owned. */
+  inventory: Record<string, number>
   /** Gil (currency) for shops and tournaments. */
   gil: number
   /** Win count per area id. Used to show rematch badges. */
   npcWins: Record<string, number>
 }
 
-/** First 10 card ids – starter deck, protected from being lost in matches. */
+/** 5 starter cards – always protected (count can never drop below 1). */
 export const STARTER_DECK_IDS: string[] = [
   'geezard', 'funguar', 'bite_bug', 'red_bat', 'blobra',
-  'gayla', 'gesper', 'fastitocalon_f', 'blood_soul', 'caterchipillar',
 ]
 
-const DEFAULT_GIL = 1000
+const DEFAULT_GIL = 500
 
 function defaultState(): WorldPlayerState {
+  const inventory: Record<string, number> = {}
+  for (const id of STARTER_DECK_IDS) {
+    inventory[id] = 1
+  }
   return {
     unlockedOrder: 0,
-    collection: [...STARTER_DECK_IDS],
+    inventory,
     gil: DEFAULT_GIL,
     npcWins: {},
   }
+}
+
+/** Get a flat list of card IDs the player owns (count > 0). */
+export function getOwnedCardIds(inventory: Record<string, number>): string[] {
+  return Object.entries(inventory)
+    .filter(([, count]) => count > 0)
+    .map(([id]) => id)
 }
 
 export function loadWorldState(): WorldPlayerState {
@@ -42,9 +52,39 @@ export function loadWorldState(): WorldPlayerState {
     if (typeof parsed !== 'object' || parsed === null) return defaultState()
     const o = parsed as Record<string, unknown>
     const unlockedOrder = typeof o.unlockedOrder === 'number' ? o.unlockedOrder : 0
-    const collection = Array.isArray(o.collection)
-      ? (o.collection as unknown[]).filter((id): id is string => typeof id === 'string')
-      : [...STARTER_DECK_IDS]
+
+    // Parse inventory — support both new Record format and legacy string[] migration
+    let inventory: Record<string, number>
+    if (typeof o.inventory === 'object' && o.inventory !== null && !Array.isArray(o.inventory)) {
+      // New format: Record<string, number>
+      inventory = {}
+      for (const [k, v] of Object.entries(o.inventory as Record<string, unknown>)) {
+        if (typeof v === 'number' && v > 0) {
+          inventory[k] = v
+        }
+      }
+    } else if (Array.isArray(o.collection)) {
+      // Legacy migration: convert string[] collection to inventory
+      inventory = {}
+      for (const item of o.collection as unknown[]) {
+        if (typeof item === 'string') {
+          inventory[item] = (inventory[item] ?? 0) + 1
+        }
+      }
+    } else {
+      inventory = {}
+      for (const id of STARTER_DECK_IDS) {
+        inventory[id] = 1
+      }
+    }
+
+    // Ensure starters always have at least count 1
+    for (const id of STARTER_DECK_IDS) {
+      if (!inventory[id] || inventory[id] < 1) {
+        inventory[id] = 1
+      }
+    }
+
     const gil = typeof o.gil === 'number' && o.gil >= 0 ? o.gil : DEFAULT_GIL
     const npcWins: Record<string, number> = (
       typeof o.npcWins === 'object' && o.npcWins !== null && !Array.isArray(o.npcWins)
@@ -55,7 +95,7 @@ export function loadWorldState(): WorldPlayerState {
           )
         : {}
     )
-    return { unlockedOrder, collection, gil, npcWins }
+    return { unlockedOrder, inventory, gil, npcWins }
   } catch {
     return defaultState()
   }
@@ -73,10 +113,24 @@ export function isStarterCard(cardId: string): boolean {
   return STARTER_DECK_IDS.includes(cardId)
 }
 
+/** Add a card to inventory (increment count). */
+export function addToInventory(inventory: Record<string, number>, cardId: string, count = 1): Record<string, number> {
+  return { ...inventory, [cardId]: (inventory[cardId] ?? 0) + count }
+}
+
+/** Remove a card from inventory (decrement count, respecting starter card protection). */
+export function removeFromInventory(inventory: Record<string, number>, cardId: string, count = 1): Record<string, number> {
+  const current = inventory[cardId] ?? 0
+  const minCount = isStarterCard(cardId) ? 1 : 0
+  const newCount = Math.max(minCount, current - count)
+  if (newCount === current) return inventory // no change
+  return { ...inventory, [cardId]: newCount }
+}
+
 /**
  * Apply trade rule "One": winner gains one card, loser loses one (starter protected).
- * For world vs AI: player is always 0; if player wins they gain a random card from pool;
- * if player loses they lose a random non-starter card from collection.
+ * For world vs AI: player is always 0; if player wins they gain a random card from the
+ * opponent's deck pool; if player loses they lose a random non-starter card.
  */
 export function applyTradeRuleOne(
   state: WorldPlayerState,
@@ -84,13 +138,18 @@ export function applyTradeRuleOne(
   allCardIds: string[]
 ): WorldPlayerState {
   if (playerWon) {
-    const notOwned = allCardIds.filter((id) => !state.collection.includes(id))
-    const add = notOwned.length > 0 ? notOwned[Math.floor(Math.random() * notOwned.length)] : null
-    if (!add) return state
-    return { ...state, collection: [...state.collection, add] }
+    // Winner gains a random card (can be one they already own — multi-copy)
+    if (allCardIds.length === 0) return state
+    const add = allCardIds[Math.floor(Math.random() * allCardIds.length)]
+    return { ...state, inventory: addToInventory(state.inventory, add) }
   }
-  const canLose = state.collection.filter((id) => !isStarterCard(id))
+  // Loser loses a random non-starter card (or one with count > 1 for starters)
+  const canLose = Object.entries(state.inventory).filter(([id, count]) => {
+    if (count <= 0) return false
+    if (isStarterCard(id)) return count > 1 // Can only lose extras of starters
+    return true
+  }).map(([id]) => id)
   if (canLose.length === 0) return state
   const remove = canLose[Math.floor(Math.random() * canLose.length)]
-  return { ...state, collection: state.collection.filter((id) => id !== remove) }
+  return { ...state, inventory: removeFromInventory(state.inventory, remove) }
 }

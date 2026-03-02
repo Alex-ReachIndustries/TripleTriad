@@ -7,6 +7,7 @@ import type { Difficulty } from '../game'
 import { createRoom, joinRoom, getWsUrl } from '../api/client'
 import cardsData from '../data/cards.json'
 import { getRegionById, formatRules, getAreaDeckPool } from '../data/world'
+import { getOwnedCardIds } from '../data/worldState'
 import { GameBoard } from './GameBoard'
 import { CardView } from './CardView'
 
@@ -23,8 +24,8 @@ export interface PlayPageProps {
   /** Called when a world challenge or tournament match ends; receives winner (0 = player won). */
   onWorldMatchEnd?: (winner: WorldMatchResult) => void
   onLeaveWorldChallenge?: () => void
-  /** Player's owned card ids. When in world challenge mode, only show these in the deck picker. */
-  worldPlayerCollection?: string[]
+  /** Player's card inventory. When in world challenge mode, only show owned cards in the deck picker. */
+  worldPlayerInventory?: Record<string, number>
 }
 
 function pickRandomDeck(pool: Card[], size: number): Card[] {
@@ -35,7 +36,7 @@ function pickRandomDeck(pool: Card[], size: number): Card[] {
 type Screen = 'home' | 'lobby' | 'game' | 'vs-ai-setup'
 type GameMode = 'online' | 'vs-ai'
 
-export function PlayPage({ worldChallengeLocation = null, tournamentPrize = null, onWorldMatchEnd, onLeaveWorldChallenge, worldPlayerCollection }: PlayPageProps = {}) {
+export function PlayPage({ worldChallengeLocation = null, tournamentPrize = null, onWorldMatchEnd, onLeaveWorldChallenge, worldPlayerInventory }: PlayPageProps = {}) {
   const [screen, setScreen] = useState<Screen>(worldChallengeLocation || tournamentPrize ? 'vs-ai-setup' : 'home')
   const [gameMode, setGameMode] = useState<GameMode>('online')
   const [code, setCode] = useState('')
@@ -52,11 +53,12 @@ export function PlayPage({ worldChallengeLocation = null, tournamentPrize = null
 
   // In world/tournament mode, only show owned cards in the vs-ai deck picker
   const displayCards = useMemo(() => {
-    if ((worldChallengeLocation || tournamentPrize) && worldPlayerCollection && worldPlayerCollection.length > 0) {
-      return allCards.filter((c) => worldPlayerCollection.includes(c.id))
+    if ((worldChallengeLocation || tournamentPrize) && worldPlayerInventory && Object.keys(worldPlayerInventory).length > 0) {
+      const ownedIds = getOwnedCardIds(worldPlayerInventory)
+      return allCards.filter((c) => ownedIds.includes(c.id))
     }
     return allCards
-  }, [worldChallengeLocation, tournamentPrize, worldPlayerCollection])
+  }, [worldChallengeLocation, tournamentPrize, worldPlayerInventory])
 
   useEffect(() => {
     if (worldChallengeLocation || tournamentPrize) {

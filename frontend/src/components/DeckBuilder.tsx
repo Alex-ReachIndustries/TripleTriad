@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import type { Card } from '../types/card'
+import { getOwnedCardIds } from '../data/worldState'
 import { CardView } from './CardView'
 import cardsData from '../data/cards.json'
 
@@ -7,16 +8,17 @@ const DECK_SIZE = 5
 const allCards: Card[] = cardsData.cards as Card[]
 
 interface DeckBuilderProps {
-  /** Card ids owned by the player. If provided, only these cards are shown. */
-  collection?: string[]
+  /** Card inventory: cardId → count. If provided, only owned cards are shown. */
+  inventory?: Record<string, number>
 }
 
-export function DeckBuilder({ collection: collectionIds }: DeckBuilderProps = {}) {
+export function DeckBuilder({ inventory }: DeckBuilderProps = {}) {
   const [deck, setDeck] = useState<Card[]>([])
   const collection = useMemo(() => {
-    if (!collectionIds || collectionIds.length === 0) return allCards
-    return allCards.filter((c) => collectionIds.includes(c.id))
-  }, [collectionIds])
+    if (!inventory || Object.keys(inventory).length === 0) return allCards
+    const ownedIds = getOwnedCardIds(inventory)
+    return allCards.filter((c) => ownedIds.includes(c.id))
+  }, [inventory])
 
   const toggleInDeck = (card: Card) => {
     setDeck((prev) => {
@@ -55,7 +57,7 @@ export function DeckBuilder({ collection: collectionIds }: DeckBuilderProps = {}
         </div>
       </section>
       <section className="collection">
-        <h2>Collection</h2>
+        <h2>Collection ({collection.length} cards)</h2>
         <div className="card-grid">
           {collection.map((card) => (
             <CardView

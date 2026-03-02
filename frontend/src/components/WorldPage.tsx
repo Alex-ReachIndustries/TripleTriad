@@ -3,6 +3,7 @@ import type { Area, Spot } from '../types/world'
 import { getAreas, getRegionById, getSpots, formatRules } from '../data/world'
 import { getCharactersAtLocation } from '../data/characters'
 import { getShopAtLocation, getTournamentAtLocation } from '../data/shops'
+import { isStarterCard } from '../data/worldState'
 import cardsData from '../data/cards.json'
 
 const cardNameById = (cardsData as { cards: { id: string; name: string }[] }).cards.reduce(
@@ -13,14 +14,15 @@ const cardNameById = (cardsData as { cards: { id: string; name: string }[] }).ca
 interface WorldPageProps {
   unlockedOrder: number
   gil: number
-  collection: string[]
+  inventory: Record<string, number>
   npcWins: Record<string, number>
   onChallenge: (area: Area) => void
   onBuyCard: (cardId: string, price: number) => void
+  onSellCard: (cardId: string, sellPrice: number) => void
   onEnterTournament: (spot: Spot) => void
 }
 
-export function WorldPage({ unlockedOrder, gil, collection, npcWins, onChallenge, onBuyCard, onEnterTournament }: WorldPageProps) {
+export function WorldPage({ unlockedOrder, gil, inventory, npcWins, onChallenge, onBuyCard, onSellCard, onEnterTournament }: WorldPageProps) {
   const areas = getAreas()
   const totalAreas = areas.length
   const [selected, setSelected] = useState<Area | null>(null)
@@ -171,22 +173,33 @@ export function WorldPage({ unlockedOrder, gil, collection, npcWins, onChallenge
                         <h3 className="detail-section-heading">🛒 Shop</h3>
                         <ul className="shop-list">
                           {shop.items.map((item) => {
-                            const owned = collection.includes(item.cardId)
+                            const ownedCount = inventory[item.cardId] ?? 0
+                            const sellPrice = Math.floor(item.price / 2)
+                            const canSell = isStarterCard(item.cardId) ? ownedCount > 1 : ownedCount > 0
                             return (
                               <li key={item.cardId} className="shop-item">
-                                <span>{cardNameById[item.cardId] ?? item.cardId}</span>
-                                <span>{item.price} gil</span>
-                                {owned ? (
-                                  <span className="shop-owned-badge">Owned</span>
-                                ) : (
+                                <span className="shop-item-name">{cardNameById[item.cardId] ?? item.cardId}</span>
+                                <span className="shop-item-price">{item.price} gil</span>
+                                {ownedCount > 0 && (
+                                  <span className="shop-owned-badge">x{ownedCount}</span>
+                                )}
+                                <button
+                                  type="button"
+                                  className="shop-buy-button"
+                                  onClick={() => onBuyCard(item.cardId, item.price)}
+                                  disabled={gil < item.price}
+                                  aria-label={`Buy ${cardNameById[item.cardId] ?? item.cardId} for ${item.price} gil`}
+                                >
+                                  Buy
+                                </button>
+                                {canSell && (
                                   <button
                                     type="button"
-                                    className="shop-buy-button"
-                                    onClick={() => onBuyCard(item.cardId, item.price)}
-                                    disabled={gil < item.price}
-                                    aria-label={`Buy ${cardNameById[item.cardId] ?? item.cardId} for ${item.price} gil`}
+                                    className="shop-sell-button"
+                                    onClick={() => onSellCard(item.cardId, sellPrice)}
+                                    aria-label={`Sell ${cardNameById[item.cardId] ?? item.cardId} for ${sellPrice} gil`}
                                   >
-                                    Buy
+                                    Sell ({sellPrice}g)
                                   </button>
                                 )}
                               </li>
