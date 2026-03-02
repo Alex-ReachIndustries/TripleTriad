@@ -289,6 +289,14 @@
 
 .game-board-container {
   margin-top: 1rem;
+  position: relative;
+}
+
+.game-board-wrap {
+  position: relative;
+  display: inline-block;
+  max-width: 320px;
+  width: 100%;
 }
 
 .game-status {
@@ -334,12 +342,14 @@
   border: none;
   border-radius: 0;
   box-shadow: none;
-  transform: none !important;
+  transform: none;
   cursor: default;
   width: 100%;
   height: 100%;
   min-height: 0;
 }
+/* Prevent hover lift on board cards (animations override this via @keyframes) */
+.board-cell > .card-view:hover { transform: none; }
 .board-cell > .card-view .card-face {
   height: 100%;
 }
@@ -352,9 +362,101 @@
 }
 
 .board-cell-empty { opacity: 0.5; font-size: 1.5rem; color: var(--text-muted); }
-.game-hand { margin-top: 1rem; }
+.game-hand { margin-top: 1rem; border-radius: 8px; padding: 0.4rem; }
 .game-hand h3 { font-family: var(--font); margin-bottom: 0.5rem; color: var(--text); }
 .game-hand .hint { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; }
+
+/* ── Placement animation ── */
+@keyframes card-place {
+  0%   { transform: scale(0.45); opacity: 0; }
+  65%  { transform: scale(1.07); opacity: 1; }
+  100% { transform: scale(1);    opacity: 1; }
+}
+.board-cell.is-placing > .card-view {
+  animation: card-place 240ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* ── Capture flip animation ── */
+@keyframes card-flip {
+  0%   { transform: rotateY(0deg); }
+  45%  { transform: rotateY(90deg); }
+  55%  { transform: rotateY(90deg); }
+  100% { transform: rotateY(0deg); }
+}
+.board-cell.is-captured {
+  perspective: 600px;
+  /* Prevent transition from fighting the animation */
+  transition: none;
+}
+.board-cell.is-captured > .card-view {
+  animation: card-flip 440ms ease-in-out forwards;
+}
+
+/* ── Turn indicator pulse on hand ── */
+@keyframes hand-pulse {
+  0%   { box-shadow: 0 0 0 0   rgba(201, 162, 39, 0); }
+  50%  { box-shadow: 0 0 0 6px rgba(201, 162, 39, 0.3); }
+  100% { box-shadow: 0 0 0 0   rgba(201, 162, 39, 0); }
+}
+.game-hand.is-my-turn {
+  animation: hand-pulse 1.5s ease-in-out infinite;
+}
+
+/* ── Win / draw overlay ── */
+@keyframes game-over-fade {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.game-over-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 20, 25, 0.88);
+  border-radius: 12px;
+  z-index: 20;
+  animation: game-over-fade 350ms ease forwards;
+}
+.game-over-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  text-align: center;
+  padding: 1.5rem;
+}
+.game-over-result {
+  font-family: var(--font);
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 0;
+}
+.game-over-result.won  { color: var(--success); }
+.game-over-result.lost { color: var(--error); }
+.game-over-result.draw { color: var(--accent); }
+.game-over-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.game-over-btn {
+  padding: 0.6rem 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 8px;
+  font-family: var(--font);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+.game-over-btn:hover { border-color: var(--accent-dim); background: var(--surface-alt); }
+.game-over-btn.primary { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+.game-over-btn.primary:hover { opacity: 0.9; }
+.game-over-btn:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
 
 @media (max-width: 480px) {
   .app { padding: 0.5rem; }

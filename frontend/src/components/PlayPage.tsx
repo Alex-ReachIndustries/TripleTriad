@@ -338,6 +338,16 @@ export function PlayPage({ worldChallengeLocation = null, tournamentPrize = null
   }
 
   if (screen === 'game' && gameMode === 'vs-ai' && localGameState) {
+    const handlePlayAgain = () => {
+      setLocalGameState(null)
+      setScreen('vs-ai-setup')
+    }
+    const handleReturnToWorld = () => {
+      setScreen('home')
+      setGameMode('online')
+      setLocalGameState(null)
+      onLeaveWorldChallenge?.()
+    }
     return (
       <div className="play-page game">
         {(worldChallengeLocation || tournamentPrize) && (
@@ -355,7 +365,13 @@ export function PlayPage({ worldChallengeLocation = null, tournamentPrize = null
         <button type="button" className="back" onClick={() => { setScreen('home'); setGameMode('online'); setLocalGameState(null); onLeaveWorldChallenge?.() }}>
           ← Back to menu
         </button>
-        <GameBoard state={localGameState} myPlayer={0} onPlace={handleLocalPlace} />
+        <GameBoard
+          state={localGameState}
+          myPlayer={0}
+          onPlace={handleLocalPlace}
+          onPlayAgain={handlePlayAgain}
+          onReturnToWorld={handleReturnToWorld}
+        />
       </div>
     )
   }
