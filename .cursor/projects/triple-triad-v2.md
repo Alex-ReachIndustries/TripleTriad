@@ -153,7 +153,7 @@ Todos:
 ---
 
 ### Phase 5: Performance & Code Quality
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 Goal: Ensure the codebase is clean, performant, and maintainable before shipping.
 
@@ -165,8 +165,8 @@ Tasks:
 - **Mobile responsive test** — Test layout at 320px, 375px, 414px, 768px breakpoints
 
 Todos:
-- [ ] `todo-perf-ai.md` — Alpha-beta pruning for hard AI + dynamic depth cap
-- [ ] `todo-perf-cleanup.md` — Engine sync, type audit, bundle check, responsive testing
+- [x] `todo-perf-ai.md` — Alpha-beta pruning for hard AI + dynamic depth cap
+- [x] `todo-perf-cleanup.md` — Engine sync, type audit, bundle check, responsive testing
 
 ---
 
