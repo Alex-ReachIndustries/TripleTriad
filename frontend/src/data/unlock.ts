@@ -49,6 +49,8 @@ export function isUnlockConditionMet(
       return getUniqueNpcWinsInRegion(state.npcWins, condition.targetId!) >= (condition.count ?? 1)
     case 'quest_count':
       return state.completedQuests.length >= (condition.count ?? 1)
+    case 'story_chapter':
+      return state.storyChapter >= (condition.count ?? 0)
     default:
       return false
   }

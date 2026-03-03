@@ -1,6 +1,7 @@
 /**
- * V3 World mode types: 7 regions → locations → NPCs.
+ * V3 World mode types: 6 regions → locations → NPCs.
  * Towns have free-roam NPC grids; dungeons have sequential floor gauntlets.
+ * Story chapter system controls progression and NPC visibility.
  */
 
 export type SpecialRule =
@@ -39,10 +40,10 @@ export interface Region {
 
 export interface UnlockCondition {
   /** Type of condition. */
-  type: 'default' | 'beat_npc' | 'clear_dungeon' | 'unique_wins_in_location' | 'unique_wins_in_region' | 'quest_count'
+  type: 'default' | 'beat_npc' | 'clear_dungeon' | 'unique_wins_in_location' | 'unique_wins_in_region' | 'quest_count' | 'story_chapter'
   /** For beat_npc: NPC id. For clear_dungeon: location id. For unique_wins: location/region id. */
   targetId?: string
-  /** For unique_wins: how many unique NPC wins needed. For quest_count: how many quests. */
+  /** For unique_wins: how many unique NPC wins needed. For quest_count: how many quests. For story_chapter: chapter number required. */
   count?: number
 }
 
@@ -62,6 +63,8 @@ export interface Location {
   unlockCondition: UnlockCondition | null
   /** Dungeon flavour text (dungeon type only). */
   flavour?: string
+  /** For TD (Town-Dungeon) locations: the parent town location ID this dungeon is accessed from. */
+  parentTownId?: string
 }
 
 export interface NpcDialogue {
@@ -112,6 +115,10 @@ export interface NPC {
   isBoss?: boolean
   /** Quest ID this NPC offers (for dialogue NPCs with quests). */
   questId?: string
+  /** Story chapter minimum — NPC only visible when storyChapter >= this value. */
+  minChapter?: number
+  /** Story chapter maximum — NPC only visible when storyChapter <= this value. */
+  maxChapter?: number
 }
 
 // ─── Legacy type aliases (backward compat until UI migration) ───

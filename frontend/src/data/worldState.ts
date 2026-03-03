@@ -31,6 +31,12 @@ export interface WorldPlayerState {
   completedQuests: string[]
   /** Set of dungeon location IDs the player has cleared (beat the boss). */
   clearedDungeons: string[]
+  /** Current story chapter (0 = new game, advances with main quest completion). */
+  storyChapter: number
+  /** Completed main quest IDs in order (for quest log / story recap). */
+  mainQuestLog: string[]
+  /** Per-location NPC interaction tracking for notification markers: locationId → npcId[]. */
+  seenContent: Record<string, string[]>
 }
 
 /** 5 starter cards – always protected (count can never drop below 1). */
@@ -56,6 +62,9 @@ function defaultState(): WorldPlayerState {
     activeQuests: [],
     completedQuests: [],
     clearedDungeons: [],
+    storyChapter: 0,
+    mainQuestLog: [],
+    seenContent: {},
   }
 }
 
@@ -141,7 +150,21 @@ export function loadWorldState(): WorldPlayerState {
       }
     }
 
-    return { unlockedOrder, inventory, discoveredCards, gil, npcWins, savedDecks, lastDeckId, activeQuests, completedQuests, clearedDungeons }
+    // Parse new campaign fields with graceful defaults for legacy saves
+    const storyChapter = typeof o.storyChapter === 'number' ? o.storyChapter : 0
+    const mainQuestLog = Array.isArray(o.mainQuestLog)
+      ? (o.mainQuestLog as unknown[]).filter((v): v is string => typeof v === 'string')
+      : []
+    const seenContent: Record<string, string[]> = {}
+    if (typeof o.seenContent === 'object' && o.seenContent !== null && !Array.isArray(o.seenContent)) {
+      for (const [locId, npcs] of Object.entries(o.seenContent as Record<string, unknown>)) {
+        if (Array.isArray(npcs)) {
+          seenContent[locId] = (npcs as unknown[]).filter((v): v is string => typeof v === 'string')
+        }
+      }
+    }
+
+    return { unlockedOrder, inventory, discoveredCards, gil, npcWins, savedDecks, lastDeckId, activeQuests, completedQuests, clearedDungeons, storyChapter, mainQuestLog, seenContent }
   } catch {
     return defaultState()
   }
@@ -177,6 +200,30 @@ export function removeFromInventory(inventory: Record<string, number>, cardId: s
   const newCount = Math.max(minCount, current - count)
   if (newCount === current) return inventory // no change
   return { ...inventory, [cardId]: newCount }
+}
+
+// ─── Story chapter helpers ───
+
+/** Mark an NPC as seen at a location (for notification tracking). */
+export function markNpcSeen(state: WorldPlayerState, locationId: string, npcId: string): WorldPlayerState {
+  const existing = state.seenContent[locationId] ?? []
+  if (existing.includes(npcId)) return state
+  return {
+    ...state,
+    seenContent: {
+      ...state.seenContent,
+      [locationId]: [...existing, npcId],
+    },
+  }
+}
+
+/** Advance the story chapter and log the completed main quest. */
+export function advanceStoryChapter(state: WorldPlayerState, mainQuestId: string): WorldPlayerState {
+  return {
+    ...state,
+    storyChapter: state.storyChapter + 1,
+    mainQuestLog: [...state.mainQuestLog, mainQuestId],
+  }
 }
 
 // ─── Quest helpers ───

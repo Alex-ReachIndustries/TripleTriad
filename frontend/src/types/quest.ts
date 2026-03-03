@@ -24,6 +24,12 @@ export interface Quest {
   /** Card ID (find_card), NPC ID (beat_npc), or dungeon location ID (clear_dungeon). */
   targetId: string
   reward: QuestReward
+  /** True if this is a main storyline quest that advances storyChapter on completion. */
+  isMainQuest?: boolean
+  /** Narrative text shown in the quest log after completion (story recap). */
+  storyText?: string
+  /** Chapter title, e.g. "Chapter 1: The SeeD Exam". */
+  chapterTitle?: string
 }
 
 export type QuestStatus = 'available' | 'active' | 'completed'

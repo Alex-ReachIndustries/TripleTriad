@@ -1823,28 +1823,96 @@ export const NPCS: NPC[] = [
   },
 ]
 
+// ─── Map Override Persistence ────────────────────────────────────────────────
+
+const MAP_OVERRIDES_KEY = 'tripletriad-map-overrides'
+
+export interface MapOverrides {
+  regions?: Record<string, string>           // regionId → mapBounds
+  locations?: Record<string, { mapX: number; mapY: number }>  // locationId → { mapX, mapY }
+}
+
+export function loadMapOverrides(): MapOverrides | null {
+  try {
+    const raw = localStorage.getItem(MAP_OVERRIDES_KEY)
+    if (!raw) return null
+    return JSON.parse(raw) as MapOverrides
+  } catch {
+    return null
+  }
+}
+
+export function saveMapOverrides(overrides: MapOverrides): void {
+  try {
+    localStorage.setItem(MAP_OVERRIDES_KEY, JSON.stringify(overrides))
+  } catch {
+    // ignore quota errors
+  }
+}
+
+export function clearMapOverrides(): void {
+  try {
+    localStorage.removeItem(MAP_OVERRIDES_KEY)
+  } catch {
+    // ignore
+  }
+}
+
+function applyRegionOverrides(regions: Region[]): Region[] {
+  const overrides = loadMapOverrides()
+  if (!overrides?.regions) return regions
+  return regions.map(r => {
+    const bounds = overrides.regions![r.id]
+    return bounds ? { ...r, mapBounds: bounds } : r
+  })
+}
+
+function applyLocationOverrides(locations: Location[]): Location[] {
+  const overrides = loadMapOverrides()
+  if (!overrides?.locations) return locations
+  return locations.map(l => {
+    const pos = overrides.locations![l.id]
+    return pos ? { ...l, mapX: pos.mapX, mapY: pos.mapY } : l
+  })
+}
+
 // ─── V3 Accessor Functions ──────────────────────────────────────────────────
 
 export function getRegions(): Region[] {
-  return REGIONS
+  return applyRegionOverrides(REGIONS)
 }
 
 export function getRegionById(id: string): Region | undefined {
-  return REGIONS.find((r) => r.id === id)
+  return getRegions().find((r) => r.id === id)
 }
 
 export function getLocations(): Location[] {
-  return LOCATIONS
+  return applyLocationOverrides(LOCATIONS)
 }
 
 export function getLocationById(id: string): Location | undefined {
-  return LOCATIONS.find((l) => l.id === id)
+  return getLocations().find((l) => l.id === id)
 }
 
 export function getLocationsByRegion(regionId: string): Location[] {
-  return LOCATIONS.filter((l) => l.regionId === regionId).sort(
+  return getLocations().filter((l) => l.regionId === regionId).sort(
     (a, b) => a.order - b.order
   )
+}
+
+/** Get TD (Town-Dungeon) locations whose parent is a given town. */
+export function getLocationsByParentTown(townId: string): Location[] {
+  return getLocations().filter((l) => l.parentTownId === townId)
+}
+
+/** Get NPCs visible at the current story chapter. Filters by minChapter/maxChapter. */
+export function getVisibleNpcs(locationId: string, storyChapter: number): NPC[] {
+  return NPCS.filter((n) => {
+    if (n.locationId !== locationId) return false
+    if (n.minChapter !== undefined && storyChapter < n.minChapter) return false
+    if (n.maxChapter !== undefined && storyChapter > n.maxChapter) return false
+    return true
+  })
 }
 
 export function getNpcs(): NPC[] {

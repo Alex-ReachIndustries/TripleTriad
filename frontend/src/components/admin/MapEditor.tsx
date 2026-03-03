@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useMemo } from 'react'
-import { REGIONS, LOCATIONS } from '../../data/world'
+import { REGIONS, LOCATIONS, loadMapOverrides, saveMapOverrides, clearMapOverrides } from '../../data/world'
+import type { MapOverrides } from '../../data/world'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -134,25 +135,36 @@ const REGION_STROKE: Record<string, string> = {
 export function MapEditor() {
   const svgRef = useRef<SVGSVGElement>(null)
 
-  // Editable polygon data
-  const [polygons, setPolygons] = useState<RegionPolygon[]>(() =>
-    REGIONS.map(r => ({ regionId: r.id, points: parseMapBounds(r.mapBounds) }))
-  )
+  // Editable polygon data (loads overrides from localStorage if available)
+  const [polygons, setPolygons] = useState<RegionPolygon[]>(() => {
+    const overrides = loadMapOverrides()
+    return REGIONS.map(r => {
+      const bounds = overrides?.regions?.[r.id] ?? r.mapBounds
+      return { regionId: r.id, points: parseMapBounds(bounds) }
+    })
+  })
 
   // Editable location positions (stored as absolute SVG coords)
-  const [locations, setLocations] = useState<LocationPos[]>(() =>
-    LOCATIONS.map(loc => {
+  const [locations, setLocations] = useState<LocationPos[]>(() => {
+    const overrides = loadMapOverrides()
+    return LOCATIONS.map(loc => {
       const region = REGIONS.find(r => r.id === loc.regionId)!
-      const regionPts = parseMapBounds(region.mapBounds)
+      // Use overridden region bounds for coordinate conversion
+      const regionBounds = overrides?.regions?.[region.id] ?? region.mapBounds
+      const regionPts = parseMapBounds(regionBounds)
       const bbox = getBBox(regionPts)
-      const { absX, absY } = relativeToAbs(loc.mapX, loc.mapY, bbox)
+      // Use overridden location coords if available
+      const mapX = overrides?.locations?.[loc.id]?.mapX ?? loc.mapX
+      const mapY = overrides?.locations?.[loc.id]?.mapY ?? loc.mapY
+      const { absX, absY } = relativeToAbs(mapX, mapY, bbox)
       return { locationId: loc.id, regionId: loc.regionId, absX, absY }
     })
-  )
+  })
 
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null)
   const [drag, setDrag] = useState<DragState | null>(null)
   const [copied, setCopied] = useState(false)
+  const [saved, setSaved] = useState(false)
 
   // Memoize polygon lookup
   const polyMap = useMemo(() => {
@@ -284,6 +296,54 @@ export function MapEditor() {
     })
   }, [generateExport])
 
+  // ─── Save / Clear / Download overrides ─────────────────────────────────
+
+  const buildOverrides = useCallback((): MapOverrides => {
+    const regionOverrides: Record<string, string> = {}
+    for (const poly of polygons) {
+      regionOverrides[poly.regionId] = pointsToMapBounds(poly.points)
+    }
+    const locationOverrides: Record<string, { mapX: number; mapY: number }> = {}
+    for (const loc of locations) {
+      const poly = polyMap.get(loc.regionId)
+      if (!poly) continue
+      const bbox = getBBox(poly.points)
+      const { mapX, mapY } = absToRelative(loc.absX, loc.absY, bbox)
+      locationOverrides[loc.locationId] = { mapX, mapY }
+    }
+    return { regions: regionOverrides, locations: locationOverrides }
+  }, [polygons, locations, polyMap])
+
+  const handleSave = useCallback(() => {
+    saveMapOverrides(buildOverrides())
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2000)
+  }, [buildOverrides])
+
+  const handleClear = useCallback(() => {
+    clearMapOverrides()
+    // Reset all polygons and locations to original hardcoded values
+    setPolygons(REGIONS.map(r => ({ regionId: r.id, points: parseMapBounds(r.mapBounds) })))
+    setLocations(LOCATIONS.map(loc => {
+      const region = REGIONS.find(r => r.id === loc.regionId)!
+      const regionPts = parseMapBounds(region.mapBounds)
+      const bbox = getBBox(regionPts)
+      const { absX, absY } = relativeToAbs(loc.mapX, loc.mapY, bbox)
+      return { locationId: loc.id, regionId: loc.regionId, absX, absY }
+    }))
+  }, [])
+
+  const handleDownload = useCallback(() => {
+    const json = JSON.stringify(buildOverrides(), null, 2)
+    const blob = new Blob([json], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'map-overrides.json'
+    a.click()
+    URL.revokeObjectURL(url)
+  }, [buildOverrides])
+
   // ─── Render ──────────────────────────────────────────────────────────────
 
   return (
@@ -295,8 +355,17 @@ export function MapEditor() {
           Right-click polygon to add vertex. Right-click vertex to remove.
         </div>
         <div className="map-editor-actions">
+          <button type="button" className="map-editor-btn save" onClick={handleSave}>
+            {saved ? 'Saved!' : 'Save Overrides'}
+          </button>
+          <button type="button" className="map-editor-btn clear" onClick={handleClear}>
+            Clear Overrides
+          </button>
+          <button type="button" className="map-editor-btn download" onClick={handleDownload}>
+            Download JSON
+          </button>
           <button type="button" className="map-editor-btn copy" onClick={handleCopy}>
-            {copied ? 'Copied!' : 'Copy All Data'}
+            {copied ? 'Copied!' : 'Copy Code'}
           </button>
           {selectedRegion && (
             <button type="button" className="map-editor-btn reset" onClick={() => resetRegion(selectedRegion)}>
