@@ -1930,3 +1930,299 @@
     animation: none;
   }
 }
+
+/* ── Town View ──────────────────────────────── */
+
+.wm-town {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.wm-town-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.wm-town-title-area {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.wm-town-name {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin: 0;
+}
+
+.wm-town-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.wm-town-rules {
+  background: var(--surface-alt);
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+
+.wm-town-gil {
+  background: var(--surface-alt);
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.wm-town-npc-count {
+  background: var(--surface-alt);
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+
+.wm-town-flavour {
+  font-style: italic;
+  color: var(--text-muted);
+  margin: 0 0 1rem 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  border-left: 3px solid var(--accent-dim);
+  padding-left: 0.75rem;
+}
+
+.wm-town-empty {
+  text-align: center;
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 2rem 0;
+}
+
+/* ── NPC Grid ──────────────────────────────── */
+
+.wm-npc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.75rem;
+}
+
+.wm-npc-card {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  color: var(--text);
+  font-family: var(--font);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+
+.wm-npc-card:hover,
+.wm-npc-card.hovered {
+  border-color: var(--accent-dim);
+  box-shadow: var(--card-shadow-hover);
+  transform: translateY(-2px);
+}
+
+.wm-npc-card:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+/* Type-specific left border accent */
+.wm-npc-card.duel {
+  border-left: 3px solid var(--player-0);
+}
+
+.wm-npc-card.shop {
+  border-left: 3px solid var(--accent);
+}
+
+.wm-npc-card.dialogue {
+  border-left: 3px solid var(--success);
+}
+
+.wm-npc-card.tournament {
+  border-left: 3px solid #a855f7;
+}
+
+/* ── NPC Avatar ──────────────────────────────── */
+
+.wm-npc-avatar {
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.wm-npc-portrait {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.wm-npc-initials {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* ── NPC Info ──────────────────────────────── */
+
+.wm-npc-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.wm-npc-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wm-npc-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.wm-npc-type-icon {
+  font-size: 0.8rem;
+}
+
+.wm-npc-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── NPC Stats (duel/tournament) ──────────── */
+
+.wm-npc-stats {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.15rem;
+  font-size: 0.7rem;
+}
+
+.wm-npc-tier {
+  color: var(--accent);
+  font-size: 0.65rem;
+  letter-spacing: -0.02em;
+}
+
+.wm-npc-reward {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.wm-npc-wins {
+  color: var(--success);
+  font-weight: 500;
+}
+
+/* ── Quest Badges ──────────────────────────── */
+
+.wm-npc-quest-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 900;
+  z-index: 1;
+  border: 2px solid var(--surface);
+}
+
+.wm-npc-quest-badge.available {
+  background: var(--accent);
+  color: var(--bg);
+  animation: quest-pulse 2s ease-in-out infinite;
+}
+
+.wm-npc-quest-badge.active {
+  background: var(--player-0);
+  color: #fff;
+}
+
+.wm-npc-quest-badge.completed {
+  background: var(--success);
+  color: #fff;
+}
+
+@keyframes quest-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+/* ── Town Mobile ──────────────────────────── */
+
+@media (max-width: 600px) {
+  .wm-town-name {
+    font-size: 1.3rem;
+  }
+
+  .wm-npc-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .wm-npc-card {
+    padding: 0.75rem;
+  }
+
+  .wm-npc-avatar {
+    width: 44px;
+    height: 44px;
+  }
+
+  .wm-npc-initials {
+    font-size: 0.95rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wm-npc-quest-badge.available {
+    animation: none;
+  }
+}
