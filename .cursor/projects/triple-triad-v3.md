@@ -108,13 +108,13 @@ Todos:
 ---
 
 ### Phase 5: Pre-Duel Flow & Deck Selection
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 Goal: Replace the full deck builder screen before duels with a streamlined deck selection dropdown. Add quick access to deck editing without losing navigation context.
 
 Todos:
-- [ ] `todo-pre-duel-screen.md` — New PreDuelPage: shows opponent info (name, portrait, difficulty indicator), active rules for the match, and a dropdown to select from saved decks (default = last used deck, "Starter Deck" always in list). "Edit Decks" button opens the deck manager. "Start Duel" button (enabled only with valid 5-card deck). Back button returns to the location/NPC that initiated the duel.
-- [ ] `todo-deck-manager-ui.md` — Full deck manager screen: list of saved decks (create/rename/delete), deck editor (add/remove cards from inventory, shows card count available). Navigate here from pre-duel "Edit Decks" button. Back button returns to the pre-duel screen (NOT home). Also accessible from main menu for general deck management.
+- [x] `todo-pre-duel-screen.md` — New PreDuelPage: shows opponent info (name, portrait, difficulty indicator), active rules for the match, and a dropdown to select from saved decks (default = last used deck, "Starter Deck" always in list). "Edit Decks" button opens the deck manager. "Start Duel" button (enabled only with valid 5-card deck). Back button returns to the location/NPC that initiated the duel.
+- [x] `todo-deck-manager-ui.md` — Full deck manager screen: list of saved decks (create/rename/delete), deck editor (add/remove cards from inventory, shows card count available). Navigate here from pre-duel "Edit Decks" button. Back button returns to the pre-duel screen (NOT home). Also accessible from main menu for general deck management.
 
 ---
 

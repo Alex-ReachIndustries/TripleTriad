@@ -3726,3 +3726,157 @@
     height: 76px;
   }
 }
+
+/* ================================================
+   2P LOBBY
+   ================================================ */
+
+.lobby-2p {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.lobby-2p-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.lobby-2p-header .back {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.lobby-2p-header .back:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.lobby-2p-title {
+  font-size: 1.3rem;
+  color: var(--accent);
+  margin: 0;
+}
+
+.lobby-2p-room {
+  margin-bottom: 1.5rem;
+}
+
+.lobby-2p-code {
+  background: var(--surface);
+  border: 1px solid var(--accent-dim);
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.lobby-2p-code-label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.3rem;
+}
+
+.lobby-2p-code-value {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 6px;
+  font-family: 'Courier New', monospace;
+}
+
+.lobby-2p-code-hint {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.3rem;
+}
+
+.lobby-2p-joined {
+  background: var(--surface);
+  border: 1px solid var(--success);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  text-align: center;
+  color: var(--success);
+  font-weight: 600;
+}
+
+.lobby-2p-players {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.lobby-2p-player {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.75rem;
+  text-align: center;
+}
+
+.lobby-2p-player.you {
+  border-color: var(--accent-dim);
+}
+
+.lobby-2p-player-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.3rem;
+}
+
+.lobby-2p-player-status {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.lobby-2p-player-status.waiting {
+  color: var(--text-muted);
+}
+
+.lobby-2p-player-status.connected {
+  color: var(--accent);
+}
+
+.lobby-2p-player-status.ready {
+  color: var(--success);
+}
+
+.lobby-2p-vs {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--accent-dim);
+}
+
+.lobby-2p-deck-section {
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 600px) {
+  .lobby-2p-players {
+    gap: 0.75rem;
+  }
+
+  .lobby-2p-code-value {
+    font-size: 1.5rem;
+    letter-spacing: 4px;
+  }
+}

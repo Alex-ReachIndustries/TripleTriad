@@ -68,7 +68,7 @@ export function PlayPage({
   const [joinCode, setJoinCode] = useState('')
   const [roomId, setRoomId] = useState<string | null>(null)
   const [player, setPlayer] = useState<0 | 1 | null>(null)
-  const [deck, setDeck] = useState<Card[]>([])
+  // deck state removed — 2P lobby now uses saved decks (resolvedDeck)
   const [gameState, setGameState] = useState<GameState | null>(null)
   const [localGameState, setLocalGameState] = useState<GameState | null>(null)
   const [difficulty, setDifficulty] = useState<Difficulty>('medium')
@@ -134,6 +134,11 @@ export function PlayPage({
         if (msg.type === 'start') {
           setGameState(msg.state)
           setScreen('game')
+          setLobbyStatus('waiting')
+        } else if (msg.type === 'lobby') {
+          if (msg.decksReady) {
+            setLobbyStatus('opponent-ready')
+          }
         } else if (msg.type === 'state') {
           setGameState(msg.state)
         } else if (msg.type === 'error') {
@@ -148,19 +153,6 @@ export function PlayPage({
     }
   }, [screen, roomId, player])
 
-  const sendReady = useCallback(() => {
-    if (!ws || deck.length !== DECK_SIZE) return
-    ws.send(JSON.stringify({ type: 'set_deck', deck }))
-  }, [ws, deck])
-
-  const sendPlace = useCallback(
-    (cardIndex: number, row: number, col: number) => {
-      if (!ws) return
-      ws.send(JSON.stringify({ type: 'place', cardIndex, row, col }))
-    },
-    [ws]
-  )
-
   // --- Resolve saved deck to Card[] ---
   const resolvedDeck = useMemo(() => {
     const sd = getDeckById(savedDecks, selectedDeckId)
@@ -170,6 +162,23 @@ export function PlayPage({
 
   const selectedSavedDeck = useMemo(() => getDeckById(savedDecks, selectedDeckId), [savedDecks, selectedDeckId])
   const deckIsValid = selectedSavedDeck ? isDeckValid(selectedSavedDeck, worldPlayerInventory ?? {}) : false
+
+  const [lobbyStatus, setLobbyStatus] = useState<'waiting' | 'ready' | 'opponent-ready'>('waiting')
+
+  const sendReady = useCallback(() => {
+    if (!ws || resolvedDeck.length !== DECK_SIZE || !deckIsValid) return
+    onSetLastDeckId?.(selectedDeckId)
+    ws.send(JSON.stringify({ type: 'set_deck', deck: resolvedDeck }))
+    setLobbyStatus('ready')
+  }, [ws, resolvedDeck, deckIsValid, selectedDeckId, onSetLastDeckId])
+
+  const sendPlace = useCallback(
+    (cardIndex: number, row: number, col: number) => {
+      if (!ws) return
+      ws.send(JSON.stringify({ type: 'place', cardIndex, row, col }))
+    },
+    [ws]
+  )
 
   // --- Start AI duel ---
   const handleStartVsAi = useCallback(() => {
@@ -408,55 +417,95 @@ export function PlayPage({
 
   // --- Lobby (2P online) ---
   if (screen === 'lobby') {
+    const isReady = lobbyStatus === 'ready' || lobbyStatus === 'opponent-ready'
+
     return (
-      <div className="play-page lobby">
-        <h1>Lobby</h1>
-        {player === 0 && (
-          <p className="room-code">Room code: <strong>{code}</strong></p>
-        )}
-        <p>Choose 5 cards, then click Ready.</p>
-        <div className="lobby-deck">
-          {Array.from({ length: DECK_SIZE }, (_, i) => (
-            <div key={i} className="deck-slot">
-              {deck[i] ? (
-                <button type="button" className="deck-slot-card" onClick={() => setDeck(prev => prev.filter((_, idx) => idx !== i))}>
-                  <img src={`/cards/${deck[i].id}.png`} alt={deck[i].name} className="lobby-card-img" />
-                </button>
-              ) : (
-                <div className="empty-slot">Empty</div>
-              )}
+      <div className="play-page lobby-2p">
+        <div className="lobby-2p-header">
+          <button
+            type="button"
+            className="back"
+            onClick={() => { setScreen('home'); setGameMode('online'); setLobbyStatus('waiting'); ws?.close() }}
+          >
+            &larr; Leave
+          </button>
+          <h2 className="lobby-2p-title">2P Lobby</h2>
+        </div>
+
+        {/* Room code + status */}
+        <div className="lobby-2p-room">
+          {player === 0 && (
+            <div className="lobby-2p-code">
+              <span className="lobby-2p-code-label">Room Code:</span>
+              <span className="lobby-2p-code-value">{code}</span>
+              <span className="lobby-2p-code-hint">Share this code with your opponent</span>
             </div>
-          ))}
+          )}
+          {player === 1 && (
+            <div className="lobby-2p-joined">Connected to room</div>
+          )}
         </div>
-        <div className="card-grid" style={{ marginTop: 8 }}>
-          {allCards.map((card) => {
-            const inDeck = deck.some((c) => c.id === card.id)
-            return (
-              <button
-                key={card.id}
-                type="button"
-                className={`lobby-card-btn ${inDeck ? 'selected' : ''}`}
-                disabled={!inDeck && deck.length >= DECK_SIZE}
-                onClick={() => {
-                  setDeck(prev => {
-                    if (inDeck) return prev.filter(c => c.id !== card.id)
-                    if (prev.length >= DECK_SIZE) return prev
-                    return [...prev, card]
-                  })
-                }}
-              >
-                <img src={`/cards/${card.id}.png`} alt={card.name} className="lobby-card-img" />
-              </button>
-            )
-          })}
+
+        {/* Player status indicators */}
+        <div className="lobby-2p-players">
+          <div className={`lobby-2p-player ${player === 0 ? 'you' : ''} ${lobbyStatus !== 'waiting' || player === 0 ? '' : ''}`}>
+            <div className="lobby-2p-player-label">Player 1 {player === 0 ? '(You)' : ''}</div>
+            <div className={`lobby-2p-player-status ${player === 0 && isReady ? 'ready' : ws ? 'connected' : 'waiting'}`}>
+              {player === 0 && isReady ? 'Ready' : ws ? 'Connected' : 'Waiting...'}
+            </div>
+          </div>
+          <div className="lobby-2p-vs">VS</div>
+          <div className={`lobby-2p-player ${player === 1 ? 'you' : ''}`}>
+            <div className="lobby-2p-player-label">Player 2 {player === 1 ? '(You)' : ''}</div>
+            <div className={`lobby-2p-player-status ${player === 1 && isReady ? 'ready' : ws ? 'connected' : 'waiting'}`}>
+              {player === 1 && isReady ? 'Ready' : ws ? 'Connected' : 'Waiting...'}
+            </div>
+          </div>
         </div>
+
+        {/* Deck selection — uses saved decks */}
+        <div className="lobby-2p-deck-section">
+          <div className="pre-duel-deck-row">
+            <label htmlFor="lobby-deck-select" className="pre-duel-deck-label">Your Deck:</label>
+            <select
+              id="lobby-deck-select"
+              className="pre-duel-deck-dropdown"
+              value={selectedDeckId}
+              onChange={(e) => setSelectedDeckId(e.target.value)}
+              disabled={isReady}
+            >
+              {savedDecks.map(d => (
+                <option key={d.id} value={d.id}>
+                  {d.name} {isDeckValid(d, worldPlayerInventory ?? {}) ? '' : '(invalid)'}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Card preview */}
+          {resolvedDeck.length > 0 && (
+            <div className="pre-duel-deck-preview">
+              {resolvedDeck.map((card, i) => (
+                <div key={`${card.id}-${i}`} className="pre-duel-preview-card">
+                  <img src={`/cards/${card.id}.png`} alt={card.name} className="pre-duel-card-img" />
+                  <span className="pre-duel-card-name">{card.name}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Ready button */}
         <button
           type="button"
+          className="pre-duel-start-btn"
           onClick={sendReady}
-          disabled={deck.length !== DECK_SIZE || !ws}
+          disabled={!deckIsValid || resolvedDeck.length !== DECK_SIZE || !ws || isReady}
         >
-          Ready ({deck.length}/{DECK_SIZE})
+          {isReady ? 'Waiting for opponent...' : 'Ready!'}
         </button>
+
+        {error && <p className="pre-duel-invalid">{error}</p>}
       </div>
     )
   }
