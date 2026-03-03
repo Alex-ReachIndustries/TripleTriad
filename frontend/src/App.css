@@ -18,6 +18,14 @@
   --transition-fast: 150ms ease;
   --transition-normal: 220ms ease;
   --font: 'Outfit', system-ui, sans-serif;
+  /* Safe area insets for mobile (status bar, gesture nav, notch) */
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+  /* App padding = max(1rem, safe-area) on each side */
+  --app-pt: max(1rem, var(--sat));
+  --app-pb: max(1rem, var(--sab));
 }
 
 .visually-hidden {
@@ -37,10 +45,10 @@
   min-height: 100vh;
   min-height: 100dvh;
   padding: 1rem;
-  padding-top: max(1rem, env(safe-area-inset-top));
-  padding-right: max(1rem, env(safe-area-inset-right));
-  padding-bottom: max(1rem, env(safe-area-inset-bottom));
-  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-top: var(--app-pt);
+  padding-right: max(1rem, var(--sar));
+  padding-bottom: var(--app-pb);
+  padding-left: max(1rem, var(--sal));
   background: var(--bg);
   color: var(--text);
   font-family: var(--font);
@@ -753,7 +761,7 @@
 .play-page.game {
   display: flex;
   flex-direction: column;
-  height: calc(100dvh - 2rem - 3rem);
+  height: calc(100dvh - var(--app-pt) - var(--app-pb) - 3rem);
   overflow: hidden;
   align-items: center;
 }
@@ -2024,7 +2032,7 @@
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  height: calc(100dvh - 2rem - 3rem);
+  height: calc(100dvh - var(--app-pt) - var(--app-pb) - 3rem);
   overflow: hidden;
 }
 
@@ -2294,7 +2302,7 @@
 
 @media (max-width: 600px) {
   .wm-town {
-    height: calc(100dvh - 1rem - 3rem);
+    height: calc(100dvh - var(--app-pt) - var(--app-pb) - 3rem);
   }
 
   .wm-town-name {
@@ -3415,7 +3423,7 @@
   padding: 1rem;
   display: flex;
   flex-direction: column;
-  height: calc(100dvh - 2rem - 3rem);
+  height: calc(100dvh - var(--app-pt) - var(--app-pb) - 3rem);
   overflow: hidden;
 }
 
@@ -3806,7 +3814,7 @@
   padding: 1rem;
   display: flex;
   flex-direction: column;
-  height: calc(100dvh - 2rem - 3rem);
+  height: calc(100dvh - var(--app-pt) - var(--app-pb) - 3rem);
   overflow: hidden;
 }
 
@@ -4018,11 +4026,11 @@
   }
 
   .deck-mgr {
-    height: calc(100dvh - 1rem - 3rem);
+    height: calc(100dvh - var(--app-pt) - var(--app-pb) - 3rem);
   }
 
   .deck-editor {
-    height: calc(100dvh - 1rem - 3rem);
+    height: calc(100dvh - var(--app-pt) - var(--app-pb) - 3rem);
   }
 
   .collection-grid {
@@ -4451,7 +4459,7 @@
 .battle-screen {
   display: flex;
   flex-direction: column;
-  height: calc(100dvh - 2rem);
+  height: calc(100dvh - var(--app-pt) - var(--app-pb));
   overflow: hidden;
   box-sizing: border-box;
 }
@@ -4463,7 +4471,7 @@
   align-items: center;
   overflow-y: auto;
   height: auto;
-  max-height: calc(100dvh - 2rem);
+  max-height: calc(100dvh - var(--app-pt) - var(--app-pb));
 }
 
 .battle-header {
@@ -4783,11 +4791,11 @@
 
 @media (max-width: 480px) {
   .battle-screen {
-    height: calc(100dvh - 1rem);
+    height: calc(100dvh - var(--app-pt) - var(--app-pb));
   }
 
   .play-page.game {
-    height: calc(100dvh - 1rem - 3rem);
+    height: calc(100dvh - var(--app-pt) - var(--app-pb) - 3rem);
   }
 
   .battle-reward-result {
@@ -4806,7 +4814,7 @@
 .map-editor {
   display: flex;
   flex-direction: column;
-  height: calc(100dvh - 3rem);
+  height: calc(100dvh - var(--app-pt) - var(--app-pb) - 3rem);
   overflow: hidden;
   background: var(--bg-dark, #0f0f23);
   color: #e8e6e3;
