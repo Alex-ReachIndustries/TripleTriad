@@ -749,6 +749,54 @@
   opacity: 0.8;
 }
 
+/* Viewport-constrained game screen for PlayPage (freestyle AI + 2P) */
+.play-page.game {
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - 2rem - 3rem);
+  overflow: hidden;
+  align-items: center;
+}
+
+.play-page.game > .back {
+  flex-shrink: 0;
+  align-self: flex-start;
+  margin-bottom: 0.25rem;
+}
+
+.play-page.game .game-board-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 0;
+  margin-top: 0;
+  width: 100%;
+  max-width: 480px;
+}
+
+.play-page.game .game-board-wrap {
+  flex: 1;
+  min-height: 0;
+}
+
+.play-page.game .board-cell {
+  min-height: 0;
+}
+
+.play-page.game .score-bar {
+  flex-shrink: 0;
+}
+
+.play-page.game .rules-bar {
+  flex-shrink: 0;
+}
+
+.play-page.game .game-hand {
+  flex-shrink: 0;
+  margin-top: 0.5rem;
+}
+
 .game-board-container {
   margin-top: 1rem;
   position: relative;
@@ -758,6 +806,7 @@
   position: relative;
   max-width: 480px;
   width: 100%;
+  aspect-ratio: 93 / 120;
 }
 
 /* Score bar */
@@ -826,6 +875,8 @@
   border-radius: 12px;
   border: 1px solid var(--border);
   box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3);
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .board-cell {
@@ -833,7 +884,10 @@
   background: var(--surface-alt);
   transition: background-color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
   overflow: hidden;
-  min-height: 120px;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .board-cell.has-card {
   background: var(--surface);
@@ -871,7 +925,7 @@
   min-height: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
 }
 
 .board-cell-empty { opacity: 0.5; font-size: 1.5rem; color: var(--text-muted); }
@@ -987,7 +1041,6 @@
   .game-board { max-width: 100% !important; }
   .game-board-wrap { max-width: 100%; }
   .card-view { min-width: 0; }
-  .board-cell { min-height: 80px !important; }
   .score-bar, .rules-bar, .game-hand { max-width: 100%; }
   .world-page { padding: 0 0 1.5rem; }
   .world-map-container { max-width: 100%; }
@@ -4349,14 +4402,6 @@
 .battle-game .game-board-wrap {
   flex: 1;
   min-height: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.battle-game .game-board {
-  flex: 1;
-  min-height: 0;
-  display: grid;
 }
 
 .battle-game .board-cell {
@@ -4490,6 +4535,10 @@
 @media (max-width: 480px) {
   .battle-screen {
     height: calc(100dvh - 1rem);
+  }
+
+  .play-page.game {
+    height: calc(100dvh - 1rem - 3rem);
   }
 
   .battle-reward-result {

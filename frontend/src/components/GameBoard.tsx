@@ -115,6 +115,7 @@ export function GameBoard({ state, myPlayer, onPlace, onPlayAgain, onReturnToWor
           style={{
             display: 'grid',
             gridTemplateColumns: `repeat(${COLS}, 1fr)`,
+            gridTemplateRows: `repeat(${ROWS}, 1fr)`,
             gap: 4,
           }}
         >
