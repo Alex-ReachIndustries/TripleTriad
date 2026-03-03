@@ -1722,3 +1722,211 @@
     stroke-width: 0.6;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   V3 Region View — Zoomed map with location markers
+   ═══════════════════════════════════════════════════════════════════ */
+
+.wm-region {
+  padding: 0 0 2rem;
+}
+
+.wm-region-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.wm-region-title-area {
+  flex: 1;
+}
+
+.wm-region-name {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.wm-region-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+}
+
+.wm-region-rules-badge,
+.wm-region-trade-badge {
+  font-size: 0.78rem;
+  padding: 0.15rem 0.6rem;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text-muted);
+}
+
+.wm-region-loc-count {
+  font-size: 0.78rem;
+  padding: 0.15rem 0.6rem;
+  background: var(--surface-alt);
+  border: 1px solid var(--accent-dim);
+  border-radius: 12px;
+  color: var(--accent-dim);
+  font-weight: 600;
+}
+
+.wm-region-desc {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin: 0 0 1rem;
+  line-height: 1.4;
+}
+
+/* Zoomed map container */
+.wm-region-map-container {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto 1.25rem;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+}
+
+.wm-region-map-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* SVG marker hover effects */
+.wm-loc-marker.unlocked {
+  cursor: pointer;
+}
+
+.wm-loc-marker.unlocked:hover circle,
+.wm-loc-marker.unlocked:hover rect {
+  filter: brightness(1.3);
+}
+
+.wm-loc-marker.unlocked:focus-visible {
+  outline: none;
+}
+
+.wm-loc-marker.unlocked:focus-visible circle,
+.wm-loc-marker.unlocked:focus-visible rect {
+  stroke: white;
+  stroke-width: 0.4;
+}
+
+/* Location marker pulse animation */
+@keyframes loc-marker-pulse {
+  0%   { opacity: 0.3; r: inherit; }
+  50%  { opacity: 0.7; }
+  100% { opacity: 0.3; }
+}
+
+.wm-loc-pulse {
+  animation: loc-marker-pulse 2.5s ease-in-out infinite;
+}
+
+/* Location card list below map */
+.wm-region-loc-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.wm-region-loc-card {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 0.9rem;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 0.85rem;
+  color: var(--text);
+  transition: border-color var(--transition-fast), background-color var(--transition-fast), transform var(--transition-fast);
+  text-align: left;
+}
+
+.wm-region-loc-card.unlocked:hover {
+  border-color: var(--accent-dim);
+  background: var(--surface);
+  transform: translateY(-1px);
+}
+
+.wm-region-loc-card.locked {
+  cursor: not-allowed;
+  opacity: 0.55;
+  filter: grayscale(0.5);
+}
+
+.wm-region-loc-card.dungeon {
+  border-left: 3px solid #b45309;
+}
+
+.wm-region-loc-card.town.unlocked {
+  border-left: 3px solid var(--accent);
+}
+
+.wm-region-loc-card:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+.wm-loc-card-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.wm-loc-card-name {
+  flex: 1;
+  font-weight: 600;
+}
+
+.wm-loc-card-count {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.wm-loc-card-lock {
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+/* Mobile responsiveness for region view */
+@media (max-width: 600px) {
+  .wm-region-header {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .wm-region-name {
+    font-size: 1.25rem;
+  }
+
+  .wm-region-loc-list {
+    grid-template-columns: 1fr;
+  }
+
+  .wm-region-loc-card {
+    padding: 0.75rem;
+    min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wm-loc-pulse {
+    animation: none;
+  }
+}

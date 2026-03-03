@@ -1,8 +1,9 @@
 import { useState, useCallback } from 'react'
-import type { Region } from '../../types/world'
+import type { Region, Location } from '../../types/world'
 import type { WorldPlayerState } from '../../data/worldState'
-import { getRegionById } from '../../data/world'
+import { getRegionById, getLocationById } from '../../data/world'
 import { WorldMapView } from './WorldMapView'
+import { RegionView } from './RegionView'
 
 type WorldScreen =
   | { type: 'map' }
@@ -38,24 +39,47 @@ export function WorldMode({ worldState }: WorldModeProps) {
     setScreen({ type: 'region', regionId })
   }, [])
 
+  const handleSelectLocation = useCallback((location: Location) => {
+    const screenType = location.type === 'dungeon' ? 'dungeon' : 'town'
+    setScreen({ type: screenType, locationId: location.id, regionId: location.regionId })
+  }, [])
+
   switch (screen.type) {
     case 'map':
       return <WorldMapView worldState={worldState} onSelectRegion={handleSelectRegion} />
 
     case 'region': {
       const region = getRegionById(screen.regionId)
+      if (!region) return null
+      return (
+        <RegionView
+          region={region}
+          worldState={worldState}
+          onSelectLocation={handleSelectLocation}
+          onBack={handleBackToMap}
+        />
+      )
+    }
+
+    case 'town': {
+      const loc = getLocationById(screen.locationId)
       return (
         <div className="wm-placeholder">
-          <button type="button" className="wm-back-btn" onClick={handleBackToMap}>
-            &#8592; Back to World Map
+          <button
+            type="button"
+            className="wm-back-btn"
+            onClick={() => handleBackToRegion(screen.regionId)}
+          >
+            &#8592; Back to {getRegionById(screen.regionId)?.name ?? 'Region'}
           </button>
-          <h2>{region?.name ?? screen.regionId}</h2>
-          <p className="wm-placeholder-text">Region view — coming in Phase 4b</p>
+          <h2>{loc?.name ?? screen.locationId}</h2>
+          <p className="wm-placeholder-text">Town view — coming in Phase 4c</p>
         </div>
       )
     }
 
-    case 'town':
+    case 'dungeon': {
+      const loc = getLocationById(screen.locationId)
       return (
         <div className="wm-placeholder">
           <button
@@ -63,26 +87,12 @@ export function WorldMode({ worldState }: WorldModeProps) {
             className="wm-back-btn"
             onClick={() => handleBackToRegion(screen.regionId)}
           >
-            &#8592; Back to Region
+            &#8592; Back to {getRegionById(screen.regionId)?.name ?? 'Region'}
           </button>
-          <h2>Town: {screen.locationId}</h2>
-          <p className="wm-placeholder-text">Town view — coming in Phase 4c</p>
-        </div>
-      )
-
-    case 'dungeon':
-      return (
-        <div className="wm-placeholder">
-          <button
-            type="button"
-            className="wm-back-btn"
-            onClick={() => handleBackToRegion(screen.regionId)}
-          >
-            &#8592; Back to Region
-          </button>
-          <h2>Dungeon: {screen.locationId}</h2>
+          <h2>{loc?.name ?? screen.locationId}</h2>
           <p className="wm-placeholder-text">Dungeon view — coming in Phase 4d</p>
         </div>
       )
+    }
   }
 }
