@@ -82,14 +82,14 @@ Todos:
 ---
 
 ### Phase 3: Title Screen, How To Play & Story Cutscenes
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 Goal: Transform the title screen into a visually striking FFVIII-inspired landing page. Add diagrams to How To Play. Implement a story cutscene system for world mode entry.
 
 Todos:
-- [ ] `todo-title-screen.md` — Redesign with FFVIII-inspired background art (generated or sourced), animated title text, atmospheric styling (particles, gradient overlays, maybe a subtle card-flip animation). Include menu: New Game / Continue / How to Play / 2P Duel.
-- [ ] `todo-how-to-play.md` — Add visual diagrams: card anatomy diagram (showing rank positions), step-by-step capture example, special rules illustrations (Same, Plus, Combo, Elemental). Use generated images or SVG/CSS diagrams.
-- [ ] `todo-story-cutscene.md` — Simple cutscene system: full-screen illustrated panels with text overlay and "Next" button. Opening cutscene when starting a new game (introducing Triple Triad in the FFVIII world). Optionally brief cutscenes at region transitions.
+- [x] Title screen redesign — FFVIII world map background with blur/overlay, glowing animated title, floating gold particles, card fan decoration, menu: Continue/New Game/How to Play/2P Duel. Continue only shows when save data exists.
+- [x] How To Play overhaul — Card anatomy CSS diagram (rank positions), 3-step capture walkthrough with mini-boards, 8 special rules grid cards with icons, World Mode feature list.
+- [x] Story cutscene system — Full-screen 6-panel opening cutscene with fade-in text, speaker labels, Skip/Next buttons, click-anywhere navigation. Plays on New Game, transitions to World Map on completion.
 
 ---
 

@@ -10,10 +10,21 @@ import { WorldPage } from './components/WorldPage'
 import { TitleScreen } from './components/TitleScreen'
 import { HowToPlay } from './components/HowToPlay'
 import { HomePage } from './components/HomePage'
+import { StoryCutscene, OPENING_PANELS } from './components/StoryCutscene'
 import './App.css'
 
-type AppView = 'title' | 'howto' | 'home' | 'game'
+type AppView = 'title' | 'howto' | 'home' | 'game' | 'cutscene'
 type GameTab = 'world' | 'deck' | 'duel'
+
+const STORAGE_KEY = 'tripletriad-world'
+
+function hasSaveData(): boolean {
+  try {
+    return localStorage.getItem(STORAGE_KEY) !== null
+  } catch {
+    return false
+  }
+}
 
 function App() {
   const [view, setView] = useState<AppView>('title')
@@ -21,6 +32,7 @@ function App() {
   const [worldState, setWorldState] = useState(loadWorldState)
   const [worldChallengeLocation, setWorldChallengeLocation] = useState<Area | null>(null)
   const [tournamentPrize, setTournamentPrize] = useState<string | null>(null)
+  const [saveExists, setSaveExists] = useState(hasSaveData)
 
   useEffect(() => {
     saveWorldState(worldState)
@@ -102,6 +114,29 @@ function App() {
     setView('home')
   }, [])
 
+  const handleNewGame = useCallback(() => {
+    // Reset world state for a fresh start, then show cutscene
+    localStorage.removeItem(STORAGE_KEY)
+    setWorldState(loadWorldState())
+    setSaveExists(true) // Will exist after cutscene completes and state saves
+    setView('cutscene')
+  }, [])
+
+  const handleContinue = useCallback(() => {
+    setTab('world')
+    setView('game')
+  }, [])
+
+  const handleCutsceneComplete = useCallback(() => {
+    setTab('world')
+    setView('game')
+  }, [])
+
+  const handle2PDuel = useCallback(() => {
+    setTab('duel')
+    setView('game')
+  }, [])
+
   // Derive owned card IDs from inventory for components that need string[]
   const ownedCardIds = getOwnedCardIds(worldState.inventory)
 
@@ -110,9 +145,21 @@ function App() {
       <div className="app">
         <a href="#main-content" className="skip-link">Skip to main content</a>
         <main id="main-content">
-          <TitleScreen onStart={() => setView('home')} onHowToPlay={() => setView('howto')} />
+          <TitleScreen
+            onNewGame={handleNewGame}
+            onContinue={handleContinue}
+            onHowToPlay={() => setView('howto')}
+            on2PDuel={handle2PDuel}
+            hasSaveData={saveExists}
+          />
         </main>
       </div>
+    )
+  }
+
+  if (view === 'cutscene') {
+    return (
+      <StoryCutscene panels={OPENING_PANELS} onComplete={handleCutsceneComplete} />
     )
   }
 
@@ -145,8 +192,8 @@ function App() {
         <button
           type="button"
           className="app-nav-home"
-          onClick={handleBackToHome}
-          aria-label="Back to mode selection"
+          onClick={() => setView('title')}
+          aria-label="Back to title screen"
         >
           Home
         </button>
