@@ -5,6 +5,7 @@ import { getRegionById, getLocationById } from '../../data/world'
 import { WorldMapView } from './WorldMapView'
 import { RegionView } from './RegionView'
 import { TownView } from './TownView'
+import { DungeonView } from './DungeonView'
 
 type WorldScreen =
   | { type: 'map' }
@@ -82,18 +83,14 @@ export function WorldMode({ worldState }: WorldModeProps) {
 
     case 'dungeon': {
       const loc = getLocationById(screen.locationId)
+      if (!loc) return null
       return (
-        <div className="wm-placeholder">
-          <button
-            type="button"
-            className="wm-back-btn"
-            onClick={() => handleBackToRegion(screen.regionId)}
-          >
-            &#8592; Back to {getRegionById(screen.regionId)?.name ?? 'Region'}
-          </button>
-          <h2>{loc?.name ?? screen.locationId}</h2>
-          <p className="wm-placeholder-text">Dungeon view — coming in Phase 4d</p>
-        </div>
+        <DungeonView
+          location={loc}
+          worldState={worldState}
+          onStartFloor={handleSelectNpc}
+          onBack={() => handleBackToRegion(screen.regionId)}
+        />
       )
     }
   }

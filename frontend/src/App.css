@@ -2226,3 +2226,344 @@
     animation: none;
   }
 }
+
+/* ── Dungeon View ──────────────────────────── */
+
+.wm-dungeon {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.wm-dungeon-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.wm-dungeon-title-area {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.wm-dungeon-name {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #d4786b;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.wm-dungeon-cleared-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: var(--success);
+  color: #fff;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+}
+
+.wm-dungeon-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.wm-dungeon-floors {
+  background: var(--surface-alt);
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+
+.wm-dungeon-rematch-hint {
+  font-style: italic;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.wm-dungeon-flavour {
+  font-style: italic;
+  color: var(--text-muted);
+  margin: 0 0 1.5rem 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  border-left: 3px solid #d4786b;
+  padding-left: 0.75rem;
+}
+
+/* ── Floor Path ──────────────────────────── */
+
+.wm-dungeon-path {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0.5rem 0;
+}
+
+.wm-floor-node {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem 1rem 1rem 0;
+  margin-left: 1.5rem;
+}
+
+/* Vertical connector line */
+.wm-floor-connector {
+  position: absolute;
+  left: 19px;
+  bottom: -1px;
+  width: 2px;
+  height: calc(100% + 2px);
+  background: var(--border);
+  z-index: 0;
+}
+
+.wm-floor-connector.completed {
+  background: var(--success);
+}
+
+/* ── Floor Marker (circle) ──────────────── */
+
+.wm-floor-marker {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-alt);
+  border: 2px solid var(--border);
+  z-index: 1;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.wm-floor-node.defeated .wm-floor-marker {
+  background: var(--success);
+  border-color: var(--success);
+  color: #fff;
+}
+
+.wm-floor-node.current .wm-floor-marker {
+  background: var(--surface);
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 0 12px rgba(201, 162, 39, 0.3);
+  animation: floor-current-pulse 2s ease-in-out infinite;
+}
+
+.wm-floor-node.boss .wm-floor-marker {
+  width: 48px;
+  height: 48px;
+  border-width: 3px;
+}
+
+.wm-floor-node.boss.defeated .wm-floor-marker {
+  background: linear-gradient(135deg, var(--success), #4a7a4a);
+  border-color: var(--accent);
+}
+
+.wm-floor-node.boss.current .wm-floor-marker {
+  border-color: #d4786b;
+  box-shadow: 0 0 16px rgba(212, 120, 107, 0.4);
+}
+
+.wm-floor-node.locked .wm-floor-marker {
+  opacity: 0.4;
+}
+
+@keyframes floor-current-pulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(201, 162, 39, 0.2); }
+  50% { box-shadow: 0 0 16px rgba(201, 162, 39, 0.4); }
+}
+
+.wm-floor-boss-icon {
+  font-size: 1.2rem;
+}
+
+.wm-floor-check {
+  font-size: 1rem;
+}
+
+.wm-floor-number {
+  font-size: 0.9rem;
+}
+
+/* ── Floor Info ──────────────────────────── */
+
+.wm-floor-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.wm-floor-header-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.wm-floor-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.wm-floor-node.boss .wm-floor-name {
+  color: #d4786b;
+  font-size: 1.1rem;
+}
+
+.wm-floor-node.locked .wm-floor-name {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.wm-floor-tier {
+  font-size: 0.65rem;
+  color: var(--accent);
+  letter-spacing: -0.02em;
+  flex-shrink: 0;
+}
+
+.wm-floor-intro {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0.25rem 0 0.5rem 0;
+  line-height: 1.4;
+}
+
+.wm-floor-status {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.wm-floor-status.defeated-text {
+  color: var(--success);
+}
+
+/* ── Floor Action Buttons ──────────────── */
+
+.wm-floor-challenge-btn,
+.wm-floor-rematch-btn {
+  display: inline-block;
+  margin-top: 0.4rem;
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+  font-family: var(--font);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.wm-floor-challenge-btn {
+  background: var(--accent);
+  color: var(--bg);
+  border: 1px solid var(--accent);
+}
+
+.wm-floor-challenge-btn:hover {
+  background: #d4b02a;
+  transform: translateY(-1px);
+}
+
+.wm-floor-challenge-btn:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+.wm-floor-rematch-btn {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  margin-left: 0.5rem;
+}
+
+.wm-floor-rematch-btn:hover {
+  border-color: var(--accent-dim);
+  color: var(--text);
+}
+
+.wm-floor-rematch-btn:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+/* ── Dungeon Entrance Messages ──────────── */
+
+.wm-dungeon-entrance {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.wm-dungeon-complete-msg {
+  color: var(--success);
+  font-weight: 600;
+  margin: 0;
+}
+
+.wm-dungeon-progress-msg {
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* ── Dungeon Mobile ──────────────────────── */
+
+@media (max-width: 600px) {
+  .wm-dungeon-name {
+    font-size: 1.3rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+
+  .wm-floor-node {
+    margin-left: 0.75rem;
+    gap: 0.75rem;
+    padding: 0.75rem 0.5rem 0.75rem 0;
+  }
+
+  .wm-floor-marker {
+    width: 36px;
+    height: 36px;
+    font-size: 0.8rem;
+  }
+
+  .wm-floor-node.boss .wm-floor-marker {
+    width: 42px;
+    height: 42px;
+  }
+
+  .wm-floor-connector {
+    left: 17px;
+  }
+
+  .wm-floor-name {
+    font-size: 0.9rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wm-floor-node.current .wm-floor-marker {
+    animation: none;
+  }
+}
