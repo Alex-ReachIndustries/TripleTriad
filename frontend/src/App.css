@@ -1435,3 +1435,290 @@
     animation: none;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   V3 World Mode — Region-based navigation
+   ═══════════════════════════════════════════════════════════════════ */
+
+.wm-map {
+  padding: 0 0 2rem;
+}
+
+.wm-map-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.wm-map-title {
+  font-size: 1.5rem;
+  margin: 0;
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.wm-header-stats {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.wm-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.wm-progress-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.wm-progress-bar {
+  width: 100px;
+  height: 6px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.wm-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+  transition: width 600ms ease;
+}
+
+.wm-gil {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.wm-gil-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--bg);
+  font-size: 0.65rem;
+  font-weight: 800;
+}
+
+/* Map container with SVG overlay */
+.wm-map-container {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+}
+
+.wm-map-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  vertical-align: top;
+}
+
+.wm-map-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* SVG region polygons */
+.wm-region-poly {
+  pointer-events: all;
+  cursor: pointer;
+  fill: rgba(201, 162, 39, 0.08);
+  stroke: rgba(201, 162, 39, 0.3);
+  stroke-width: 0.3;
+  transition: fill 200ms ease, stroke 200ms ease;
+}
+
+.wm-region-poly.unlocked:hover,
+.wm-region-poly.unlocked.hovered {
+  fill: rgba(201, 162, 39, 0.25);
+  stroke: rgba(201, 162, 39, 0.8);
+  stroke-width: 0.5;
+}
+
+.wm-region-poly.locked {
+  fill: rgba(0, 0, 0, 0.35);
+  stroke: rgba(100, 100, 100, 0.3);
+  stroke-width: 0.2;
+  cursor: not-allowed;
+}
+
+.wm-region-poly:focus-visible {
+  outline: none;
+  stroke: var(--border-focus);
+  stroke-width: 0.6;
+}
+
+/* Region name labels floating on map */
+.wm-region-label {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8), 0 0 8px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  white-space: nowrap;
+  letter-spacing: 0.04em;
+  transition: color 200ms ease, transform 200ms ease;
+}
+
+.wm-region-label.unlocked.hovered {
+  color: var(--accent);
+  transform: translate(-50%, -50%) scale(1.15);
+}
+
+.wm-region-label.locked {
+  color: var(--text-muted);
+  opacity: 0.6;
+  font-style: italic;
+}
+
+/* Info panel below map */
+.wm-info-panel {
+  margin-top: 1rem;
+  padding: 1rem 1.25rem;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  max-width: 960px;
+  margin-left: auto;
+  margin-right: auto;
+  min-height: 80px;
+  transition: all 200ms ease;
+}
+
+.wm-info-name {
+  margin: 0 0 0.25rem;
+  font-size: 1.15rem;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.wm-info-desc {
+  margin: 0 0 0.5rem;
+  color: var(--text);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.wm-info-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.wm-info-rules,
+.wm-info-trade {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.wm-info-hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Placeholder screens for in-development views */
+.wm-placeholder {
+  padding: 2rem;
+  text-align: center;
+}
+
+.wm-placeholder h2 {
+  color: var(--accent);
+  margin: 1rem 0 0.5rem;
+}
+
+.wm-placeholder-text {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.wm-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 1rem;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.wm-back-btn:hover {
+  border-color: var(--accent-dim);
+  background: var(--surface);
+}
+
+.wm-back-btn:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 600px) {
+  .wm-map-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .wm-map-title {
+    font-size: 1.25rem;
+  }
+
+  .wm-region-label {
+    font-size: 0.6rem;
+  }
+
+  .wm-info-panel {
+    padding: 0.75rem;
+    min-height: 60px;
+  }
+
+  .wm-region-poly {
+    stroke-width: 0.4;
+  }
+
+  .wm-region-poly.unlocked:hover,
+  .wm-region-poly.unlocked.hovered {
+    stroke-width: 0.6;
+  }
+}

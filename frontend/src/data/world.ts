@@ -26,7 +26,7 @@ export const REGIONS: Region[] = [
     order: 0,
     description:
       'A small peaceful island with the prestigious Balamb Garden SeeD academy.',
-    mapBounds: '10,48 28,48 30,65 12,68 10,48',
+    mapBounds: '19,55 29,55 29,64 19,64 19,55',
     unlockCondition: null,
   },
   {
@@ -37,7 +37,7 @@ export const REGIONS: Region[] = [
     order: 1,
     description:
       'An independent dukedom known for its communication tower. Tricky rules make card games here unpredictable.',
-    mapBounds: '5,55 14,55 16,70 7,72 5,55',
+    mapBounds: '17,30 30,30 32,47 17,47 17,30',
     unlockCondition: { type: 'beat_npc', targetId: 'ifrit_guardian' },
   },
   {
@@ -48,7 +48,7 @@ export const REGIONS: Region[] = [
     order: 2,
     description:
       'The militaristic Galbadian continent. The Same rule makes positioning crucial — one wrong move and your cards get chain-captured.',
-    mapBounds: '14,35 50,35 52,68 16,70 14,35',
+    mapBounds: '30,37 52,37 52,59 28,59 30,37',
     unlockCondition: {
       type: 'unique_wins_in_location',
       targetId: 'dollet_city',
@@ -63,7 +63,7 @@ export const REGIONS: Region[] = [
     order: 3,
     description:
       'A pacifist settlement on the transcontinental bridge. Sudden Death means draws never end — you keep playing until someone wins.',
-    mapBounds: '42,48 55,48 55,58 42,58 42,48',
+    mapBounds: '49,46 57,46 57,54 49,54 49,46',
     unlockCondition: {
       type: 'unique_wins_in_location',
       targetId: 'winhill',
@@ -78,7 +78,7 @@ export const REGIONS: Region[] = [
     order: 4,
     description:
       'The frozen northern continent. The Plus rule rewards mathematical thinking, but Random hands make it a gamble.',
-    mapBounds: '28,8 58,8 60,32 30,32 28,8',
+    mapBounds: '44,14 72,14 74,36 46,36 44,14',
     unlockCondition: {
       type: 'unique_wins_in_location',
       targetId: 'fishermans_horizon',
@@ -93,7 +93,7 @@ export const REGIONS: Region[] = [
     order: 5,
     description:
       'The ruined southern continent, devastated by the Lunar Cry. The toughest rule combination — Same + Plus + Random together make every match brutal.',
-    mapBounds: '28,68 62,68 64,92 30,92 28,68',
+    mapBounds: '30,67 60,67 62,88 32,88 30,67',
     unlockCondition: { type: 'beat_npc', targetId: 'shumi_elder' },
   },
   {
@@ -104,7 +104,7 @@ export const REGIONS: Region[] = [
     order: 6,
     description:
       'The technologically advanced Esthar continent and the Lunar Gate. Same Wall makes board edges dangerous — every edge acts like a rank-10 card for the Same rule.',
-    mapBounds: '58,28 95,28 95,65 60,65 58,28',
+    mapBounds: '60,30 90,30 92,65 62,65 60,30',
     unlockCondition: { type: 'beat_npc', targetId: 'centra_guardian' },
   },
 ]

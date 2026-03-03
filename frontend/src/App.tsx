@@ -6,7 +6,7 @@ import { getAreaById } from './data/world'
 import cardsData from './data/cards.json'
 import { DeckBuilder } from './components/DeckBuilder'
 import { PlayPage } from './components/PlayPage'
-import { WorldPage } from './components/WorldPage'
+import { WorldMode } from './components/world/WorldMode'
 import { TitleScreen } from './components/TitleScreen'
 import { HowToPlay } from './components/HowToPlay'
 import { HomePage } from './components/HomePage'
@@ -224,16 +224,7 @@ function App() {
       </nav>
       <main id="main-content">
         {tab === 'world' && (
-          <WorldPage
-            unlockedOrder={worldState.unlockedOrder}
-            gil={worldState.gil}
-            inventory={worldState.inventory}
-            npcWins={worldState.npcWins}
-            onChallenge={handleWorldChallenge}
-            onBuyCard={handleBuyCard}
-            onSellCard={handleSellCard}
-            onEnterTournament={handleEnterTournament}
-          />
+          <WorldMode worldState={worldState} />
         )}
         {tab === 'deck' && <DeckBuilder inventory={worldState.inventory} />}
         {tab === 'duel' && (
