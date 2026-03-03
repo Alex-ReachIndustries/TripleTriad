@@ -5,6 +5,8 @@
 
 import type { SavedDeck } from './deckManager'
 import { createStarterDeck, parseSavedDecks } from './deckManager'
+import type { Quest } from '../types/quest'
+import { getQuestById, isQuestComplete } from './quests'
 
 const STORAGE_KEY = 'tripletriad-world'
 
@@ -22,6 +24,12 @@ export interface WorldPlayerState {
   savedDecks: SavedDeck[]
   /** ID of the last deck the player used in a duel. */
   lastDeckId: string | null
+  /** Quest IDs the player has accepted but not yet completed. */
+  activeQuests: string[]
+  /** Quest IDs the player has completed and claimed rewards for. */
+  completedQuests: string[]
+  /** Set of dungeon location IDs the player has cleared (beat the boss). */
+  clearedDungeons: string[]
 }
 
 /** 5 starter cards – always protected (count can never drop below 1). */
@@ -43,6 +51,9 @@ function defaultState(): WorldPlayerState {
     npcWins: {},
     savedDecks: [createStarterDeck(STARTER_DECK_IDS)],
     lastDeckId: 'starter',
+    activeQuests: [],
+    completedQuests: [],
+    clearedDungeons: [],
   }
 }
 
@@ -106,7 +117,16 @@ export function loadWorldState(): WorldPlayerState {
     )
     const savedDecks = parseSavedDecks(o.savedDecks, STARTER_DECK_IDS)
     const lastDeckId = typeof o.lastDeckId === 'string' ? o.lastDeckId : 'starter'
-    return { unlockedOrder, inventory, gil, npcWins, savedDecks, lastDeckId }
+    const activeQuests = Array.isArray(o.activeQuests)
+      ? (o.activeQuests as unknown[]).filter((v): v is string => typeof v === 'string')
+      : []
+    const completedQuests = Array.isArray(o.completedQuests)
+      ? (o.completedQuests as unknown[]).filter((v): v is string => typeof v === 'string')
+      : []
+    const clearedDungeons = Array.isArray(o.clearedDungeons)
+      ? (o.clearedDungeons as unknown[]).filter((v): v is string => typeof v === 'string')
+      : []
+    return { unlockedOrder, inventory, gil, npcWins, savedDecks, lastDeckId, activeQuests, completedQuests, clearedDungeons }
   } catch {
     return defaultState()
   }
@@ -136,6 +156,56 @@ export function removeFromInventory(inventory: Record<string, number>, cardId: s
   const newCount = Math.max(minCount, current - count)
   if (newCount === current) return inventory // no change
   return { ...inventory, [cardId]: newCount }
+}
+
+// ─── Quest helpers ───
+
+/** Accept a quest: add its ID to activeQuests if not already active or completed. */
+export function acceptQuest(state: WorldPlayerState, questId: string): WorldPlayerState {
+  if (state.activeQuests.includes(questId) || state.completedQuests.includes(questId)) return state
+  if (!getQuestById(questId)) return state
+  return { ...state, activeQuests: [...state.activeQuests, questId] }
+}
+
+/**
+ * Check and claim a completed quest's reward.
+ * Returns updated state with reward applied and quest moved to completedQuests.
+ * Returns unchanged state if quest is not active or conditions not met.
+ */
+export function claimQuestReward(state: WorldPlayerState, questId: string): WorldPlayerState {
+  if (!state.activeQuests.includes(questId)) return state
+  const quest = getQuestById(questId)
+  if (!quest) return state
+  const dungeonSet = new Set(state.clearedDungeons)
+  if (!isQuestComplete(quest, state.inventory, state.npcWins, dungeonSet)) return state
+
+  let inventory = state.inventory
+  let gil = state.gil
+
+  // Award gil
+  if (quest.reward.gil > 0) {
+    gil += quest.reward.gil
+  }
+
+  // Award card(s)
+  if (quest.reward.cardId) {
+    const count = quest.reward.cardCount ?? 1
+    inventory = addToInventory(inventory, quest.reward.cardId, count)
+  }
+
+  return {
+    ...state,
+    inventory,
+    gil,
+    activeQuests: state.activeQuests.filter((id) => id !== questId),
+    completedQuests: [...state.completedQuests, questId],
+  }
+}
+
+/** Mark a dungeon as cleared (used when player beats the boss floor). */
+export function markDungeonCleared(state: WorldPlayerState, dungeonLocationId: string): WorldPlayerState {
+  if (state.clearedDungeons.includes(dungeonLocationId)) return state
+  return { ...state, clearedDungeons: [...state.clearedDungeons, dungeonLocationId] }
 }
 
 /**

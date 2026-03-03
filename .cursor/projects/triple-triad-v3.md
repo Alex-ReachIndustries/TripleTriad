@@ -68,16 +68,16 @@ Decisions (resolved):
 ---
 
 ### Phase 2: Core Data & Systems Overhaul
-**Status:** [ ] In Progress
+**Status:** [x] Complete
 
 Goal: Rebuild the foundational data models and systems to support multi-copy card inventory, named/saved decks, side quests, and the new 7-region world hierarchy. This phase is pure data/logic — no UI changes yet.
 
 Todos:
 - [x] `todo-inventory-system.md` — Replace single-copy `collection: string[]` with multi-copy `inventory: Record<string, number>` (cardId → count). Update worldState persistence, trade rules, shop logic. Protect 5 starter cards (always >= 1 count). Add sell-back at shops (50% price).
 - [x] `todo-deck-management.md` — New `SavedDeck` type `{ id, name, cardIds: string[] }`. CRUD operations: create, rename, delete, set-active. Persist to localStorage. Default "Starter Deck" always exists (5 basic cards, undeletable). Remember last-used deck. Limit of e.g. 10 saved decks.
-- [ ] `todo-world-data-redesign.md` — New hierarchy: `Region` (7) → `Location` (many) → `NPC` (many per location). Each region has rules, a map bounds area, and unlock condition. Locations have a `type: 'town' | 'dungeon'` — towns have free-roam NPC grids; dungeons have sequential floors leading to a boss. Locations unlock progressively within a region. NPCs have type (dialogue / shop / duel / tournament), portrait, dialogue lines, deck pool, difficulty tier. Dungeon NPCs have floor order and isBoss flag.
-- [ ] `todo-progressive-difficulty.md` — Remove player-chosen AI difficulty. Map each NPC to a difficulty tier based on story progression: early NPCs = easy AI + weak decks, mid = medium AI + moderate decks, late = hard AI + strong decks. Define the difficulty curve across all regions/locations.
-- [ ] `todo-side-quest-system.md` — New `Quest` type `{ id, giverNpcId, type: 'find_card' | 'beat_npc', targetId, reward: { type: 'card' | 'gil', value } }`. Quest state tracking in worldState (active, completed). NPC dialogue triggers quest offers. Reward delivery on completion.
+- [x] `todo-world-data-redesign.md` — 7 regions, 17 locations (12 towns + 5 dungeons), 68 NPCs with full dialogue, deck pools, difficulty tiers, shop items. Legacy backward-compat functions preserved.
+- [x] `todo-progressive-difficulty.md` — DifficultyTier (1-5) mapped to AI strategy: 1=easy, 2-3=medium, 4-5=hard. World mode auto-sets difficulty from NPC tier, freestyle retains manual selector.
+- [x] `todo-side-quest-system.md` — 13 hand-crafted quests (8 find_card, 3 beat_npc, 2 clear_dungeon). Quest types, state tracking (active/completed/clearedDungeons), accept/claim/reward helpers.
 
 ---
 
