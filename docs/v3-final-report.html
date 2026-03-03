@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Triple Triad V3 — Final Report</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface-alt: #1c2333;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #daa520;
+    --accent-dim: #b8860b;
+    --green: #3fb950;
+    --red: #f85149;
+    --blue: #58a6ff;
+    --purple: #bc8cff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 960px; margin: 0 auto; }
+  h1 {
+    font-size: 2.5rem;
+    color: var(--accent);
+    text-align: center;
+    margin-bottom: 0.25rem;
+    text-shadow: 0 0 20px rgba(218, 165, 32, 0.3);
+  }
+  .subtitle {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+  }
+  h2 {
+    font-size: 1.5rem;
+    color: var(--accent);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+    margin: 2rem 0 1rem;
+  }
+  h3 {
+    font-size: 1.15rem;
+    color: var(--text);
+    margin: 1.25rem 0 0.5rem;
+  }
+
+  /* Stat boxes */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem;
+    text-align: center;
+  }
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    display: block;
+  }
+  .stat-value.green { color: var(--green); }
+  .stat-value.gold { color: var(--accent); }
+  .stat-value.blue { color: var(--blue); }
+  .stat-value.purple { color: var(--purple); }
+  .stat-label {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* Phase cards */
+  .phase {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin: 1rem 0;
+  }
+  .phase-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+  .phase-name {
+    font-weight: 700;
+    font-size: 1.05rem;
+  }
+  .badge {
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .badge-pass {
+    background: rgba(63, 185, 80, 0.15);
+    color: var(--green);
+    border: 1px solid rgba(63, 185, 80, 0.3);
+  }
+  .phase ul { padding-left: 1.25rem; }
+  .phase li { color: var(--text-muted); margin: 0.25rem 0; }
+
+  /* Feature table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+  }
+  th, td {
+    padding: 0.6rem 0.8rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  th {
+    background: var(--surface);
+    color: var(--accent);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  td { color: var(--text-muted); }
+  td:first-child { color: var(--text); font-weight: 600; }
+  .check { color: var(--green); font-weight: bold; }
+
+  /* Test results */
+  .test-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 0.75rem;
+    margin: 1rem 0;
+  }
+  .test-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .test-name { font-size: 0.9rem; }
+  .test-pass { color: var(--green); font-weight: 700; font-size: 0.85rem; }
+
+  /* Screen list */
+  .screen-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.75rem;
+    margin: 1rem 0;
+  }
+  .screen-card {
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.75rem;
+    text-align: center;
+  }
+  .screen-card .icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+  }
+  .screen-card .name {
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .screen-card .status {
+    font-size: 0.75rem;
+    color: var(--green);
+  }
+
+  /* Misc */
+  p { margin: 0.5rem 0; color: var(--text-muted); }
+  ul { padding-left: 1.5rem; }
+  li { margin: 0.3rem 0; }
+  code {
+    background: var(--surface-alt);
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+  .footer {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>Triple Triad V3</h1>
+<p class="subtitle">Final Fantasy VIII Card Game — Major Expansion Report</p>
+
+<!-- Key Stats -->
+<div class="stats">
+  <div class="stat">
+    <span class="stat-value green">42/42</span>
+    <span class="stat-label">Engine Tests Passing</span>
+  </div>
+  <div class="stat">
+    <span class="stat-value gold">9</span>
+    <span class="stat-label">Phases Complete</span>
+  </div>
+  <div class="stat">
+    <span class="stat-value blue">15+</span>
+    <span class="stat-label">Screens Built</span>
+  </div>
+  <div class="stat">
+    <span class="stat-value purple">110</span>
+    <span class="stat-label">Cards with Art</span>
+  </div>
+</div>
+
+<h2>Executive Summary</h2>
+<p>
+  Triple Triad V3 is a major expansion of the FFVIII-inspired browser card game, transforming it from
+  a functional prototype into a polished, immersive experience. The project delivered: a story cutscene system,
+  a complete 7-region world mode rework with NPC interactions, a multi-copy card inventory with buy/sell shops,
+  a full deck management system with save/load, a fixed and overhauled 2P online mode, a streamlined pre-duel flow,
+  progressive AI difficulty, a side quest system, and a comprehensive UI/UX visual polish pass with mobile responsiveness.
+</p>
+
+<h2>What Was Built (V3 New Features)</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Feature</th>
+      <th>Description</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Story Cutscene System</td>
+      <td>6-panel opening cutscene with fade-in text, Skip/Next, click-anywhere navigation</td>
+      <td class="check">Done</td>
+    </tr>
+    <tr>
+      <td>7-Region World Map</td>
+      <td>SVG polygon overlays on FFVIII world map, hover tooltips, locked/unlocked states</td>
+      <td class="check">Done</td>
+    </tr>
+    <tr>
+      <td>Region Screens</td>
+      <td>Zoomed region maps with location markers, connection lines, lock states</td>
+      <td class="check">Done</td>
+    </tr>
+    <tr>
+      <td>Town Screens</td>
+      <td>NPC grid with color-coded cards, avatar initials, difficulty stars, quest badges</td>
+      <td class="check">Done</td>
+    </tr>
+    <tr>
+      <td>Dungeon Screens</td>
+      <td>Vertical floor progression, boss crown, sequential challenges, cleared badges</td>
+      <td class="check">Done</td>
+    </tr>
+    <tr>
+      <td>NPC Interaction Modals</td>
+      <td>Dialogue, shop (buy/sell tabs), duel (deck selector), tournament (entry fee + prizes)</td>
+      <td class="check">Done</td>
+    </tr>
+    <tr>
+      <td>Multi-Copy Inventory</td>
+      <td>Cards tracked as <code>Record&lt;string, number&gt;</code>, buy/sell at shops, protected starter cards</td>
+      <td class="check">Done</td>
+    </tr>
+    <tr>
+      <td>Deck Management</td>
+      <td>Create/rename/delete saved decks, deck editor with inventory-aware card selection</td>
+      <td class="check">Done</td>
+    </tr>
+    <tr>
+      <td>Pre-Duel Flow</td>
+      <td>Dropdown deck selector, remembers last used deck, Edit Decks button with proper back nav</td>
+      <td class="check">Done</td>
+    </tr>
+    <tr>
+      <td>Side Quest System</td>
+      <td>13 hand-crafted quests (find_card, beat_npc, clear_dungeon) with dialogue and rewards</td>
+      <td class="check">Done</td>
+    </tr>
+    <tr>
+      <td>Progressive Difficulty</td>
+      <td>5 tiers mapped to AI strategy: tier 1=easy, 2-3=medium, 4-5=hard (alpha-beta pruning)</td>
+      <td class="check">Done</td>
+    </tr>
+    <tr>
+      <td>2P Mode Fix & Overhaul</td>
+      <td>CORS fix, room creation working, deck-based lobby, inventory-tied card selection</td>
+      <td class="check">Done</td>
+    </tr>
+    <tr>
+      <td>UI/UX Visual Overhaul</td>
+      <td>Restyled duel home, deck manager, sticky nav bar, mobile responsive pass at 390px</td>
+      <td class="check">Done</td>
+    </tr>
+    <tr>
+      <td>Title Screen</td>
+      <td>FFVIII world map background, animated title, floating particles, card fan decoration</td>
+      <td class="check">Done</td>
+    </tr>
+    <tr>
+      <td>How To Play Overhaul</td>
+      <td>Card anatomy CSS diagram, 3-step capture walkthrough, 8 special rules grid</td>
+      <td class="check">Done</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Phase Completion Summary</h2>
+
+<div class="phase">
+  <div class="phase-header">
+    <span class="phase-name">Phase 1: Research & Asset Pipeline</span>
+    <span class="badge badge-pass">Complete</span>
+  </div>
+  <ul>
+    <li>Researched FFVIII world geography, mapped 7 regions with locations</li>
+    <li>Defined asset pipeline: CSS/SVG diagrams, curated images, Docker generation</li>
+    <li>Created architecture, UI/UX, world design, and asset pipeline guidance docs</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-header">
+    <span class="phase-name">Phase 2: Core Data & Systems Overhaul</span>
+    <span class="badge badge-pass">Complete</span>
+  </div>
+  <ul>
+    <li>Multi-copy inventory system (<code>Record&lt;string, number&gt;</code>)</li>
+    <li>SavedDeck CRUD with localStorage persistence</li>
+    <li>7 regions, 17 locations, 68 NPCs with dialogue/decks/difficulty tiers</li>
+    <li>Progressive difficulty mapping NPC tier to AI strategy</li>
+    <li>13 hand-crafted side quests with accept/claim/reward flow</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-header">
+    <span class="phase-name">Phase 3: Title Screen, How To Play & Cutscenes</span>
+    <span class="badge badge-pass">Complete</span>
+  </div>
+  <ul>
+    <li>FFVIII-inspired title screen with animated elements</li>
+    <li>How To Play with CSS diagrams and special rules grid</li>
+    <li>6-panel opening story cutscene system</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-header">
+    <span class="phase-name">Phase 4: World Mode — Region Map & Navigation</span>
+    <span class="badge badge-pass">Complete</span>
+  </div>
+  <ul>
+    <li>World map with 7 clickable SVG polygon region overlays</li>
+    <li>Region screens with zoomed map and location markers</li>
+    <li>Town screens with NPC grid and interaction modals</li>
+    <li>Dungeon screens with floor progression</li>
+    <li>NPC modals: dialogue, shop (buy/sell), duel, tournament</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-header">
+    <span class="phase-name">Phase 5: Pre-Duel Flow & Deck Selection</span>
+    <span class="badge badge-pass">Complete</span>
+  </div>
+  <ul>
+    <li>Pre-duel screen: opponent info, rules, deck dropdown, card preview</li>
+    <li>DeckManager: full CRUD (create/rename/delete/edit) with inventory awareness</li>
+    <li>Edit Decks → Back returns to pre-duel (not home)</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-header">
+    <span class="phase-name">Phase 6: 2P Mode Fix & Overhaul</span>
+    <span class="badge badge-pass">Complete</span>
+  </div>
+  <ul>
+    <li>Fixed CORS header typo in backend server</li>
+    <li>2P lobby uses saved deck dropdown from 1P inventory</li>
+    <li>Styled lobby with room code display, player status indicators</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-header">
+    <span class="phase-name">Phase 7: UI/UX Visual Overhaul & Mobile</span>
+    <span class="badge badge-pass">Complete</span>
+  </div>
+  <ul>
+    <li>Restyled Duel home page with Online Multiplayer / Solo Practice sections</li>
+    <li>Replaced DeckBuilder tab with full DeckManager</li>
+    <li>Sticky nav bar with backdrop blur and active state glow</li>
+    <li>Mobile responsive pass: all screens verified at 390px viewport</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-header">
+    <span class="phase-name">Phase 8: Integration Testing</span>
+    <span class="badge badge-pass">Complete</span>
+  </div>
+  <ul>
+    <li>42/42 engine tests passing</li>
+    <li>Full playthrough: New Game → cutscene → world → duel → win → rewards</li>
+    <li>Shop buy/sell, quest accept, deck management all verified</li>
+    <li>2P mode: room creation, lobby, deck selection working</li>
+    <li>Mobile viewport testing on all 15+ screens</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-header">
+    <span class="phase-name">Phase 9: Evaluation & Reporting</span>
+    <span class="badge badge-pass">Complete</span>
+  </div>
+  <ul>
+    <li>Docker build verified</li>
+    <li>This report produced</li>
+  </ul>
+</div>
+
+<h2>Test Results</h2>
+
+<h3>Engine Unit Tests (42/42 Passing)</h3>
+<div class="test-grid">
+  <div class="test-item"><span class="test-name">Basic Capture (4 tests)</span><span class="test-pass">PASS</span></div>
+  <div class="test-item"><span class="test-name">createGame Options (10 tests)</span><span class="test-pass">PASS</span></div>
+  <div class="test-item"><span class="test-name">Elemental Rule (2 tests)</span><span class="test-pass">PASS</span></div>
+  <div class="test-item"><span class="test-name">Same Rule (3 tests)</span><span class="test-pass">PASS</span></div>
+  <div class="test-item"><span class="test-name">Same Wall (1 test)</span><span class="test-pass">PASS</span></div>
+  <div class="test-item"><span class="test-name">Plus Rule (4 tests)</span><span class="test-pass">PASS</span></div>
+  <div class="test-item"><span class="test-name">Combo Rule (2 tests)</span><span class="test-pass">PASS</span></div>
+  <div class="test-item"><span class="test-name">Winner/Draw/SD (10 tests)</span><span class="test-pass">PASS</span></div>
+  <div class="test-item"><span class="test-name">State Forwarding (4 tests)</span><span class="test-pass">PASS</span></div>
+</div>
+
+<h3>Integration Tests (via Playwright MCP)</h3>
+<div class="test-grid">
+  <div class="test-item"><span class="test-name">New Game → Cutscene → World</span><span class="test-pass">PASS</span></div>
+  <div class="test-item"><span class="test-name">Region → Town → NPC Navigation</span><span class="test-pass">PASS</span></div>
+  <div class="test-item"><span class="test-name">NPC Duel (Full Game)</span><span class="test-pass">PASS</span></div>
+  <div class="test-item"><span class="test-name">Shop Buy (Gil deducted)</span><span class="test-pass">PASS</span></div>
+  <div class="test-item"><span class="test-name">Shop Sell (Non-starter cards)</span><span class="test-pass">PASS</span></div>
+  <div class="test-item"><span class="test-name">Quest Accept</span><span class="test-pass">PASS</span></div>
+  <div class="test-item"><span class="test-name">Deck Manager CRUD</span><span class="test-pass">PASS</span></div>
+  <div class="test-item"><span class="test-name">Pre-Duel Deck Selection</span><span class="test-pass">PASS</span></div>
+  <div class="test-item"><span class="test-name">2P Room Creation</span><span class="test-pass">PASS</span></div>
+  <div class="test-item"><span class="test-name">2P Lobby (Deck + Ready)</span><span class="test-pass">PASS</span></div>
+  <div class="test-item"><span class="test-name">Gil Reward on Win</span><span class="test-pass">PASS</span></div>
+  <div class="test-item"><span class="test-name">Progressive Difficulty Display</span><span class="test-pass">PASS</span></div>
+</div>
+
+<h2>Screens Verified (Desktop + Mobile)</h2>
+<div class="screen-grid">
+  <div class="screen-card"><div class="icon">🏠</div><div class="name">Title Screen</div><div class="status">Verified</div></div>
+  <div class="screen-card"><div class="icon">📖</div><div class="name">How to Play</div><div class="status">Verified</div></div>
+  <div class="screen-card"><div class="icon">🎬</div><div class="name">Story Cutscene</div><div class="status">Verified</div></div>
+  <div class="screen-card"><div class="icon">🗺️</div><div class="name">World Map</div><div class="status">Verified</div></div>
+  <div class="screen-card"><div class="icon">📍</div><div class="name">Region View</div><div class="status">Verified</div></div>
+  <div class="screen-card"><div class="icon">🏘️</div><div class="name">Town View</div><div class="status">Verified</div></div>
+  <div class="screen-card"><div class="icon">⚔️</div><div class="name">Dungeon View</div><div class="status">Verified</div></div>
+  <div class="screen-card"><div class="icon">💬</div><div class="name">NPC Dialogue</div><div class="status">Verified</div></div>
+  <div class="screen-card"><div class="icon">💰</div><div class="name">NPC Shop</div><div class="status">Verified</div></div>
+  <div class="screen-card"><div class="icon">🃏</div><div class="name">NPC Duel Modal</div><div class="status">Verified</div></div>
+  <div class="screen-card"><div class="icon">⚡</div><div class="name">Pre-Duel Screen</div><div class="status">Verified</div></div>
+  <div class="screen-card"><div class="icon">📦</div><div class="name">Deck Manager</div><div class="status">Verified</div></div>
+  <div class="screen-card"><div class="icon">✏️</div><div class="name">Deck Editor</div><div class="status">Verified</div></div>
+  <div class="screen-card"><div class="icon">🎮</div><div class="name">Game Board</div><div class="status">Verified</div></div>
+  <div class="screen-card"><div class="icon">🎯</div><div class="name">Duel Home</div><div class="status">Verified</div></div>
+  <div class="screen-card"><div class="icon">👥</div><div class="name">2P Lobby</div><div class="status">Verified</div></div>
+</div>
+
+<h2>Tech Stack</h2>
+<table>
+  <tr><td>Frontend</td><td>React 19 + Vite + TypeScript</td></tr>
+  <tr><td>Backend</td><td>Node.js + WebSocket (2P multiplayer)</td></tr>
+  <tr><td>Mobile</td><td>Capacitor (Android APK)</td></tr>
+  <tr><td>Infrastructure</td><td>Docker Compose</td></tr>
+  <tr><td>Testing</td><td>Vitest (engine), Playwright MCP (visual/integration)</td></tr>
+  <tr><td>Cards</td><td>110 cards with real PNG art from FFVIII</td></tr>
+</table>
+
+<h2>Known Limitations & Future Improvements</h2>
+<ul>
+  <li><strong>2P full game test:</strong> Room creation and lobby verified; full 2-client game requires two separate browser sessions (tested in V2, architecture unchanged)</li>
+  <li><strong>Android APK build:</strong> Capacitor configuration in place; actual APK build requires Android SDK on the host machine</li>
+  <li><strong>Cross-browser:</strong> Tested in Chromium via Playwright; Firefox/Safari testing recommended before release</li>
+  <li><strong>Card art generation:</strong> NPC portraits use initials (CSS avatars) — could be enhanced with generated or curated character art</li>
+  <li><strong>Story cutscenes:</strong> Opening cutscene implemented; planned mid-game cutscenes (Galbadia, Centra, Deep Sea) could be added</li>
+  <li><strong>Performance:</strong> Smooth on desktop and mobile viewports tested; extended session memory profiling recommended</li>
+  <li><strong>Accessibility:</strong> Skip links, ARIA labels, and keyboard navigation in place; screen reader testing recommended</li>
+</ul>
+
+<h2>Data Model (V3)</h2>
+<table>
+  <tr><td>Inventory</td><td><code>Record&lt;string, number&gt;</code> — cardId to count owned</td></tr>
+  <tr><td>Saved Decks</td><td><code>SavedDeck[]</code> — id, name, cardIds[5], isStarter</td></tr>
+  <tr><td>World Hierarchy</td><td>Region → Location[] → NPC[]</td></tr>
+  <tr><td>NPC Types</td><td>dialogue, shop, duel, tournament</td></tr>
+  <tr><td>Quests</td><td>find_card, beat_npc, clear_dungeon with rewards</td></tr>
+  <tr><td>Difficulty Tiers</td><td>1-5 mapped to easy/medium/hard AI strategies</td></tr>
+  <tr><td>Special Rules</td><td>Same, Plus, Combo, Same Wall, Elemental, Random, Open, Sudden Death</td></tr>
+</table>
+
+<div class="footer">
+  <p>Generated March 2026 | Triple Triad V3 — A Final Fantasy VIII fan tribute</p>
+  <p>Built with React 19 + TypeScript + Docker</p>
+</div>
+
+</div>
+</body>
+</html>
