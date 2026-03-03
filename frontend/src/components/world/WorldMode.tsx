@@ -8,7 +8,7 @@ import { TownView } from './TownView'
 import { DungeonView } from './DungeonView'
 import { NpcInteraction } from './NpcInteraction'
 
-type WorldScreen =
+export type WorldScreen =
   | { type: 'map' }
   | { type: 'region'; regionId: string }
   | { type: 'town'; locationId: string; regionId: string }

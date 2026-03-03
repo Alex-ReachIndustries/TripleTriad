@@ -121,6 +121,7 @@ function App() {
   const handleBattleCancel = useCallback(() => {
     setBattleContext(null)
     setTab('world')
+    // Don't clear worldReturnScreen — user cancelled, return to where they were
   }, [])
 
   // V3: Quest accept/claim
@@ -207,8 +208,7 @@ function App() {
   return (
     <div className="app">
       <a href="#main-content" className="skip-link">Skip to main content</a>
-      {tab !== 'battle' && (
-        <nav className="app-nav" aria-label="Main navigation">
+        <nav className="app-nav" aria-label="Main navigation" style={{ display: tab === 'battle' ? 'none' : undefined }}>
           <button
             type="button"
             className="app-nav-home"
@@ -242,9 +242,8 @@ function App() {
             Duel
           </button>
         </nav>
-      )}
       <main id="main-content">
-        {tab === 'world' && (
+        <div style={{ display: tab === 'world' ? undefined : 'none' }}>
           <WorldMode
             worldState={worldState}
             onInitiateDuel={handleWorldInitiateDuel}
@@ -254,7 +253,7 @@ function App() {
             onAcceptQuest={handleAcceptQuest}
             onClaimQuest={handleClaimQuest}
           />
-        )}
+        </div>
         {tab === 'deck' && (
           <DeckManager
             savedDecks={worldState.savedDecks}
