@@ -5,7 +5,6 @@
 
 import type { SavedDeck } from './deckManager'
 import { createStarterDeck, parseSavedDecks } from './deckManager'
-import type { Quest } from '../types/quest'
 import { getQuestById, isQuestComplete } from './quests'
 
 const STORAGE_KEY = 'tripletriad-world'

@@ -4,14 +4,6 @@ import type { WorldPlayerState } from '../../data/worldState'
 import { getRegionById, getNpcsByLocation, formatRules } from '../../data/world'
 import { getQuestsByNpc, getQuestStatus } from '../../data/quests'
 
-/** NPC type → icon character */
-const NPC_TYPE_ICON: Record<string, string> = {
-  duel: '\u2694\uFE0F',      // ⚔️
-  shop: '\uD83D\uDCB0',      // 💰 (won't render — use JS expression)
-  dialogue: '\uD83D\uDCAC',  // 💬
-  tournament: '\uD83C\uDFC6', // 🏆
-}
-
 /** NPC type → human-readable label */
 const NPC_TYPE_LABEL: Record<string, string> = {
   duel: 'Duel',
