@@ -1,7 +1,6 @@
 /**
- * World mode types: regions, areas, spots, and rules.
- * Hierarchy: 8 regions (continents) → areas (towns/dungeons) → spots (duel/shop/tournament).
- * See docs/rules.md for regional defaults.
+ * V3 World mode types: 7 regions → locations → NPCs.
+ * Towns have free-roam NPC grids; dungeons have sequential floor gauntlets.
  */
 
 export type SpecialRule =
@@ -16,7 +15,10 @@ export type SpecialRule =
 
 export type TradeRule = 'One' | 'Diff' | 'Direct' | 'All'
 
-export type SpotType = 'duel' | 'shop' | 'tournament'
+export type NpcType = 'dialogue' | 'shop' | 'duel' | 'tournament'
+
+/** Difficulty tiers 1-5 mapping to AI strategy + deck strength. */
+export type DifficultyTier = 1 | 2 | 3 | 4 | 5
 
 export interface Region {
   id: string
@@ -25,51 +27,113 @@ export interface Region {
   rules: SpecialRule[]
   /** Default trade rule for this region. */
   tradeRule: TradeRule
+  /** Story order (0 = starter region, 6 = endgame). */
+  order: number
+  /** Description shown in tooltips. */
+  description: string
+  /** SVG polygon points for map overlay (% of image dimensions). */
+  mapBounds: string
+  /** What the player must do to unlock this region. Null = unlocked by default. */
+  unlockCondition: UnlockCondition | null
 }
 
-/** Area = town or dungeon on the map; has map position and story order. */
-export interface Area {
+export interface UnlockCondition {
+  /** Type of condition. */
+  type: 'default' | 'beat_npc' | 'clear_dungeon' | 'unique_wins_in_location' | 'unique_wins_in_region' | 'quest_count'
+  /** For beat_npc: NPC id. For clear_dungeon: location id. For unique_wins: location/region id. */
+  targetId?: string
+  /** For unique_wins: how many unique NPC wins needed. For quest_count: how many quests. */
+  count?: number
+}
+
+export interface Location {
   id: string
   name: string
   regionId: string
-  /** Story order (0 = first unlockable). Lower = earlier in story. */
+  /** 'town' = free-roam NPC grid; 'dungeon' = sequential floor gauntlet. */
+  type: 'town' | 'dungeon'
+  /** Order within region (0 = first location). */
   order: number
-  /** X position on world map image, 0–100 (percent from left). */
+  /** X position on region sub-map, 0–100 (percent). */
   mapX: number
-  /** Y position on world map image, 0–100 (percent from top). */
+  /** Y position on region sub-map, 0–100 (percent). */
   mapY: number
-  /** Default duel opponent name for this area (e.g. "Balamb Student"). */
+  /** What the player must do to unlock this location. Null = unlocked with region. */
+  unlockCondition: UnlockCondition | null
+  /** Dungeon flavour text (dungeon type only). */
+  flavour?: string
+}
+
+export interface NpcDialogue {
+  /** Shown when NPC is available to interact with (or challenge). */
+  challenge?: string
+  /** Shown after player defeats this NPC (during cooldown). */
+  defeated?: string
+  /** Shown when NPC is available for rematch. */
+  rematch?: string
+  /** General dialogue (for dialogue-type NPCs). */
+  text?: string
+  /** Dungeon floor intro text. */
+  floorIntro?: string
+  /** Dungeon floor defeated text. */
+  floorDefeated?: string
+}
+
+export interface ShopInventory {
+  cardId: string
+  buyPrice: number
+  /** Sell price is auto-calculated as floor(buyPrice / 2). */
+}
+
+export interface NPC {
+  id: string
+  name: string
+  locationId: string
+  type: NpcType
+  /** Portrait image path. */
+  portrait?: string
+  /** Dialogue lines for various states. */
+  dialogue: NpcDialogue
+  /** For duel NPCs: difficulty tier (1-5). */
+  difficultyTier?: DifficultyTier
+  /** For duel NPCs: card IDs the AI draws from (8-10 cards). */
+  deckPool?: string[]
+  /** For duel NPCs: gil awarded on win. */
+  gilReward?: number
+  /** For shop NPCs: items they sell. */
+  shopItems?: ShopInventory[]
+  /** For tournament NPCs: entry fee. */
+  tournamentEntryFee?: number
+  /** For tournament NPCs: prize pool card IDs. */
+  tournamentPrizePool?: string[]
+  /** For dungeon NPCs: floor order (0 = floor 1, 1 = floor 2, ...). */
+  floorOrder?: number
+  /** For dungeon NPCs: true if this is the boss floor. */
+  isBoss?: boolean
+  /** Quest ID this NPC offers (for dialogue NPCs with quests). */
+  questId?: string
+}
+
+// ─── Legacy type aliases (backward compat until UI migration) ───
+
+/** @deprecated Use Location instead. */
+export type Area = Location & {
   opponentName?: string
-  /** Optional opponent/NPC image path (e.g. /npcs/balamb_student.png). */
   opponentImagePath?: string
-  /** Card ids that the AI opponent draws from (8–10 cards). 5 selected at game start. */
   opponentDeckPool?: string[]
-  /** Gil awarded to player on winning a duel at this area. */
   gilReward?: number
 }
 
-/** Spot = NPC/location within an area: card duel, shop, or tournament. */
+/** @deprecated Use NPC instead. */
+export type SpotType = 'duel' | 'shop' | 'tournament'
+
+/** @deprecated Use NPC instead. */
 export interface Spot {
   id: string
   name: string
   areaId: string
   type: SpotType
-  /** For duel spots: opponent display name. */
-  opponentName?: string
-  /** For duel spots: opponent image path. */
-  opponentImagePath?: string
-  /** Order within area for display. */
-  order: number
-}
-
-/** @deprecated Use Area for map markers and Spot for duels/shops/tournaments. */
-export interface Location {
-  id: string
-  name: string
-  regionId: string
-  order: number
   opponentName?: string
   opponentImagePath?: string
-  mapX: number
-  mapY: number
+  order: number
 }
