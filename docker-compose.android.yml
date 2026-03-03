@@ -1,0 +1,12 @@
+# Android APK build (Docker). Use: docker compose -f docker-compose.yml -f docker-compose.android.yml run --rm android-build
+# APK is written to ./output/apk/ (bind-mounted).
+
+services:
+  android-build:
+    image: tripletriad-android-build
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.android
+    volumes:
+      - ./output/apk:/out
+    working_dir: /app

@@ -244,26 +244,49 @@ export function PlayPage({
   // --- Home (freestyle/2P hub) ---
   if (screen === 'home') {
     return (
-      <div className="play-page">
-        <h1>Play Triple Triad</h1>
-        {error && <p className="error">{error}</p>}
-        <section aria-label="Play options">
-          <button type="button" onClick={handleCreate}>Create room</button>
-          <p className="or">— or —</p>
-          <label htmlFor="join-room-code" className="visually-hidden">Room code to join</label>
-          <input
-            id="join-room-code"
-            type="text"
-            placeholder="Room code"
-            value={joinCode}
-            onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-            maxLength={6}
-          />
-          <button type="button" onClick={handleJoin}>Join room</button>
-          <p className="or">— or —</p>
-          <button type="button" onClick={() => { setGameMode('vs-ai'); setScreen('pre-duel') }}>
-            Play vs AI
-          </button>
+      <div className="play-page duel-home">
+        <h2 className="duel-home-title">Duel</h2>
+        <p className="duel-home-subtitle">Challenge opponents or play online</p>
+        {error && <p className="pre-duel-invalid">{error}</p>}
+
+        <section className="duel-home-options" aria-label="Play options">
+          {/* Online 2P section */}
+          <div className="duel-home-section">
+            <h3 className="duel-home-section-title">Online Multiplayer</h3>
+            <div className="duel-home-row">
+              <button type="button" className="duel-home-btn primary" onClick={handleCreate}>
+                Create Room
+              </button>
+            </div>
+            <div className="duel-home-divider">or join an existing room</div>
+            <div className="duel-home-join-row">
+              <label htmlFor="join-room-code" className="visually-hidden">Room code to join</label>
+              <input
+                id="join-room-code"
+                type="text"
+                className="duel-home-code-input"
+                placeholder="ROOM CODE"
+                value={joinCode}
+                onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+                maxLength={6}
+              />
+              <button type="button" className="duel-home-btn secondary" onClick={handleJoin}>
+                Join
+              </button>
+            </div>
+          </div>
+
+          {/* AI section */}
+          <div className="duel-home-section">
+            <h3 className="duel-home-section-title">Solo Practice</h3>
+            <button
+              type="button"
+              className="duel-home-btn primary"
+              onClick={() => { setGameMode('vs-ai'); setScreen('pre-duel') }}
+            >
+              Play vs AI
+            </button>
+          </div>
         </section>
       </div>
     )

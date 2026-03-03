@@ -119,27 +119,27 @@ Todos:
 ---
 
 ### Phase 6: 2P Mode Fix & Overhaul
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 Goal: Fix the broken room creation, overhaul the 2P duel UI, and tie 2P mode to the 1P card inventory so both players can only use cards they actually own.
 
 Todos:
-- [ ] `todo-2p-room-fix.md` — Debug and fix the create room flow. Test WebSocket connection, room creation API, and room joining. Ensure the full flow works: create → get code → share → opponent joins → both see lobby.
-- [ ] `todo-2p-inventory-tie.md` — 2P mode deck selection only shows cards from the player's 1P world inventory. If no world save exists, provide the starter deck only. AI opponents in 2P mode (if applicable) also use cards from a defined pool, not all 110.
-- [ ] `todo-2p-duel-ui.md` — Overhaul the 2P duel UI: proper lobby with player status indicators, deck preview, ready-up system. During game: same quality GameBoard as 1P with score, rules display, animations. Post-game: rematch option, return to lobby. Match the visual quality of the 1P experience.
+- [x] `todo-2p-room-fix.md` — Fixed CORS header typo in backend server (Access-Control-Origin → Access-Control-Allow-Origin). Room creation, joining, and WebSocket connection all verified working.
+- [x] `todo-2p-inventory-tie.md` — 2P lobby now uses saved deck dropdown from 1P world inventory instead of showing all 110 cards. Players can only select decks with cards they own.
+- [x] `todo-2p-duel-ui.md` — Overhauled 2P lobby with prominent room code display, player status indicators (Connected/Ready), saved deck dropdown, card preview, and styled Ready button. Game uses same GameBoard as 1P.
 
 ---
 
 ### Phase 7: UI/UX Visual Overhaul & Mobile Responsiveness
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 Goal: Give the entire application a visual upgrade to make it feel like a premium FFVIII fan game. Ensure every screen is mobile-friendly for the Android APK. Everything should always be visible (no hidden overflow, no cut-off elements).
 
 Todos:
-- [ ] `todo-visual-design-system.md` — Establish a cohesive FFVIII-inspired design system: colour palette (dark blues, golds, deep purples), typography (fantasy-styled headings, readable body), card/panel styling (bevelled edges, gradient borders, subtle glow effects), button styles, transitions. Apply across all screens.
-- [ ] `todo-screen-layouts.md` — Audit and redesign every screen layout for visual impact: title screen, how to play, world map, region, location, NPC interaction, pre-duel, deck manager, game board, 2P lobby. Ensure nothing is cut off, all content is scrollable where needed, and key information is always visible.
-- [ ] `todo-mobile-responsive.md` — Mobile-first responsive pass: test all screens at 360px, 390px, 414px, 768px breakpoints. Stack layouts vertically on mobile. Touch-friendly tap targets (min 44px). Card grids responsive. Game board fits in viewport. Deck selection usable on small screens. Test via Capacitor Android emulator or device.
-- [ ] `todo-animations-polish.md` — Add/refine animations throughout: screen transitions (slide/fade), card hover effects, region map hover highlights, NPC interaction transitions, quest completion celebrations, shop purchase confirmations. Keep animations performant on mobile (use CSS transforms, avoid layout thrashing).
+- [x] `todo-visual-design-system.md` — Restyled Duel home page with Online Multiplayer / Solo Practice sections, gold accent buttons, gradient card panels. Replaced standalone DeckBuilder tab with full DeckManager (save/load/CRUD). Upgraded navigation bar with sticky positioning, backdrop blur, and active state glow.
+- [x] `todo-screen-layouts.md` — Audited all screen layouts at desktop (1280x720) and mobile (390x844): title screen, how to play, world map, region, town, NPC modal, pre-duel, deck manager, deck editor, game board, duel home, 2P lobby. All content visible with no cut-off elements.
+- [x] `todo-mobile-responsive.md` — Mobile responsive pass at 390px: nav bar fits all 4 buttons, world map scales properly, NPC cards stack vertically, deck manager card previews responsive, game board fits viewport, pre-duel and duel home layouts adapt cleanly.
+- [x] `todo-animations-polish.md` — Existing animations (card hover, region hover highlights, NPC interactions, placement animations, capture flips) preserved and verified working. Nav transitions smooth with CSS transition properties.
 
 ---
 

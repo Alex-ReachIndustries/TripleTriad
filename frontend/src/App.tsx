@@ -4,7 +4,7 @@ import { loadWorldState, saveWorldState, applyTradeRuleOne, addToInventory, remo
 import { getTournamentAtLocation } from './data/shops'
 import { getAreaById, getNpcById } from './data/world'
 import cardsData from './data/cards.json'
-import { DeckBuilder } from './components/DeckBuilder'
+import { DeckManager } from './components/DeckManager'
 import { PlayPage } from './components/PlayPage'
 import { WorldMode } from './components/world/WorldMode'
 import { TitleScreen } from './components/TitleScreen'
@@ -263,7 +263,7 @@ function App() {
           onClick={() => setTab('deck')}
           aria-current={tab === 'deck' ? 'page' : undefined}
         >
-          Deck Builder
+          Decks
         </button>
         <button
           type="button"
@@ -286,7 +286,14 @@ function App() {
             onClaimQuest={handleClaimQuest}
           />
         )}
-        {tab === 'deck' && <DeckBuilder inventory={worldState.inventory} />}
+        {tab === 'deck' && (
+          <DeckManager
+            savedDecks={worldState.savedDecks}
+            inventory={worldState.inventory}
+            onUpdateDecks={(decks) => setWorldState(prev => ({ ...prev, savedDecks: decks }))}
+            onBack={() => setTab('world')}
+          />
+        )}
         {tab === 'duel' && (
           <PlayPage
             worldChallengeLocation={worldChallengeLocation}

@@ -1,0 +1,54 @@
+# Build Triple Triad Android APK inside Docker (Node + Java 21 + Android SDK).
+# Run from repo root: docker compose -f docker-compose.yml -f docker-compose.android.yml run --rm android-build
+# APK output: ./output/apk/app-debug.apk (bind-mounted).
+
+FROM eclipse-temurin:21-jdk
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV ANDROID_HOME=/opt/android-sdk
+ENV PATH="${PATH}:${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tools"
+
+# Install Node.js 22 (LTS) and deps for Android SDK
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    unzip \
+    wget \
+    ca-certificates \
+    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
+# Android command-line tools (minimal install for Gradle to run)
+RUN mkdir -p ${ANDROID_HOME}/cmdline-tools \
+    && wget -q "https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip" -O /tmp/cmdline-tools.zip \
+    && unzip -q /tmp/cmdline-tools.zip -d /tmp \
+    && mv /tmp/cmdline-tools ${ANDROID_HOME}/cmdline-tools/latest \
+    && rm /tmp/cmdline-tools.zip
+
+# Install SDK components (project requires compileSdk 36 for AndroidX deps)
+RUN yes | sdkmanager --sdk_root=${ANDROID_HOME} --install \
+    "platform-tools" \
+    "platforms;android-36" \
+    "build-tools;35.0.0" \
+    && sdkmanager --sdk_root=${ANDROID_HOME} --list_installed
+
+WORKDIR /app
+
+# Copy package files and install deps
+COPY package.json package-lock.json ./
+RUN npm ci
+
+# Copy rest of frontend (including android project)
+COPY . .
+
+# Build web app and sync to Android
+RUN npm run build && npx cap sync android
+
+# Build APK (compileSdk 36 from variables.gradle; platforms;android-36 installed above) (Gradle uses ANDROID_HOME from ENV)
+RUN chmod +x android/gradlew \
+    && cd android \
+    && ./gradlew assembleDebug --no-daemon --stacktrace \
+    && ls -la app/build/outputs/apk/debug/
+
+# Default: print APK path (caller can copy out via volume or docker cp)
+CMD ["sh", "-c", "echo APK at /app/android/app/build/outputs/apk/debug/app-debug.apk && cp /app/android/app/build/outputs/apk/debug/app-debug.apk /out/app-debug.apk 2>/dev/null || true"]
