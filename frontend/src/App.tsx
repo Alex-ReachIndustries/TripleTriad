@@ -10,10 +10,11 @@ import { TitleScreen } from './components/TitleScreen'
 import { HowToPlay } from './components/HowToPlay'
 import { HomePage } from './components/HomePage'
 import { StoryCutscene, OPENING_PANELS } from './components/StoryCutscene'
+import { MapEditor } from './components/admin/MapEditor'
 import './App.css'
 
 type AppView = 'title' | 'howto' | 'home' | 'game' | 'cutscene'
-type GameTab = 'world' | 'deck' | 'duel' | 'battle'
+type GameTab = 'world' | 'deck' | 'duel' | 'battle' | 'admin'
 
 const STORAGE_KEY = 'tripletriad-world'
 
@@ -241,6 +242,14 @@ function App() {
           >
             Duel
           </button>
+          <button
+            type="button"
+            className={tab === 'admin' ? 'active' : ''}
+            onClick={() => setTab('admin')}
+            aria-current={tab === 'admin' ? 'page' : undefined}
+          >
+            Admin
+          </button>
         </nav>
       <main id="main-content">
         <div style={{ display: tab === 'world' ? undefined : 'none' }}>
@@ -271,6 +280,9 @@ function App() {
             onSetLastDeckId={(deckId) => setWorldState(prev => ({ ...prev, lastDeckId: deckId }))}
             onUpdateDecks={(decks) => setWorldState(prev => ({ ...prev, savedDecks: decks }))}
           />
+        )}
+        {tab === 'admin' && (
+          <MapEditor />
         )}
         {tab === 'battle' && battleContext && (
           <BattleScreen
