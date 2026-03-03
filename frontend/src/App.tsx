@@ -231,7 +231,7 @@ function App() {
             onClick={() => setTab('deck')}
             aria-current={tab === 'deck' ? 'page' : undefined}
           >
-            Decks
+            Collection
           </button>
           <button
             type="button"
