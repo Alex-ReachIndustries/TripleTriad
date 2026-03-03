@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import type { GameState } from '../game'
 import type { Card } from '../types/card'
 import type { Area } from '../types/world'
-import { createGame, placeCard, continueSuddenDeath, getAiMove } from '../game'
+import { createGame, placeCard, continueSuddenDeath, getAiMove, getDifficultyForTier } from '../game'
 import type { Difficulty } from '../game'
 import { createRoom, joinRoom, getWsUrl } from '../api/client'
 import cardsData from '../data/cards.json'
@@ -64,6 +64,10 @@ export function PlayPage({ worldChallengeLocation = null, tournamentPrize = null
     if (worldChallengeLocation || tournamentPrize) {
       setGameMode('vs-ai')
       setScreen('vs-ai-setup')
+      // Auto-set difficulty from NPC tier in world mode
+      if (worldChallengeLocation?.difficultyTier) {
+        setDifficulty(getDifficultyForTier(worldChallengeLocation.difficultyTier))
+      }
     }
   }, [worldChallengeLocation, tournamentPrize])
 
@@ -258,14 +262,23 @@ export function PlayPage({ worldChallengeLocation = null, tournamentPrize = null
         <button type="button" className="back" onClick={() => { setScreen('home'); setGameMode('online'); onLeaveWorldChallenge?.() }}>
           ← Back
         </button>
-        <p>
-          <label>Difficulty: </label>
-          <select value={difficulty} onChange={(e) => setDifficulty(e.target.value as Difficulty)}>
-            <option value="easy">Easy</option>
-            <option value="medium">Medium</option>
-            <option value="hard">Hard</option>
-          </select>
-        </p>
+        {worldChallengeLocation ? (
+          <p className="difficulty-auto">
+            Difficulty: <strong>{difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}</strong>
+            {worldChallengeLocation.difficultyTier && (
+              <span className="difficulty-tier"> (Tier {worldChallengeLocation.difficultyTier})</span>
+            )}
+          </p>
+        ) : (
+          <p>
+            <label>Difficulty: </label>
+            <select value={difficulty} onChange={(e) => setDifficulty(e.target.value as Difficulty)}>
+              <option value="easy">Easy</option>
+              <option value="medium">Medium</option>
+              <option value="hard">Hard</option>
+            </select>
+          </p>
+        )}
         <p>Choose 5 cards, then click Start game.</p>
         {(worldChallengeLocation || tournamentPrize) && (
           <p className="lobby-deck-label">Your deck ({deck.length}/{DECK_SIZE}):</p>

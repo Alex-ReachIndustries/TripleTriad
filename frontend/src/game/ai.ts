@@ -1,7 +1,15 @@
 import type { GameState, PlayerId } from './types'
+import type { DifficultyTier } from '../types/world'
 import { placeCard, getValidMoves, isGameOver } from './engine'
 
 export type Difficulty = 'easy' | 'medium' | 'hard'
+
+/** Map NPC difficulty tier (1-5) to AI strategy. */
+export function getDifficultyForTier(tier: DifficultyTier): Difficulty {
+  if (tier <= 1) return 'easy'
+  if (tier <= 3) return 'medium'
+  return 'hard'
+}
 
 /** Count cells owned by player (0–9). */
 function countOwned(state: GameState, player: PlayerId): number {

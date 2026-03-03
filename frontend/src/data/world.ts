@@ -1891,6 +1891,7 @@ export function getAreas(): Area[] {
       opponentImagePath: firstDuel?.portrait,
       opponentDeckPool: firstDuel?.deckPool,
       gilReward: firstDuel?.gilReward,
+      difficultyTier: firstDuel?.difficultyTier,
     }
   })
 }

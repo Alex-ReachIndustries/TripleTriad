@@ -122,6 +122,7 @@ export type Area = Location & {
   opponentImagePath?: string
   opponentDeckPool?: string[]
   gilReward?: number
+  difficultyTier?: DifficultyTier
 }
 
 /** @deprecated Use NPC instead. */
