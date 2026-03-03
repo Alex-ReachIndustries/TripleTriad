@@ -294,6 +294,10 @@ function App() {
             onWorldMatchEnd={handleWorldMatchEnd}
             onLeaveWorldChallenge={handleLeaveWorldChallenge}
             worldPlayerInventory={worldState.inventory}
+            savedDecks={worldState.savedDecks}
+            lastDeckId={worldState.lastDeckId}
+            onSetLastDeckId={(deckId) => setWorldState(prev => ({ ...prev, lastDeckId: deckId }))}
+            onUpdateDecks={(decks) => setWorldState(prev => ({ ...prev, savedDecks: decks }))}
           />
         )}
       </main>

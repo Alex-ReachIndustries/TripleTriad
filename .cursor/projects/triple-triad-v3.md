@@ -94,16 +94,16 @@ Todos:
 ---
 
 ### Phase 4: World Mode — Region Map & Navigation
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 Goal: Replace the current flat world map with a 7-region hierarchical navigation system. The world map shows highlighted regions on the FFVIII world map; clicking a region shows a zoomed region screen with location markers; clicking a location shows a location screen with NPCs.
 
 Todos:
-- [ ] `todo-world-map-regions.md` — New WorldMapPage: display the FFVIII world map with 7 clickable/hoverable region overlays (SVG polygons or image map). Hover shows region name + active rules tooltip. Click navigates to RegionPage. Locked regions shown dimmed. Progress indicator.
-- [ ] `todo-region-screen.md` — New RegionPage: zoomed portion of world map for the selected region. Location markers placed at correct positions. Locked locations shown with lock icon. Unlocked locations show name + NPC count. Click navigates to LocationPage. Region rules displayed prominently. Back button → world map.
-- [ ] `todo-town-screen.md` — TownPage (for `type: 'town'` locations): shows the location name, background, and a grid/list of NPCs with their portrait art. Each NPC card shows: name, type icon (dialogue/shop/duel/tournament), and brief description. Click NPC → opens NPC interaction (dialogue panel, shop UI, pre-duel screen, or tournament entry). Active quests indicator. Gil display. Back button → region.
-- [ ] `todo-dungeon-screen.md` — DungeonPage (for `type: 'dungeon'` locations): vertical path UI showing sequential floors from bottom to top, with boss at the top. Player selects deck ONCE before entering. Each floor shows opponent name, tier, and completion status. Current floor highlighted. Losing any floor returns to dungeon entrance. Brief narrative text between floors. "Cleared" badge once boss is beaten. Can be re-entered for rematches.
-- [ ] `todo-npc-interactions.md` — NPC interaction panels (town only): Dialogue NPC shows conversation text (with quest offers if applicable). Shop NPC shows buy/sell interface. Duel NPC shows pre-duel deck selection. Tournament NPC shows entry fee, prize info, and pre-duel deck selection. All interactions stay within the town screen (modal or side panel).
+- [x] `todo-world-map-regions.md` — World map with 7 clickable SVG polygon region overlays, hover tooltips, locked/unlocked states, progress indicator.
+- [x] `todo-region-screen.md` — Zoomed region map with SVG viewBox, location markers (gold circles for towns, red squares for dungeons), connection lines, lock states.
+- [x] `todo-town-screen.md` — NPC grid with color-coded cards by type, avatar initials, difficulty stars, quest badges, gil rewards.
+- [x] `todo-dungeon-screen.md` — Vertical floor path UI with boss crown, sequential progression, challenge/rematch buttons, cleared badge.
+- [x] `todo-npc-interactions.md` — Modal interaction panels: dialogue (with quest accept/claim), shop (buy/sell tabs), duel (deck selector + preview), tournament (entry fee + prizes).
 
 ---
 

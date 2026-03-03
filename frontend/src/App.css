@@ -3091,3 +3091,638 @@
     height: 42px;
   }
 }
+
+/* ================================================
+   PRE-DUEL SCREEN
+   ================================================ */
+
+.pre-duel {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.pre-duel-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.pre-duel-header .back {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.pre-duel-header .back:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.pre-duel-title {
+  font-size: 1.3rem;
+  color: var(--accent);
+  margin: 0;
+}
+
+.pre-duel-opponent {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.pre-duel-opponent-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.25rem;
+}
+
+.pre-duel-difficulty {
+  color: var(--accent);
+  font-size: 1rem;
+  letter-spacing: 2px;
+}
+
+.pre-duel-reward {
+  color: var(--accent-dim);
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.pre-duel-rules {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.6rem 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.pre-duel-rules-label {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.pre-duel-trade {
+  color: var(--text-muted);
+}
+
+.pre-duel-difficulty-select {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.pre-duel-difficulty-select select {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.9rem;
+}
+
+.pre-duel-deck-section {
+  margin-bottom: 1.5rem;
+}
+
+.pre-duel-deck-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.pre-duel-deck-label {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.pre-duel-deck-dropdown {
+  flex: 1;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.9rem;
+}
+
+.pre-duel-edit-decks-btn {
+  background: var(--surface-alt);
+  color: var(--accent);
+  border: 1px solid var(--accent-dim);
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.pre-duel-edit-decks-btn:hover {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+}
+
+.pre-duel-deck-preview {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.pre-duel-preview-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.pre-duel-card-img {
+  width: 64px;
+  height: 84px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 2px solid var(--border);
+  transition: border-color var(--transition-fast);
+}
+
+.pre-duel-card-name {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-align: center;
+  max-width: 64px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pre-duel-invalid {
+  color: var(--error);
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.pre-duel-start-btn {
+  display: block;
+  width: 100%;
+  background: linear-gradient(135deg, var(--accent), #d4a520);
+  color: var(--bg);
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.pre-duel-start-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  opacity: 0.95;
+}
+
+.pre-duel-start-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ================================================
+   DECK MANAGER
+   ================================================ */
+
+.deck-mgr {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.deck-mgr-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.deck-mgr-title {
+  font-size: 1.3rem;
+  color: var(--accent);
+  margin: 0;
+}
+
+.deck-mgr-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.deck-mgr-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  transition: border-color var(--transition-fast);
+}
+
+.deck-mgr-item:hover {
+  border-color: var(--accent-dim);
+}
+
+.deck-mgr-item.invalid {
+  border-color: var(--error);
+  border-style: dashed;
+}
+
+.deck-mgr-item-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.deck-mgr-item-name {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.deck-mgr-starter-badge {
+  background: var(--accent);
+  color: var(--bg);
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.deck-mgr-invalid-badge {
+  background: var(--error);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+}
+
+.deck-mgr-rename-input {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.9rem;
+  flex: 1;
+  max-width: 200px;
+}
+
+.deck-mgr-item-actions {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.deck-mgr-action-btn {
+  background: var(--surface-alt);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.deck-mgr-action-btn:hover:not(:disabled) {
+  color: var(--text);
+  border-color: var(--accent-dim);
+}
+
+.deck-mgr-action-btn.delete:hover {
+  color: var(--error);
+  border-color: var(--error);
+}
+
+.deck-mgr-action-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.deck-mgr-card-preview {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.deck-mgr-preview-card {
+  width: 48px;
+}
+
+.deck-mgr-card-img {
+  width: 48px;
+  height: 62px;
+  object-fit: cover;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+}
+
+.deck-mgr-preview-card.empty .deck-mgr-empty-slot {
+  width: 48px;
+  height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  border: 1px dashed var(--border);
+  border-radius: 3px;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+}
+
+.deck-mgr-create-btn {
+  display: block;
+  width: 100%;
+  margin-top: 1rem;
+  background: var(--surface-alt);
+  color: var(--accent);
+  border: 1px dashed var(--accent-dim);
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.deck-mgr-create-btn:hover {
+  background: var(--accent);
+  color: var(--bg);
+  border-style: solid;
+  border-color: var(--accent);
+}
+
+/* ================================================
+   DECK EDITOR
+   ================================================ */
+
+.deck-editor {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.deck-editor-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.deck-editor-title {
+  flex: 1;
+  font-size: 1.1rem;
+  color: var(--accent);
+  margin: 0;
+}
+
+.deck-editor-save-btn {
+  background: linear-gradient(135deg, var(--accent), #d4a520);
+  color: var(--bg);
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1.2rem;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+
+.deck-editor-save-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.deck-editor-slots {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.deck-editor-slot {
+  width: 80px;
+}
+
+.deck-editor-slot.filled .deck-editor-slot-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  background: var(--surface);
+  border: 2px solid var(--accent-dim);
+  border-radius: 6px;
+  padding: 0.3rem;
+  cursor: pointer;
+  position: relative;
+  transition: border-color var(--transition-fast);
+  width: 100%;
+}
+
+.deck-editor-slot.filled .deck-editor-slot-btn:hover {
+  border-color: var(--error);
+}
+
+.deck-editor-slot-img {
+  width: 60px;
+  height: 78px;
+  object-fit: cover;
+  border-radius: 3px;
+}
+
+.deck-editor-slot-name {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-align: center;
+  max-width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.deck-editor-remove-hint {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  color: var(--error);
+  font-size: 0.85rem;
+  font-weight: 700;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.deck-editor-slot-btn:hover .deck-editor-remove-hint {
+  opacity: 1;
+}
+
+.deck-editor-slot.empty .deck-editor-empty {
+  width: 100%;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  border: 2px dashed var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.deck-editor-available {
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+}
+
+.deck-editor-available-title {
+  font-size: 1rem;
+  color: var(--text);
+  margin: 0 0 0.75rem 0;
+}
+
+.deck-editor-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.5rem;
+}
+
+.deck-editor-card {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.4rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: left;
+}
+
+.deck-editor-card:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: var(--surface-alt);
+}
+
+.deck-editor-card.in-deck {
+  border-color: var(--accent-dim);
+}
+
+.deck-editor-card.unavailable {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.deck-editor-card-img {
+  width: 40px;
+  height: 52px;
+  object-fit: cover;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.deck-editor-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.deck-editor-card-name {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.deck-editor-card-stats {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+.deck-editor-card-count {
+  font-size: 0.6rem;
+  color: var(--accent-dim);
+}
+
+/* Mobile responsive for pre-duel and deck manager */
+@media (max-width: 600px) {
+  .pre-duel-deck-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pre-duel-edit-decks-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .pre-duel-card-img {
+    width: 52px;
+    height: 68px;
+  }
+
+  .deck-mgr-item-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .deck-mgr-item-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .deck-editor-card-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+
+  .deck-editor-slots {
+    gap: 0.3rem;
+  }
+
+  .deck-editor-slot {
+    width: 60px;
+  }
+
+  .deck-editor-slot-img {
+    width: 44px;
+    height: 58px;
+  }
+
+  .deck-editor-slot.empty .deck-editor-empty {
+    height: 76px;
+  }
+}

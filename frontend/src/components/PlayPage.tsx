@@ -2,16 +2,18 @@ import { useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import type { GameState } from '../game'
 import type { Card } from '../types/card'
 import type { Area } from '../types/world'
+import type { SavedDeck } from '../data/deckManager'
 import { createGame, placeCard, continueSuddenDeath, getAiMove, getDifficultyForTier } from '../game'
 import type { Difficulty } from '../game'
 import { createRoom, joinRoom, getWsUrl } from '../api/client'
 import cardsData from '../data/cards.json'
 import { getRegionById, formatRules, getAreaDeckPool } from '../data/world'
-import { getOwnedCardIds } from '../data/worldState'
+import { getDeckById, isDeckValid } from '../data/deckManager'
 import { GameBoard } from './GameBoard'
-import { CardView } from './CardView'
+import { DeckManager } from './DeckManager'
 
 const allCards: Card[] = cardsData.cards as Card[]
+const cardMap = new Map(allCards.map(c => [c.id, c]))
 const DECK_SIZE = 5
 
 /** Winner: 0 = player, 1 = opponent, 'draw' = tie. */
@@ -24,8 +26,16 @@ export interface PlayPageProps {
   /** Called when a world challenge or tournament match ends; receives winner (0 = player won). */
   onWorldMatchEnd?: (winner: WorldMatchResult) => void
   onLeaveWorldChallenge?: () => void
-  /** Player's card inventory. When in world challenge mode, only show owned cards in the deck picker. */
+  /** Player's card inventory. */
   worldPlayerInventory?: Record<string, number>
+  /** Saved decks from world state */
+  savedDecks?: SavedDeck[]
+  /** Last used deck ID */
+  lastDeckId?: string | null
+  /** Update last used deck ID */
+  onSetLastDeckId?: (deckId: string) => void
+  /** Update saved decks */
+  onUpdateDecks?: (decks: SavedDeck[]) => void
 }
 
 function pickRandomDeck(pool: Card[], size: number): Card[] {
@@ -33,11 +43,26 @@ function pickRandomDeck(pool: Card[], size: number): Card[] {
   return shuffled.slice(0, size)
 }
 
-type Screen = 'home' | 'lobby' | 'game' | 'vs-ai-setup'
+function getCard(id: string): Card | undefined {
+  return cardMap.get(id)
+}
+
+type Screen = 'home' | 'lobby' | 'game' | 'pre-duel' | 'deck-manager'
 type GameMode = 'online' | 'vs-ai'
 
-export function PlayPage({ worldChallengeLocation = null, tournamentPrize = null, onWorldMatchEnd, onLeaveWorldChallenge, worldPlayerInventory }: PlayPageProps = {}) {
-  const [screen, setScreen] = useState<Screen>(worldChallengeLocation || tournamentPrize ? 'vs-ai-setup' : 'home')
+export function PlayPage({
+  worldChallengeLocation = null,
+  tournamentPrize = null,
+  onWorldMatchEnd,
+  onLeaveWorldChallenge,
+  worldPlayerInventory,
+  savedDecks = [],
+  lastDeckId = null,
+  onSetLastDeckId,
+  onUpdateDecks,
+}: PlayPageProps = {}) {
+  const isWorldMode = !!(worldChallengeLocation || tournamentPrize)
+  const [screen, setScreen] = useState<Screen>(isWorldMode ? 'pre-duel' : 'home')
   const [gameMode, setGameMode] = useState<GameMode>('online')
   const [code, setCode] = useState('')
   const [joinCode, setJoinCode] = useState('')
@@ -49,22 +74,13 @@ export function PlayPage({ worldChallengeLocation = null, tournamentPrize = null
   const [difficulty, setDifficulty] = useState<Difficulty>('medium')
   const [ws, setWs] = useState<WebSocket | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [selectedDeckId, setSelectedDeckId] = useState<string>(lastDeckId ?? 'starter')
   const aiScheduledRef = useRef(false)
-
-  // In world/tournament mode, only show owned cards in the vs-ai deck picker
-  const displayCards = useMemo(() => {
-    if ((worldChallengeLocation || tournamentPrize) && worldPlayerInventory && Object.keys(worldPlayerInventory).length > 0) {
-      const ownedIds = getOwnedCardIds(worldPlayerInventory)
-      return allCards.filter((c) => ownedIds.includes(c.id))
-    }
-    return allCards
-  }, [worldChallengeLocation, tournamentPrize, worldPlayerInventory])
 
   useEffect(() => {
     if (worldChallengeLocation || tournamentPrize) {
       setGameMode('vs-ai')
-      setScreen('vs-ai-setup')
-      // Auto-set difficulty from NPC tier in world mode
+      setScreen('pre-duel')
       if (worldChallengeLocation?.difficultyTier) {
         setDifficulty(getDifficultyForTier(worldChallengeLocation.difficultyTier))
       }
@@ -72,21 +88,13 @@ export function PlayPage({ worldChallengeLocation = null, tournamentPrize = null
   }, [worldChallengeLocation, tournamentPrize])
 
   useEffect(() => {
-    if (localGameState?.phase === 'ended' && gameMode === 'vs-ai' && (worldChallengeLocation || tournamentPrize) && onWorldMatchEnd) {
+    if (localGameState?.phase === 'ended' && gameMode === 'vs-ai' && isWorldMode && onWorldMatchEnd) {
       const winner = localGameState.winner ?? 'draw'
       onWorldMatchEnd(winner)
     }
-  }, [localGameState?.phase, localGameState?.winner, gameMode, worldChallengeLocation, tournamentPrize, onWorldMatchEnd])
+  }, [localGameState?.phase, localGameState?.winner, gameMode, isWorldMode, onWorldMatchEnd])
 
-  const toggleDeck = useCallback((card: Card) => {
-    setDeck((prev) => {
-      const inDeck = prev.some((c) => c.id === card.id)
-      if (inDeck) return prev.filter((c) => c.id !== card.id)
-      if (prev.length >= DECK_SIZE) return prev
-      return [...prev, card]
-    })
-  }, [])
-
+  // --- Online room handlers ---
   const handleCreate = async () => {
     setError(null)
     try {
@@ -153,15 +161,22 @@ export function PlayPage({ worldChallengeLocation = null, tournamentPrize = null
     [ws]
   )
 
-  const handlePlayVsAi = useCallback(() => {
-    setError(null)
-    setGameMode('vs-ai')
-    setScreen('vs-ai-setup')
-  }, [])
+  // --- Resolve saved deck to Card[] ---
+  const resolvedDeck = useMemo(() => {
+    const sd = getDeckById(savedDecks, selectedDeckId)
+    if (!sd) return []
+    return sd.cardIds.map(id => getCard(id)).filter((c): c is Card => !!c)
+  }, [savedDecks, selectedDeckId])
 
+  const selectedSavedDeck = useMemo(() => getDeckById(savedDecks, selectedDeckId), [savedDecks, selectedDeckId])
+  const deckIsValid = selectedSavedDeck ? isDeckValid(selectedSavedDeck, worldPlayerInventory ?? {}) : false
+
+  // --- Start AI duel ---
   const handleStartVsAi = useCallback(() => {
-    if (deck.length !== DECK_SIZE) return
+    if (resolvedDeck.length !== DECK_SIZE) return
     setError(null)
+    // Remember last deck used
+    onSetLastDeckId?.(selectedDeckId)
     const aiPool = worldChallengeLocation
       ? getAreaDeckPool(worldChallengeLocation.id, allCards)
       : allCards
@@ -171,11 +186,12 @@ export function PlayPage({ worldChallengeLocation = null, tournamentPrize = null
       ? getRegionById(worldChallengeLocation.regionId)
       : null
     const activeRules = region?.rules ?? []
-    const initial = createGame(deck, aiDeck, firstPlayer, activeRules)
+    const initial = createGame(resolvedDeck, aiDeck, firstPlayer, activeRules)
     setLocalGameState(initial)
     setScreen('game')
-  }, [deck, worldChallengeLocation])
+  }, [resolvedDeck, worldChallengeLocation, selectedDeckId, onSetLastDeckId])
 
+  // --- AI move effect ---
   const handleLocalPlace = useCallback(
     (cardIndex: number, row: number, col: number) => {
       if (!localGameState || localGameState.turn !== 0 || localGameState.phase !== 'playing') return
@@ -205,7 +221,7 @@ export function PlayPage({ worldChallengeLocation = null, tournamentPrize = null
     return () => clearTimeout(id)
   }, [gameMode, screen, localGameState, difficulty])
 
-  // Sudden Death: after board full draw, auto-continue to new round after a brief pause
+  // Sudden Death auto-continue
   useEffect(() => {
     if (gameMode !== 'vs-ai' || !localGameState || localGameState.phase !== 'sudden_death') return
     const id = setTimeout(() => {
@@ -214,6 +230,9 @@ export function PlayPage({ worldChallengeLocation = null, tournamentPrize = null
     return () => clearTimeout(id)
   }, [gameMode, localGameState])
 
+  // ========== SCREENS ==========
+
+  // --- Home (freestyle/2P hub) ---
   if (screen === 'home') {
     return (
       <div className="play-page">
@@ -233,88 +252,161 @@ export function PlayPage({ worldChallengeLocation = null, tournamentPrize = null
           />
           <button type="button" onClick={handleJoin}>Join room</button>
           <p className="or">— or —</p>
-          <button type="button" onClick={handlePlayVsAi}>Play vs AI</button>
+          <button type="button" onClick={() => { setGameMode('vs-ai'); setScreen('pre-duel') }}>
+            Play vs AI
+          </button>
         </section>
       </div>
     )
   }
 
-  if (screen === 'vs-ai-setup') {
+  // --- Pre-duel: deck selection + opponent info ---
+  if (screen === 'pre-duel') {
+    const region = worldChallengeLocation
+      ? getRegionById(worldChallengeLocation.regionId)
+      : null
+
     return (
-      <div className="play-page lobby">
-        <h1>Play vs AI</h1>
-        {(worldChallengeLocation || tournamentPrize) && (
-          <div className="world-challenge-note" role="status">
-            {tournamentPrize ? (
-              <p><strong>Tournament!</strong> Win to win a prize card.</p>
-            ) : worldChallengeLocation ? (
-              <>
-                <p>Playing at <strong>{worldChallengeLocation.name}</strong></p>
-                {getRegionById(worldChallengeLocation.regionId) && (
-                  <p className="world-region-rules">
-                    Region rules: {formatRules(getRegionById(worldChallengeLocation.regionId)!.rules)}. Trade: {getRegionById(worldChallengeLocation.regionId)!.tradeRule}.
-                  </p>
-                )}
-              </>
-            ) : null}
+      <div className="play-page pre-duel">
+        <div className="pre-duel-header">
+          <button
+            type="button"
+            className="back"
+            onClick={() => {
+              if (isWorldMode) {
+                onLeaveWorldChallenge?.()
+              } else {
+                setScreen('home')
+                setGameMode('online')
+              }
+            }}
+          >
+            &larr; Back
+          </button>
+          <h2 className="pre-duel-title">
+            {tournamentPrize ? 'Tournament Match' : isWorldMode ? 'Challenge' : 'Play vs AI'}
+          </h2>
+        </div>
+
+        {/* Opponent info */}
+        {worldChallengeLocation && (
+          <div className="pre-duel-opponent">
+            <div className="pre-duel-opponent-name">
+              vs. {worldChallengeLocation.opponentName ?? worldChallengeLocation.name}
+            </div>
+            {worldChallengeLocation.difficultyTier && (
+              <div className="pre-duel-difficulty">
+                {'★'.repeat(worldChallengeLocation.difficultyTier)}{'☆'.repeat(5 - worldChallengeLocation.difficultyTier)}
+              </div>
+            )}
+            {worldChallengeLocation.gilReward != null && worldChallengeLocation.gilReward > 0 && (
+              <div className="pre-duel-reward">Reward: {worldChallengeLocation.gilReward} Gil</div>
+            )}
           </div>
         )}
-        <button type="button" className="back" onClick={() => { setScreen('home'); setGameMode('online'); onLeaveWorldChallenge?.() }}>
-          ← Back
-        </button>
-        {worldChallengeLocation ? (
-          <p className="difficulty-auto">
-            Difficulty: <strong>{difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}</strong>
-            {worldChallengeLocation.difficultyTier && (
-              <span className="difficulty-tier"> (Tier {worldChallengeLocation.difficultyTier})</span>
-            )}
-          </p>
-        ) : (
-          <p>
-            <label>Difficulty: </label>
-            <select value={difficulty} onChange={(e) => setDifficulty(e.target.value as Difficulty)}>
+
+        {tournamentPrize && (
+          <div className="pre-duel-opponent">
+            <div className="pre-duel-opponent-name">Tournament — win for a prize card!</div>
+          </div>
+        )}
+
+        {/* Active rules */}
+        {region && region.rules.length > 0 && (
+          <div className="pre-duel-rules">
+            <span className="pre-duel-rules-label">Rules:</span> {formatRules(region.rules)}
+            <span className="pre-duel-trade"> | Trade: {region.tradeRule}</span>
+          </div>
+        )}
+
+        {/* Difficulty — auto for world, manual for freestyle */}
+        {!isWorldMode && (
+          <div className="pre-duel-difficulty-select">
+            <label htmlFor="freestyle-difficulty">Difficulty:</label>
+            <select
+              id="freestyle-difficulty"
+              value={difficulty}
+              onChange={(e) => setDifficulty(e.target.value as Difficulty)}
+            >
               <option value="easy">Easy</option>
               <option value="medium">Medium</option>
               <option value="hard">Hard</option>
             </select>
-          </p>
+          </div>
         )}
-        <p>Choose 5 cards, then click Start game.</p>
-        {(worldChallengeLocation || tournamentPrize) && (
-          <p className="lobby-deck-label">Your deck ({deck.length}/{DECK_SIZE}):</p>
-        )}
-        <div className="lobby-deck">
-          {Array.from({ length: DECK_SIZE }, (_, i) => (
-            <div key={i} className="deck-slot">
-              {deck[i] ? (
-                <CardView card={deck[i]} selected onSelect={() => toggleDeck(deck[i])} compact />
-              ) : (
-                <div className="empty-slot">Empty</div>
-              )}
+
+        {/* Deck selector dropdown */}
+        <div className="pre-duel-deck-section">
+          <div className="pre-duel-deck-row">
+            <label htmlFor="pre-duel-deck-select" className="pre-duel-deck-label">Deck:</label>
+            <select
+              id="pre-duel-deck-select"
+              className="pre-duel-deck-dropdown"
+              value={selectedDeckId}
+              onChange={(e) => setSelectedDeckId(e.target.value)}
+            >
+              {savedDecks.map(d => (
+                <option key={d.id} value={d.id}>
+                  {d.name} {isDeckValid(d, worldPlayerInventory ?? {}) ? '' : '(invalid)'}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              className="pre-duel-edit-decks-btn"
+              onClick={() => setScreen('deck-manager')}
+            >
+              Edit Decks
+            </button>
+          </div>
+
+          {/* Card preview */}
+          {resolvedDeck.length > 0 && (
+            <div className="pre-duel-deck-preview">
+              {resolvedDeck.map((card, i) => (
+                <div key={`${card.id}-${i}`} className="pre-duel-preview-card">
+                  <img src={`/cards/${card.id}.png`} alt={card.name} className="pre-duel-card-img" />
+                  <span className="pre-duel-card-name">{card.name}</span>
+                </div>
+              ))}
             </div>
-          ))}
+          )}
+
+          {!deckIsValid && selectedSavedDeck && (
+            <p className="pre-duel-invalid">
+              This deck is invalid — some cards may not be in your inventory.
+            </p>
+          )}
         </div>
-        <div className="card-grid" style={{ marginTop: 8 }}>
-          {displayCards.map((card) => (
-            <CardView
-              key={card.id}
-              card={card}
-              selected={deck.some((c) => c.id === card.id)}
-              onSelect={() => toggleDeck(card)}
-            />
-          ))}
-        </div>
+
+        {/* Start button */}
         <button
           type="button"
+          className="pre-duel-start-btn"
+          disabled={!deckIsValid || resolvedDeck.length !== DECK_SIZE}
           onClick={handleStartVsAi}
-          disabled={deck.length !== DECK_SIZE}
         >
-          Start game ({deck.length}/{DECK_SIZE})
+          Start Duel
         </button>
       </div>
     )
   }
 
+  // --- Deck Manager sub-screen ---
+  if (screen === 'deck-manager') {
+    return (
+      <div className="play-page deck-manager-page">
+        <DeckManager
+          savedDecks={savedDecks}
+          inventory={worldPlayerInventory ?? {}}
+          onUpdateDecks={(decks) => onUpdateDecks?.(decks)}
+          onBack={() => setScreen('pre-duel')}
+        />
+      </div>
+    )
+  }
+
+  // --- Lobby (2P online) ---
   if (screen === 'lobby') {
     return (
       <div className="play-page lobby">
@@ -327,7 +419,9 @@ export function PlayPage({ worldChallengeLocation = null, tournamentPrize = null
           {Array.from({ length: DECK_SIZE }, (_, i) => (
             <div key={i} className="deck-slot">
               {deck[i] ? (
-                <CardView card={deck[i]} selected onSelect={() => toggleDeck(deck[i])} compact />
+                <button type="button" className="deck-slot-card" onClick={() => setDeck(prev => prev.filter((_, idx) => idx !== i))}>
+                  <img src={`/cards/${deck[i].id}.png`} alt={deck[i].name} className="lobby-card-img" />
+                </button>
               ) : (
                 <div className="empty-slot">Empty</div>
               )}
@@ -335,14 +429,26 @@ export function PlayPage({ worldChallengeLocation = null, tournamentPrize = null
           ))}
         </div>
         <div className="card-grid" style={{ marginTop: 8 }}>
-          {allCards.map((card) => (
-            <CardView
-              key={card.id}
-              card={card}
-              selected={deck.some((c) => c.id === card.id)}
-              onSelect={() => toggleDeck(card)}
-            />
-          ))}
+          {allCards.map((card) => {
+            const inDeck = deck.some((c) => c.id === card.id)
+            return (
+              <button
+                key={card.id}
+                type="button"
+                className={`lobby-card-btn ${inDeck ? 'selected' : ''}`}
+                disabled={!inDeck && deck.length >= DECK_SIZE}
+                onClick={() => {
+                  setDeck(prev => {
+                    if (inDeck) return prev.filter(c => c.id !== card.id)
+                    if (prev.length >= DECK_SIZE) return prev
+                    return [...prev, card]
+                  })
+                }}
+              >
+                <img src={`/cards/${card.id}.png`} alt={card.name} className="lobby-card-img" />
+              </button>
+            )
+          })}
         </div>
         <button
           type="button"
@@ -355,10 +461,11 @@ export function PlayPage({ worldChallengeLocation = null, tournamentPrize = null
     )
   }
 
+  // --- Game (vs AI) ---
   if (screen === 'game' && gameMode === 'vs-ai' && localGameState) {
     const handlePlayAgain = () => {
       setLocalGameState(null)
-      setScreen('vs-ai-setup')
+      setScreen('pre-duel')
     }
     const handleReturnToWorld = () => {
       setScreen('home')
@@ -368,11 +475,11 @@ export function PlayPage({ worldChallengeLocation = null, tournamentPrize = null
     }
     return (
       <div className="play-page game">
-        {(worldChallengeLocation || tournamentPrize) && (
+        {isWorldMode && (
           <div className="world-challenge-note">
             {tournamentPrize ? <p>Tournament — win for a prize card!</p> : worldChallengeLocation ? (
               <>
-                <p>At {worldChallengeLocation.name}</p>
+                <p>vs. {worldChallengeLocation.opponentName ?? worldChallengeLocation.name}</p>
                 {getRegionById(worldChallengeLocation.regionId) && (
                   <p className="world-region-rules">{formatRules(getRegionById(worldChallengeLocation.regionId)!.rules)}</p>
                 )}
@@ -381,7 +488,7 @@ export function PlayPage({ worldChallengeLocation = null, tournamentPrize = null
           </div>
         )}
         <button type="button" className="back" onClick={() => { setScreen('home'); setGameMode('online'); setLocalGameState(null); onLeaveWorldChallenge?.() }}>
-          ← Back to menu
+          &larr; Back to menu
         </button>
         <GameBoard
           state={localGameState}
@@ -394,6 +501,7 @@ export function PlayPage({ worldChallengeLocation = null, tournamentPrize = null
     )
   }
 
+  // --- Game (online 2P) ---
   if (screen === 'game' && gameMode === 'online' && gameState && player !== null) {
     return (
       <div className="play-page game">
