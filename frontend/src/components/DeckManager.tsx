@@ -17,33 +17,102 @@ function getCard(id: string): Card | undefined {
 interface DeckManagerProps {
   savedDecks: SavedDeck[]
   inventory: Record<string, number>
+  discoveredCards?: string[]
   onUpdateDecks: (decks: SavedDeck[]) => void
   onBack: () => void
 }
 
-type ManagerScreen = 'list' | 'edit'
+type ManagerScreen = 'collection' | 'decks' | 'edit'
 
-export function DeckManager({ savedDecks, inventory, onUpdateDecks, onBack }: DeckManagerProps) {
-  const [screen, setScreen] = useState<ManagerScreen>('list')
+export function DeckManager({ savedDecks, inventory, discoveredCards, onUpdateDecks, onBack }: DeckManagerProps) {
+  const hasCollection = !!discoveredCards
+  const [screen, setScreen] = useState<ManagerScreen>(hasCollection ? 'collection' : 'decks')
   const [editingDeckId, setEditingDeckId] = useState<string | null>(null)
   const [renamingDeckId, setRenamingDeckId] = useState<string | null>(null)
   const [renameValue, setRenameValue] = useState('')
 
   const ownedCardIds = useMemo(() => getOwnedCardIds(inventory), [inventory])
-  const ownedCards = useMemo(
-    () => ownedCardIds.map(id => getCard(id)).filter((c): c is Card => !!c).sort((a, b) => a.level - b.level),
-    [ownedCardIds]
-  )
 
-  // --- Deck list screen ---
-  if (screen === 'list') {
+  const discoveredSet = useMemo(() => new Set(discoveredCards ?? []), [discoveredCards])
+  const totalOwned = ownedCardIds.length
+  const totalDiscovered = discoveredCards?.length ?? 0
+
+  // --- Collection screen (default) ---
+  if (screen === 'collection') {
     return (
       <div className="deck-mgr">
         <div className="deck-mgr-header">
           <button type="button" className="wm-back-btn" onClick={onBack}>
             &larr; Back
           </button>
-          <h2 className="deck-mgr-title">Deck Manager</h2>
+          <h2 className="deck-mgr-title">Collection</h2>
+          <button
+            type="button"
+            className="deck-mgr-tab-btn"
+            onClick={() => setScreen('decks')}
+          >
+            My Decks
+          </button>
+        </div>
+
+        <div className="collection-stats">
+          <span className="collection-stat">{totalOwned} / {allCards.length} owned</span>
+          <span className="collection-stat">{totalDiscovered} / {allCards.length} discovered</span>
+        </div>
+
+        <div className="collection-scroll">
+          <div className="collection-grid">
+            {allCards.map(card => {
+              const count = inventory[card.id] ?? 0
+              const isDiscovered = discoveredSet.has(card.id)
+              const isOwned = count > 0
+
+              let stateClass = 'locked'
+              if (isOwned) stateClass = 'owned'
+              else if (isDiscovered) stateClass = 'greyed'
+
+              return (
+                <div key={card.id} className={`collection-card ${stateClass}`}>
+                  {isDiscovered ? (
+                    <>
+                      <img
+                        src={`/cards/${card.id}.png`}
+                        alt={card.name}
+                        className="collection-card-img"
+                      />
+                      {isOwned && count > 0 && (
+                        <span className="collection-card-count">x{count}</span>
+                      )}
+                      <div className="collection-card-name">{card.name}</div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="collection-card-back">
+                        <div className="card-back-pattern">
+                          <div className="card-back-diamond" />
+                        </div>
+                      </div>
+                      <div className="collection-card-name">???</div>
+                    </>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // --- Deck list screen ---
+  if (screen === 'decks') {
+    return (
+      <div className="deck-mgr">
+        <div className="deck-mgr-header">
+          <button type="button" className="wm-back-btn" onClick={hasCollection ? () => setScreen('collection') : onBack}>
+            &larr; {hasCollection ? 'Collection' : 'Back'}
+          </button>
+          <h2 className="deck-mgr-title">My Decks</h2>
         </div>
 
         <div className="deck-mgr-list">
@@ -165,7 +234,7 @@ export function DeckManager({ savedDecks, inventory, onUpdateDecks, onBack }: De
   if (screen === 'edit' && editingDeckId) {
     const editDeck = savedDecks.find(d => d.id === editingDeckId)
     if (!editDeck) {
-      setScreen('list')
+      setScreen('decks')
       return null
     }
 
@@ -173,12 +242,12 @@ export function DeckManager({ savedDecks, inventory, onUpdateDecks, onBack }: De
       <DeckEditor
         deck={editDeck}
         inventory={inventory}
-        ownedCards={ownedCards}
+        discoveredCards={discoveredSet}
         onSave={(cardIds) => {
           onUpdateDecks(updateDeckCards(savedDecks, editingDeckId, cardIds))
-          setScreen('list')
+          setScreen('decks')
         }}
-        onCancel={() => setScreen('list')}
+        onCancel={() => setScreen('decks')}
       />
     )
   }
@@ -191,13 +260,13 @@ export function DeckManager({ savedDecks, inventory, onUpdateDecks, onBack }: De
 function DeckEditor({
   deck,
   inventory,
-  ownedCards,
+  discoveredCards,
   onSave,
   onCancel,
 }: {
   deck: SavedDeck
   inventory: Record<string, number>
-  ownedCards: Card[]
+  discoveredCards: Set<string>
   onSave: (cardIds: string[]) => void
   onCancel: () => void
 }) {
@@ -264,16 +333,51 @@ function DeckEditor({
         })}
       </div>
 
-      {/* Available cards grid */}
+      {/* Available cards grid — shows all cards with ownership states */}
       <div className="deck-editor-available">
         <h3 className="deck-editor-available-title">Available Cards</h3>
         <div className="deck-editor-card-grid">
-          {ownedCards.map(card => {
+          {allCards.map(card => {
             const owned = inventory[card.id] ?? 0
             const used = deckUsage[card.id] ?? 0
             const remaining = owned - used
             const canAdd = remaining > 0 && cardIds.length < DECK_SIZE
+            const isDiscovered = discoveredCards.has(card.id)
 
+            // Locked (never owned)
+            if (!isDiscovered) {
+              return (
+                <div key={card.id} className="deck-editor-card locked">
+                  <div className="deck-editor-card-back-mini">
+                    <div className="card-back-pattern small">
+                      <div className="card-back-diamond" />
+                    </div>
+                  </div>
+                  <div className="deck-editor-card-info">
+                    <span className="deck-editor-card-name locked-name">???</span>
+                    <span className="deck-editor-card-stats">Lv.?</span>
+                  </div>
+                </div>
+              )
+            }
+
+            // Greyed out (discovered but 0 owned)
+            if (owned === 0) {
+              return (
+                <div key={card.id} className="deck-editor-card greyed">
+                  <img src={`/cards/${card.id}.png`} alt={card.name} className="deck-editor-card-img" />
+                  <div className="deck-editor-card-info">
+                    <span className="deck-editor-card-name">{card.name}</span>
+                    <span className="deck-editor-card-stats">
+                      Lv.{card.level} | {rankLabel(card.top)}-{rankLabel(card.right)}-{rankLabel(card.bottom)}-{rankLabel(card.left)}
+                    </span>
+                    <span className="deck-editor-card-count">Not owned</span>
+                  </div>
+                </div>
+              )
+            }
+
+            // Owned — clickable to add
             return (
               <button
                 key={card.id}

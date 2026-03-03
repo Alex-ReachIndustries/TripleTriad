@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react'
-import { loadWorldState, saveWorldState, addToInventory, removeFromInventory, isStarterCard, acceptQuest, claimQuestReward } from './data/worldState'
+import { loadWorldState, saveWorldState, addToInventory, removeFromInventory, markDiscovered, isStarterCard, acceptQuest, claimQuestReward } from './data/worldState'
 import { getTournamentAtLocation } from './data/shops'
 import { getNpcById } from './data/world'
 import { DeckManager } from './components/DeckManager'
@@ -45,7 +45,7 @@ function App() {
   const handleBuyCard = useCallback((cardId: string, price: number) => {
     setWorldState((prev) => {
       if (prev.gil < price) return prev
-      return { ...prev, gil: prev.gil - price, inventory: addToInventory(prev.inventory, cardId) }
+      return { ...prev, gil: prev.gil - price, inventory: addToInventory(prev.inventory, cardId), discoveredCards: markDiscovered(prev.discoveredCards, cardId) }
     })
   }, [])
 
@@ -89,13 +89,13 @@ function App() {
 
       // Tournament prize
       if (result.isTournament && result.tournamentPrize && result.winner === 0) {
-        next = { ...next, inventory: addToInventory(next.inventory, result.tournamentPrize) }
+        next = { ...next, inventory: addToInventory(next.inventory, result.tournamentPrize), discoveredCards: markDiscovered(next.discoveredCards, result.tournamentPrize) }
       }
 
       // Trade rule: apply pre-computed gain/loss
       if (!result.isTournament) {
         if (result.cardGained) {
-          next = { ...next, inventory: addToInventory(next.inventory, result.cardGained) }
+          next = { ...next, inventory: addToInventory(next.inventory, result.cardGained), discoveredCards: markDiscovered(next.discoveredCards, result.cardGained) }
         }
         if (result.cardLost) {
           next = { ...next, inventory: removeFromInventory(next.inventory, result.cardLost) }
@@ -258,6 +258,7 @@ function App() {
           <DeckManager
             savedDecks={worldState.savedDecks}
             inventory={worldState.inventory}
+            discoveredCards={worldState.discoveredCards}
             onUpdateDecks={(decks) => setWorldState(prev => ({ ...prev, savedDecks: decks }))}
             onBack={() => setTab('world')}
           />

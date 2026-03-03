@@ -16,6 +16,8 @@ export interface WorldPlayerState {
   unlockedOrder: number
   /** Multi-copy card inventory: cardId → count owned. */
   inventory: Record<string, number>
+  /** Cards the player has owned at least once (for collection display). */
+  discoveredCards: string[]
   /** Gil (currency) for shops and tournaments. */
   gil: number
   /** Win count per area id. Used to show rematch badges. */
@@ -47,6 +49,7 @@ function defaultState(): WorldPlayerState {
   return {
     unlockedOrder: 0,
     inventory,
+    discoveredCards: [...STARTER_DECK_IDS],
     gil: DEFAULT_GIL,
     npcWins: {},
     savedDecks: [createStarterDeck(STARTER_DECK_IDS)],
@@ -126,7 +129,20 @@ export function loadWorldState(): WorldPlayerState {
     const clearedDungeons = Array.isArray(o.clearedDungeons)
       ? (o.clearedDungeons as unknown[]).filter((v): v is string => typeof v === 'string')
       : []
-    return { unlockedOrder, inventory, gil, npcWins, savedDecks, lastDeckId, activeQuests, completedQuests, clearedDungeons }
+
+    // Parse discoveredCards — backfill from current inventory for legacy saves
+    let discoveredCards: string[] = Array.isArray(o.discoveredCards)
+      ? (o.discoveredCards as unknown[]).filter((v): v is string => typeof v === 'string')
+      : []
+    // Ensure all currently-owned cards are in discovered set
+    const discoveredSet = new Set(discoveredCards)
+    for (const id of Object.keys(inventory)) {
+      if (inventory[id] > 0 && !discoveredSet.has(id)) {
+        discoveredCards.push(id)
+      }
+    }
+
+    return { unlockedOrder, inventory, discoveredCards, gil, npcWins, savedDecks, lastDeckId, activeQuests, completedQuests, clearedDungeons }
   } catch {
     return defaultState()
   }
@@ -147,6 +163,12 @@ export function isStarterCard(cardId: string): boolean {
 /** Add a card to inventory (increment count). */
 export function addToInventory(inventory: Record<string, number>, cardId: string, count = 1): Record<string, number> {
   return { ...inventory, [cardId]: (inventory[cardId] ?? 0) + count }
+}
+
+/** Mark a card as discovered (call alongside addToInventory). */
+export function markDiscovered(discovered: string[], cardId: string): string[] {
+  if (discovered.includes(cardId)) return discovered
+  return [...discovered, cardId]
 }
 
 /** Remove a card from inventory (decrement count, respecting starter card protection). */
@@ -188,14 +210,17 @@ export function claimQuestReward(state: WorldPlayerState, questId: string): Worl
   }
 
   // Award card(s)
+  let discoveredCards = state.discoveredCards
   if (quest.reward.cardId) {
     const count = quest.reward.cardCount ?? 1
     inventory = addToInventory(inventory, quest.reward.cardId, count)
+    discoveredCards = markDiscovered(discoveredCards, quest.reward.cardId)
   }
 
   return {
     ...state,
     inventory,
+    discoveredCards,
     gil,
     activeQuests: state.activeQuests.filter((id) => id !== questId),
     completedQuests: [...state.completedQuests, questId],
@@ -222,7 +247,7 @@ export function applyTradeRuleOne(
     // Winner gains a random card (can be one they already own — multi-copy)
     if (allCardIds.length === 0) return state
     const add = allCardIds[Math.floor(Math.random() * allCardIds.length)]
-    return { ...state, inventory: addToInventory(state.inventory, add) }
+    return { ...state, inventory: addToInventory(state.inventory, add), discoveredCards: markDiscovered(state.discoveredCards, add) }
   }
   // Loser loses a random non-starter card (or one with count > 1 for starters)
   const canLose = Object.entries(state.inventory).filter(([id, count]) => {
