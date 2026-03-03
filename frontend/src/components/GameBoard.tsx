@@ -9,9 +9,10 @@ interface GameBoardProps {
   onPlace: (cardIndex: number, row: number, col: number) => void
   onPlayAgain?: () => void
   onReturnToWorld?: () => void
+  hideEndOverlay?: boolean
 }
 
-export function GameBoard({ state, myPlayer, onPlace, onPlayAgain, onReturnToWorld }: GameBoardProps) {
+export function GameBoard({ state, myPlayer, onPlace, onPlayAgain, onReturnToWorld, hideEndOverlay }: GameBoardProps) {
   const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(null)
   const [placingCell, setPlacingCell] = useState<string | null>(null)
   const [capturedCells, setCapturedCells] = useState<Set<string>>(new Set())
@@ -149,7 +150,7 @@ export function GameBoard({ state, myPlayer, onPlace, onPlayAgain, onReturnToWor
           })}
         </div>
 
-        {state.phase === 'ended' && (
+        {state.phase === 'ended' && !hideEndOverlay && (
           <div className="game-over-overlay" role="dialog" aria-live="assertive" aria-label="Game result">
             <div className="game-over-content">
               {state.winner === myPlayer ? (

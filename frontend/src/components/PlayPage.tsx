@@ -1,13 +1,11 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import type { GameState } from '../game'
 import type { Card } from '../types/card'
-import type { Area } from '../types/world'
 import type { SavedDeck } from '../data/deckManager'
-import { createGame, placeCard, continueSuddenDeath, getAiMove, getDifficultyForTier } from '../game'
+import { createGame, placeCard, continueSuddenDeath, getAiMove } from '../game'
 import type { Difficulty } from '../game'
 import { createRoom, joinRoom, getWsUrl } from '../api/client'
 import cardsData from '../data/cards.json'
-import { getRegionById, formatRules, getAreaDeckPool } from '../data/world'
 import { getDeckById, isDeckValid } from '../data/deckManager'
 import { GameBoard } from './GameBoard'
 import { DeckManager } from './DeckManager'
@@ -16,16 +14,7 @@ const allCards: Card[] = cardsData.cards as Card[]
 const cardMap = new Map(allCards.map(c => [c.id, c]))
 const DECK_SIZE = 5
 
-/** Winner: 0 = player, 1 = opponent, 'draw' = tie. */
-export type WorldMatchResult = 0 | 1 | 'draw'
-
 export interface PlayPageProps {
-  worldChallengeLocation?: Area | null
-  /** When set, player is in a paid tournament; win grants this card id. */
-  tournamentPrize?: string | null
-  /** Called when a world challenge or tournament match ends; receives winner (0 = player won). */
-  onWorldMatchEnd?: (winner: WorldMatchResult) => void
-  onLeaveWorldChallenge?: () => void
   /** Player's card inventory. */
   worldPlayerInventory?: Record<string, number>
   /** Saved decks from world state */
@@ -51,24 +40,18 @@ type Screen = 'home' | 'lobby' | 'game' | 'pre-duel' | 'deck-manager'
 type GameMode = 'online' | 'vs-ai'
 
 export function PlayPage({
-  worldChallengeLocation = null,
-  tournamentPrize = null,
-  onWorldMatchEnd,
-  onLeaveWorldChallenge,
   worldPlayerInventory,
   savedDecks = [],
   lastDeckId = null,
   onSetLastDeckId,
   onUpdateDecks,
 }: PlayPageProps = {}) {
-  const isWorldMode = !!(worldChallengeLocation || tournamentPrize)
-  const [screen, setScreen] = useState<Screen>(isWorldMode ? 'pre-duel' : 'home')
+  const [screen, setScreen] = useState<Screen>('home')
   const [gameMode, setGameMode] = useState<GameMode>('online')
   const [code, setCode] = useState('')
   const [joinCode, setJoinCode] = useState('')
   const [roomId, setRoomId] = useState<string | null>(null)
   const [player, setPlayer] = useState<0 | 1 | null>(null)
-  // deck state removed — 2P lobby now uses saved decks (resolvedDeck)
   const [gameState, setGameState] = useState<GameState | null>(null)
   const [localGameState, setLocalGameState] = useState<GameState | null>(null)
   const [difficulty, setDifficulty] = useState<Difficulty>('medium')
@@ -76,23 +59,6 @@ export function PlayPage({
   const [error, setError] = useState<string | null>(null)
   const [selectedDeckId, setSelectedDeckId] = useState<string>(lastDeckId ?? 'starter')
   const aiScheduledRef = useRef(false)
-
-  useEffect(() => {
-    if (worldChallengeLocation || tournamentPrize) {
-      setGameMode('vs-ai')
-      setScreen('pre-duel')
-      if (worldChallengeLocation?.difficultyTier) {
-        setDifficulty(getDifficultyForTier(worldChallengeLocation.difficultyTier))
-      }
-    }
-  }, [worldChallengeLocation, tournamentPrize])
-
-  useEffect(() => {
-    if (localGameState?.phase === 'ended' && gameMode === 'vs-ai' && isWorldMode && onWorldMatchEnd) {
-      const winner = localGameState.winner ?? 'draw'
-      onWorldMatchEnd(winner)
-    }
-  }, [localGameState?.phase, localGameState?.winner, gameMode, isWorldMode, onWorldMatchEnd])
 
   // --- Online room handlers ---
   const handleCreate = async () => {
@@ -180,25 +146,17 @@ export function PlayPage({
     [ws]
   )
 
-  // --- Start AI duel ---
+  // --- Start freestyle AI duel ---
   const handleStartVsAi = useCallback(() => {
     if (resolvedDeck.length !== DECK_SIZE) return
     setError(null)
-    // Remember last deck used
     onSetLastDeckId?.(selectedDeckId)
-    const aiPool = worldChallengeLocation
-      ? getAreaDeckPool(worldChallengeLocation.id, allCards)
-      : allCards
-    const aiDeck = pickRandomDeck(aiPool, DECK_SIZE)
+    const aiDeck = pickRandomDeck(allCards, DECK_SIZE)
     const firstPlayer = Math.random() < 0.5 ? 0 : 1
-    const region = worldChallengeLocation
-      ? getRegionById(worldChallengeLocation.regionId)
-      : null
-    const activeRules = region?.rules ?? []
-    const initial = createGame(resolvedDeck, aiDeck, firstPlayer, activeRules)
+    const initial = createGame(resolvedDeck, aiDeck, firstPlayer, [])
     setLocalGameState(initial)
     setScreen('game')
-  }, [resolvedDeck, worldChallengeLocation, selectedDeckId, onSetLastDeckId])
+  }, [resolvedDeck, selectedDeckId, onSetLastDeckId])
 
   // --- AI move effect ---
   const handleLocalPlace = useCallback(
@@ -241,7 +199,7 @@ export function PlayPage({
 
   // ========== SCREENS ==========
 
-  // --- Home (freestyle/2P hub) ---
+  // --- Home (2P hub + freestyle AI) ---
   if (screen === 'home') {
     return (
       <div className="play-page duel-home">
@@ -292,80 +250,34 @@ export function PlayPage({
     )
   }
 
-  // --- Pre-duel: deck selection + opponent info ---
+  // --- Pre-duel: deck selection for freestyle AI ---
   if (screen === 'pre-duel') {
-    const region = worldChallengeLocation
-      ? getRegionById(worldChallengeLocation.regionId)
-      : null
-
     return (
       <div className="play-page pre-duel">
         <div className="pre-duel-header">
           <button
             type="button"
             className="back"
-            onClick={() => {
-              if (isWorldMode) {
-                onLeaveWorldChallenge?.()
-              } else {
-                setScreen('home')
-                setGameMode('online')
-              }
-            }}
+            onClick={() => { setScreen('home'); setGameMode('online') }}
           >
             &larr; Back
           </button>
-          <h2 className="pre-duel-title">
-            {tournamentPrize ? 'Tournament Match' : isWorldMode ? 'Challenge' : 'Play vs AI'}
-          </h2>
+          <h2 className="pre-duel-title">Play vs AI</h2>
         </div>
 
-        {/* Opponent info */}
-        {worldChallengeLocation && (
-          <div className="pre-duel-opponent">
-            <div className="pre-duel-opponent-name">
-              vs. {worldChallengeLocation.opponentName ?? worldChallengeLocation.name}
-            </div>
-            {worldChallengeLocation.difficultyTier && (
-              <div className="pre-duel-difficulty">
-                {'★'.repeat(worldChallengeLocation.difficultyTier)}{'☆'.repeat(5 - worldChallengeLocation.difficultyTier)}
-              </div>
-            )}
-            {worldChallengeLocation.gilReward != null && worldChallengeLocation.gilReward > 0 && (
-              <div className="pre-duel-reward">Reward: {worldChallengeLocation.gilReward} Gil</div>
-            )}
-          </div>
-        )}
-
-        {tournamentPrize && (
-          <div className="pre-duel-opponent">
-            <div className="pre-duel-opponent-name">Tournament — win for a prize card!</div>
-          </div>
-        )}
-
-        {/* Active rules */}
-        {region && region.rules.length > 0 && (
-          <div className="pre-duel-rules">
-            <span className="pre-duel-rules-label">Rules:</span> {formatRules(region.rules)}
-            <span className="pre-duel-trade"> | Trade: {region.tradeRule}</span>
-          </div>
-        )}
-
-        {/* Difficulty — auto for world, manual for freestyle */}
-        {!isWorldMode && (
-          <div className="pre-duel-difficulty-select">
-            <label htmlFor="freestyle-difficulty">Difficulty:</label>
-            <select
-              id="freestyle-difficulty"
-              value={difficulty}
-              onChange={(e) => setDifficulty(e.target.value as Difficulty)}
-            >
-              <option value="easy">Easy</option>
-              <option value="medium">Medium</option>
-              <option value="hard">Hard</option>
-            </select>
-          </div>
-        )}
+        {/* Difficulty selector */}
+        <div className="pre-duel-difficulty-select">
+          <label htmlFor="freestyle-difficulty">Difficulty:</label>
+          <select
+            id="freestyle-difficulty"
+            value={difficulty}
+            onChange={(e) => setDifficulty(e.target.value as Difficulty)}
+          >
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+        </div>
 
         {/* Deck selector dropdown */}
         <div className="pre-duel-deck-section">
@@ -471,7 +383,7 @@ export function PlayPage({
 
         {/* Player status indicators */}
         <div className="lobby-2p-players">
-          <div className={`lobby-2p-player ${player === 0 ? 'you' : ''} ${lobbyStatus !== 'waiting' || player === 0 ? '' : ''}`}>
+          <div className={`lobby-2p-player ${player === 0 ? 'you' : ''}`}>
             <div className="lobby-2p-player-label">Player 1 {player === 0 ? '(You)' : ''}</div>
             <div className={`lobby-2p-player-status ${player === 0 && isReady ? 'ready' : ws ? 'connected' : 'waiting'}`}>
               {player === 0 && isReady ? 'Ready' : ws ? 'Connected' : 'Waiting...'}
@@ -533,33 +445,15 @@ export function PlayPage({
     )
   }
 
-  // --- Game (vs AI) ---
+  // --- Game (vs AI - freestyle) ---
   if (screen === 'game' && gameMode === 'vs-ai' && localGameState) {
     const handlePlayAgain = () => {
       setLocalGameState(null)
       setScreen('pre-duel')
     }
-    const handleReturnToWorld = () => {
-      setScreen('home')
-      setGameMode('online')
-      setLocalGameState(null)
-      onLeaveWorldChallenge?.()
-    }
     return (
       <div className="play-page game">
-        {isWorldMode && (
-          <div className="world-challenge-note">
-            {tournamentPrize ? <p>Tournament — win for a prize card!</p> : worldChallengeLocation ? (
-              <>
-                <p>vs. {worldChallengeLocation.opponentName ?? worldChallengeLocation.name}</p>
-                {getRegionById(worldChallengeLocation.regionId) && (
-                  <p className="world-region-rules">{formatRules(getRegionById(worldChallengeLocation.regionId)!.rules)}</p>
-                )}
-              </>
-            ) : null}
-          </div>
-        )}
-        <button type="button" className="back" onClick={() => { setScreen('home'); setGameMode('online'); setLocalGameState(null); onLeaveWorldChallenge?.() }}>
+        <button type="button" className="back" onClick={() => { setScreen('home'); setGameMode('online'); setLocalGameState(null) }}>
           &larr; Back to menu
         </button>
         <GameBoard
@@ -567,7 +461,6 @@ export function PlayPage({
           myPlayer={0}
           onPlace={handleLocalPlace}
           onPlayAgain={handlePlayAgain}
-          onReturnToWorld={handleReturnToWorld}
         />
       </div>
     )
@@ -582,5 +475,5 @@ export function PlayPage({
     )
   }
 
-  return <div className="play-page">Loading…</div>
+  return <div className="play-page">Loading...</div>
 }
