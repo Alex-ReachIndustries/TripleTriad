@@ -6,6 +6,7 @@ import { WorldMapView } from './WorldMapView'
 import { RegionView } from './RegionView'
 import { TownView } from './TownView'
 import { DungeonView } from './DungeonView'
+import { NpcInteraction } from './NpcInteraction'
 
 type WorldScreen =
   | { type: 'map' }
@@ -17,7 +18,7 @@ export interface WorldModeCallbacks {
   onInitiateDuel?: (npcId: string, locationId: string) => void
   onBuyCard?: (cardId: string, price: number) => void
   onSellCard?: (cardId: string, sellPrice: number) => void
-  onEnterTournament?: (npcId: string) => void
+  onEnterTournament?: (npcId: string, locationId: string) => void
   onAcceptQuest?: (questId: string) => void
   onClaimQuest?: (questId: string) => void
 }
@@ -26,8 +27,17 @@ interface WorldModeProps extends WorldModeCallbacks {
   worldState: WorldPlayerState
 }
 
-export function WorldMode({ worldState }: WorldModeProps) {
+export function WorldMode({
+  worldState,
+  onInitiateDuel,
+  onBuyCard,
+  onSellCard,
+  onEnterTournament,
+  onAcceptQuest,
+  onClaimQuest,
+}: WorldModeProps) {
   const [screen, setScreen] = useState<WorldScreen>({ type: 'map' })
+  const [selectedNpc, setSelectedNpc] = useState<NPC | null>(null)
 
   const handleSelectRegion = useCallback((region: Region) => {
     setScreen({ type: 'region', regionId: region.id })
@@ -46,25 +56,83 @@ export function WorldMode({ worldState }: WorldModeProps) {
     setScreen({ type: screenType, locationId: location.id, regionId: location.regionId })
   }, [])
 
-  // NPC selection — interaction panels built in Phase 4e
-  const handleSelectNpc = useCallback((_npc: NPC) => {
-    // Will open dialogue/shop/duel/tournament panel in Phase 4e
+  const handleSelectNpc = useCallback((npc: NPC) => {
+    setSelectedNpc(npc)
   }, [])
+
+  const handleCloseNpc = useCallback(() => {
+    setSelectedNpc(null)
+  }, [])
+
+  const handleInitiateDuel = useCallback((npcId: string) => {
+    const npc = selectedNpc
+    setSelectedNpc(null)
+    if (onInitiateDuel && npc) {
+      onInitiateDuel(npcId, npc.locationId)
+    }
+  }, [onInitiateDuel, selectedNpc])
+
+  const handleBuyCard = useCallback((cardId: string, price: number) => {
+    onBuyCard?.(cardId, price)
+  }, [onBuyCard])
+
+  const handleSellCard = useCallback((cardId: string, sellPrice: number) => {
+    onSellCard?.(cardId, sellPrice)
+  }, [onSellCard])
+
+  const handleEnterTournament = useCallback((npcId: string) => {
+    const npc = selectedNpc
+    setSelectedNpc(null)
+    if (onEnterTournament && npc) {
+      onEnterTournament(npcId, npc.locationId)
+    }
+  }, [onEnterTournament, selectedNpc])
+
+  const handleAcceptQuest = useCallback((questId: string) => {
+    onAcceptQuest?.(questId)
+  }, [onAcceptQuest])
+
+  const handleClaimQuest = useCallback((questId: string) => {
+    onClaimQuest?.(questId)
+  }, [onClaimQuest])
+
+  // NPC interaction modal (renders over any screen)
+  const npcModal = selectedNpc ? (
+    <NpcInteraction
+      npc={selectedNpc}
+      worldState={worldState}
+      onClose={handleCloseNpc}
+      onInitiateDuel={handleInitiateDuel}
+      onBuyCard={handleBuyCard}
+      onSellCard={handleSellCard}
+      onEnterTournament={handleEnterTournament}
+      onAcceptQuest={handleAcceptQuest}
+      onClaimQuest={handleClaimQuest}
+    />
+  ) : null
 
   switch (screen.type) {
     case 'map':
-      return <WorldMapView worldState={worldState} onSelectRegion={handleSelectRegion} />
+      return (
+        <>
+          <WorldMapView worldState={worldState} onSelectRegion={handleSelectRegion} />
+          {npcModal}
+        </>
+      )
 
     case 'region': {
       const region = getRegionById(screen.regionId)
       if (!region) return null
       return (
-        <RegionView
-          region={region}
-          worldState={worldState}
-          onSelectLocation={handleSelectLocation}
-          onBack={handleBackToMap}
-        />
+        <>
+          <RegionView
+            region={region}
+            worldState={worldState}
+            onSelectLocation={handleSelectLocation}
+            onBack={handleBackToMap}
+          />
+          {npcModal}
+        </>
       )
     }
 
@@ -72,12 +140,15 @@ export function WorldMode({ worldState }: WorldModeProps) {
       const loc = getLocationById(screen.locationId)
       if (!loc) return null
       return (
-        <TownView
-          location={loc}
-          worldState={worldState}
-          onSelectNpc={handleSelectNpc}
-          onBack={() => handleBackToRegion(screen.regionId)}
-        />
+        <>
+          <TownView
+            location={loc}
+            worldState={worldState}
+            onSelectNpc={handleSelectNpc}
+            onBack={() => handleBackToRegion(screen.regionId)}
+          />
+          {npcModal}
+        </>
       )
     }
 
@@ -85,12 +156,15 @@ export function WorldMode({ worldState }: WorldModeProps) {
       const loc = getLocationById(screen.locationId)
       if (!loc) return null
       return (
-        <DungeonView
-          location={loc}
-          worldState={worldState}
-          onStartFloor={handleSelectNpc}
-          onBack={() => handleBackToRegion(screen.regionId)}
-        />
+        <>
+          <DungeonView
+            location={loc}
+            worldState={worldState}
+            onStartFloor={handleSelectNpc}
+            onBack={() => handleBackToRegion(screen.regionId)}
+          />
+          {npcModal}
+        </>
       )
     }
   }
