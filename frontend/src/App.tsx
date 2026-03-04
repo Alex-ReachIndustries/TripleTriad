@@ -12,9 +12,10 @@ import { HowToPlay } from './components/HowToPlay'
 import { HomePage } from './components/HomePage'
 import { StoryCutscene, OPENING_PANELS } from './components/StoryCutscene'
 import { TutorialsMenu } from './components/TutorialsMenu'
+import { SettingsScreen, loadSettings, applySettingsToDOM } from './components/SettingsScreen'
 import './App.css'
 
-type AppView = 'title' | 'howto' | 'home' | 'game' | 'cutscene'
+type AppView = 'title' | 'howto' | 'home' | 'game' | 'cutscene' | 'settings'
 type GameTab = 'world' | 'deck' | 'quests' | 'duel' | 'battle' | 'guide'
 
 const STORAGE_KEY = 'tripletriad-world'
@@ -39,6 +40,11 @@ function App() {
   const [worldState, setWorldState] = useState(loadWorldState)
   const [battleContext, setBattleContext] = useState<BattleContext | null>(null)
   const [saveExists, setSaveExists] = useState(hasSaveData)
+
+  // Apply saved settings on mount
+  useEffect(() => {
+    applySettingsToDOM(loadSettings())
+  }, [])
 
   useEffect(() => {
     saveWorldState(worldState)
@@ -188,6 +194,7 @@ function App() {
             onContinue={handleContinue}
             onHowToPlay={() => setView('howto')}
             on2PDuel={handle2PDuel}
+            onSettings={() => setView('settings')}
             hasSaveData={saveExists}
           />
         </main>
@@ -218,6 +225,17 @@ function App() {
         <a href="#main-content" className="skip-link">Skip to main content</a>
         <main id="main-content">
           <HowToPlay onBack={() => setView('title')} />
+        </main>
+      </div>
+    )
+  }
+
+  if (view === 'settings') {
+    return (
+      <div className="app">
+        <a href="#main-content" className="skip-link">Skip to main content</a>
+        <main id="main-content">
+          <SettingsScreen onBack={() => setView('title')} />
         </main>
       </div>
     )

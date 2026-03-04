@@ -5,10 +5,11 @@ interface TitleScreenProps {
   onContinue: () => void
   onHowToPlay: () => void
   on2PDuel: () => void
+  onSettings: () => void
   hasSaveData: boolean
 }
 
-export function TitleScreen({ onNewGame, onContinue, onHowToPlay, on2PDuel, hasSaveData }: TitleScreenProps) {
+export function TitleScreen({ onNewGame, onContinue, onHowToPlay, on2PDuel, onSettings, hasSaveData }: TitleScreenProps) {
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
@@ -62,6 +63,9 @@ export function TitleScreen({ onNewGame, onContinue, onHowToPlay, on2PDuel, hasS
           </button>
           <button type="button" className="ts-menu-btn" onClick={on2PDuel}>
             2P Duel
+          </button>
+          <button type="button" className="ts-menu-btn" onClick={onSettings}>
+            Settings
           </button>
         </nav>
 

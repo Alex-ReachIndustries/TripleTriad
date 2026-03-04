@@ -26,6 +26,9 @@
   /* App padding = max(1rem, safe-area) on each side */
   --app-pt: max(1rem, var(--sat));
   --app-pb: max(1rem, var(--sab));
+  /* User-adjustable scales (set via JS from Settings screen) */
+  --text-scale: 1;
+  --card-overlay-scale: 1;
 }
 
 .visually-hidden {
@@ -52,6 +55,7 @@
   background: var(--bg);
   color: var(--text);
   font-family: var(--font);
+  font-size: calc(1rem * var(--text-scale));
   transition: background-color var(--transition-normal), color var(--transition-normal);
 }
 
@@ -1214,16 +1218,17 @@
   min-height: 0;
 }
 
-/* Rank overlay — fills the entire card face */
+/* Rank overlay — fills the entire card face; hidden when --card-overlay-scale is 0 */
 .card-ranks {
   position: absolute;
   inset: 0;
   pointer-events: none;
+  display: var(--card-overlay-display, block);
 }
 
 .card-ranks .rank {
   position: absolute;
-  font-size: 0.78rem;
+  font-size: calc(0.78rem * var(--card-overlay-scale));
   font-weight: 800;
   color: #fff;
   background: rgba(0, 0, 0, 0.62);
@@ -1258,7 +1263,7 @@
 }
 
 .card-view.compact .card-ranks .rank {
-  font-size: 0.6rem;
+  font-size: calc(0.6rem * var(--card-overlay-scale));
   padding: 1px 3px;
 }
 
@@ -5907,4 +5912,229 @@
 .tutorials-card-pages {
   font-size: 0.7rem;
   color: var(--text-muted);
+}
+
+/* ==================== Settings Screen ==================== */
+.settings-screen {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.settings-back-btn {
+  background: var(--surface);
+  color: var(--accent);
+  border: 1px solid var(--border);
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: var(--font);
+}
+
+.settings-back-btn:hover {
+  background: var(--surface-alt);
+  border-color: var(--accent);
+}
+
+.settings-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin: 0;
+}
+
+.settings-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.settings-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem;
+}
+
+.settings-section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 0.75rem;
+}
+
+.settings-slider {
+  width: 100%;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--border);
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+}
+
+.settings-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--bg);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+}
+
+.settings-slider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--bg);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+}
+
+.settings-slider-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+  padding: 0 2px;
+}
+
+/* Text scale preview */
+.settings-preview {
+  margin-top: 1rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.settings-preview-heading {
+  margin: 0 0 0.5rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.settings-preview-body {
+  margin: 0 0 0.75rem;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.settings-preview-ui {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin: 0;
+}
+
+.settings-preview-tag {
+  background: var(--surface-alt);
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* Card overlay preview */
+.settings-card-preview {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.settings-card-sample {
+  position: relative;
+  width: 120px;
+  height: 160px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid var(--border);
+  box-shadow: var(--card-shadow);
+}
+
+.settings-card-art {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #1a3a5c, #0d1f3c 40%, #2a1a3c 70%, #1a0d2c);
+  background-size: 200% 200%;
+}
+
+.settings-card-ranks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.settings-card-ranks .rank {
+  position: absolute;
+  font-weight: 800;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.62);
+  padding: 1px 4px;
+  border-radius: 3px;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+}
+
+.settings-card-ranks .rank.top {
+  top: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.settings-card-ranks .rank.right {
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.settings-card-ranks .rank.bottom {
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.settings-card-ranks .rank.left {
+  left: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.settings-preview-caption {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.settings-reset-btn {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  padding: 0.6rem 1.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-family: var(--font);
+  align-self: center;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.settings-reset-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
 }

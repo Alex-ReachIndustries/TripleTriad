@@ -42,6 +42,8 @@ export function CardView({ card, selected, onSelect, compact, owner, showName = 
           <span className="rank bottom">{rankLabel(card.bottom)}</span>
           <span className="rank left">{rankLabel(card.left)}</span>
         </div>
+        {/* Screen-reader-only ranks when overlay is hidden */}
+        <span className="visually-hidden">{card.top}/{card.right}/{card.bottom}/{card.left}</span>
         {card.element && (
           <span className="card-element-badge" aria-hidden="true">
             {ELEMENT_ICONS[card.element]}
