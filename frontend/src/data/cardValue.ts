@@ -19,7 +19,12 @@ export function getCardValue(card: Card): number {
   return base + Math.max(0, bonus)
 }
 
-/** Sell price = 50% of value, minimum 25 gil. */
+/** Buy price = full card value. Used by shops. */
+export function getCardBuyPrice(card: Card): number {
+  return getCardValue(card)
+}
+
+/** Sell price = 40% of value, minimum 10 gil. Always less than buy price. */
 export function getCardSellPrice(card: Card): number {
-  return Math.max(25, Math.floor(getCardValue(card) / 2))
+  return Math.max(10, Math.floor(getCardValue(card) * 0.4))
 }

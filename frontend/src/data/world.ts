@@ -494,7 +494,7 @@ export const NPCS: NPC[] = ([
       'gesper',
       'fastitocalon_f',
     ],
-    gilReward: 50,
+    gilReward: 75,
   },
   {
     id: 'balamb_fisher',
@@ -520,7 +520,7 @@ export const NPCS: NPC[] = ([
       'fastitocalon_f',
       'blood_soul',
     ],
-    gilReward: 50,
+    gilReward: 75,
   },
   {
     id: 'card_shop_owner',
@@ -531,9 +531,9 @@ export const NPCS: NPC[] = ([
       text: "Welcome! I've got cards for every budget.",
     },
     shopItems: [
-      { cardId: 'cockatrice', buyPrice: 80 },
-      { cardId: 'grat', buyPrice: 120 },
-      { cardId: 'buel', buyPrice: 120 },
+      { cardId: 'cockatrice' },
+      { cardId: 'grat' },
+      { cardId: 'buel' },
     ],
   },
   {
@@ -572,7 +572,7 @@ export const NPCS: NPC[] = ([
       'glacial_eye',
       'belhelmel',
     ],
-    gilReward: 75,
+    gilReward: 100,
   },
   {
     id: 'cc_club_jack',
@@ -598,7 +598,7 @@ export const NPCS: NPC[] = ([
       'anacondaur',
       'creeps',
     ],
-    gilReward: 100,
+    gilReward: 150,
   },
   {
     id: 'quistis',
@@ -619,9 +619,9 @@ export const NPCS: NPC[] = ([
       text: 'We have some cards the students donated.',
     },
     shopItems: [
-      { cardId: 'mesmerize', buyPrice: 150 },
-      { cardId: 'glacial_eye', buyPrice: 180 },
-      { cardId: 'belhelmel', buyPrice: 180 },
+      { cardId: 'mesmerize' },
+      { cardId: 'glacial_eye' },
+      { cardId: 'belhelmel' },
     ],
   },
   {
@@ -632,7 +632,7 @@ export const NPCS: NPC[] = ([
     dialogue: {
       text: 'Welcome to the Balamb Garden Tournament! Test your skills against the best students.',
     },
-    tournamentEntryFee: 100,
+    tournamentEntryFee: 200,
     tournamentPrizePool: [
       'mesmerize',
       'glacial_eye',
@@ -665,7 +665,7 @@ export const NPCS: NPC[] = ([
       'gesper',
       'fastitocalon_f',
     ],
-    gilReward: 30,
+    gilReward: 50,
     floorOrder: 0,
     isBoss: false,
   },
@@ -690,7 +690,7 @@ export const NPCS: NPC[] = ([
       'blood_soul',
       'caterchipillar',
     ],
-    gilReward: 50,
+    gilReward: 75,
     floorOrder: 1,
     isBoss: false,
   },
@@ -720,7 +720,7 @@ export const NPCS: NPC[] = ([
       'belhelmel',
       'thrustaevis',
     ],
-    gilReward: 125,
+    gilReward: 150,
     floorOrder: 2,
     isBoss: true,
   },
@@ -754,7 +754,7 @@ export const NPCS: NPC[] = ([
       'snow_lion',
       'ochu',
     ],
-    gilReward: 125,
+    gilReward: 175,
   },
   {
     id: 'dollet_soldier',
@@ -780,7 +780,7 @@ export const NPCS: NPC[] = ([
       'grand_mantis',
       'forbidden',
     ],
-    gilReward: 125,
+    gilReward: 175,
   },
   {
     id: 'dollet_pub_owner',
@@ -791,10 +791,10 @@ export const NPCS: NPC[] = ([
       text: 'Finest cards from across the sea.',
     },
     shopItems: [
-      { cardId: 'thrustaevis', buyPrice: 200 },
-      { cardId: 'anacondaur', buyPrice: 200 },
-      { cardId: 'creeps', buyPrice: 220 },
-      { cardId: 'grendel', buyPrice: 220 },
+      { cardId: 'thrustaevis' },
+      { cardId: 'anacondaur' },
+      { cardId: 'creeps' },
+      { cardId: 'grendel' },
     ],
   },
   {
@@ -815,7 +815,7 @@ export const NPCS: NPC[] = ([
     dialogue: {
       text: 'The Dollet Tournament draws players from across the dukedom. Step up and test your mettle!',
     },
-    tournamentEntryFee: 150,
+    tournamentEntryFee: 400,
     tournamentPrizePool: [
       'thrustaevis',
       'anacondaur',
@@ -855,7 +855,7 @@ export const NPCS: NPC[] = ([
       'forbidden',
       'armadodo',
     ],
-    gilReward: 100,
+    gilReward: 200,
   },
   {
     id: 'forest_fox',
@@ -881,7 +881,7 @@ export const NPCS: NPC[] = ([
       'fastitocalon',
       'snow_lion',
     ],
-    gilReward: 100,
+    gilReward: 150,
   },
   {
     id: 'resistance_member',
@@ -902,10 +902,10 @@ export const NPCS: NPC[] = ([
       text: 'Got some rare finds from the forest.',
     },
     shopItems: [
-      { cardId: 'forbidden', buyPrice: 300 },
-      { cardId: 'armadodo', buyPrice: 300 },
-      { cardId: 'jelleye', buyPrice: 250 },
-      { cardId: 'grand_mantis', buyPrice: 250 },
+      { cardId: 'forbidden' },
+      { cardId: 'armadodo' },
+      { cardId: 'jelleye' },
+      { cardId: 'grand_mantis' },
     ],
   },
 
@@ -934,7 +934,7 @@ export const NPCS: NPC[] = ([
       'sam08g',
       'death_claw',
     ],
-    gilReward: 150,
+    gilReward: 200,
   },
   {
     id: 'galbadia_instructor',
@@ -960,7 +960,7 @@ export const NPCS: NPC[] = ([
       'cactuar',
       'abyss_worm',
     ],
-    gilReward: 150,
+    gilReward: 250,
   },
   {
     id: 'irvine',
@@ -998,7 +998,7 @@ export const NPCS: NPC[] = ([
       'cactuar',
       'tonberry',
     ],
-    gilReward: 175,
+    gilReward: 250,
   },
   {
     id: 'generals_aide',
@@ -1024,7 +1024,7 @@ export const NPCS: NPC[] = ([
       'bomb',
       'blitz',
     ],
-    gilReward: 175,
+    gilReward: 300,
   },
   {
     id: 'deling_card_emporium',
@@ -1035,10 +1035,10 @@ export const NPCS: NPC[] = ([
       text: 'The finest cards in Galbadia.',
     },
     shopItems: [
-      { cardId: 'tri_face', buyPrice: 350 },
-      { cardId: 'fastitocalon', buyPrice: 350 },
-      { cardId: 'snow_lion', buyPrice: 350 },
-      { cardId: 'ochu', buyPrice: 350 },
+      { cardId: 'tri_face' },
+      { cardId: 'fastitocalon' },
+      { cardId: 'snow_lion' },
+      { cardId: 'ochu' },
     ],
   },
   {
@@ -1049,7 +1049,7 @@ export const NPCS: NPC[] = ([
     dialogue: {
       text: 'The Deling City Grand Tournament! Only the finest card players in Galbadia may enter.',
     },
-    tournamentEntryFee: 200,
+    tournamentEntryFee: 600,
     tournamentPrizePool: [
       'tri_face',
       'fastitocalon',
@@ -1084,7 +1084,7 @@ export const NPCS: NPC[] = ([
       'forbidden',
       'armadodo',
     ],
-    gilReward: 50,
+    gilReward: 75,
     floorOrder: 0,
     isBoss: false,
   },
@@ -1109,7 +1109,7 @@ export const NPCS: NPC[] = ([
       'sam08g',
       'death_claw',
     ],
-    gilReward: 75,
+    gilReward: 125,
     floorOrder: 1,
     isBoss: false,
   },
@@ -1137,7 +1137,7 @@ export const NPCS: NPC[] = ([
       'vysage',
       't_rexaur',
     ],
-    gilReward: 200,
+    gilReward: 300,
     floorOrder: 2,
     isBoss: true,
   },
@@ -1167,7 +1167,7 @@ export const NPCS: NPC[] = ([
       'torama',
       'blue_dragon',
     ],
-    gilReward: 175,
+    gilReward: 275,
   },
   {
     id: 'winhill_flower_girl',
@@ -1193,7 +1193,7 @@ export const NPCS: NPC[] = ([
       'blue_dragon',
       'adamantoise',
     ],
-    gilReward: 175,
+    gilReward: 275,
   },
   {
     id: 'laguna',
@@ -1235,7 +1235,7 @@ export const NPCS: NPC[] = ([
       'vysage',
       't_rexaur',
     ],
-    gilReward: 150,
+    gilReward: 300,
   },
   {
     id: 'bridge_mechanic',
@@ -1261,7 +1261,7 @@ export const NPCS: NPC[] = ([
       't_rexaur',
       'bomb',
     ],
-    gilReward: 150,
+    gilReward: 300,
   },
   {
     id: 'fh_fisherman',
@@ -1282,10 +1282,10 @@ export const NPCS: NPC[] = ([
       text: 'Found these washed up on the bridge.',
     },
     shopItems: [
-      { cardId: 'sam08g', buyPrice: 400 },
-      { cardId: 'death_claw', buyPrice: 400 },
-      { cardId: 'cactuar', buyPrice: 450 },
-      { cardId: 'tonberry', buyPrice: 450 },
+      { cardId: 'sam08g' },
+      { cardId: 'death_claw' },
+      { cardId: 'cactuar' },
+      { cardId: 'tonberry' },
     ],
   },
   {
@@ -1296,7 +1296,7 @@ export const NPCS: NPC[] = ([
     dialogue: {
       text: "The Fisherman's Horizon friendly tournament. All are welcome — no fighting, just cards!",
     },
-    tournamentEntryFee: 200,
+    tournamentEntryFee: 800,
     tournamentPrizePool: [
       'sam08g',
       'death_claw',
@@ -1332,7 +1332,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'sam08g', 'death_claw', 'cactuar', 'tonberry', 'abyss_worm', 'turtapod', 'vysage', 't_rexaur', 'bomb', 'blitz',
     ],
-    gilReward: 200,
+    gilReward: 500,
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -1364,7 +1364,7 @@ export const NPCS: NPC[] = ([
       'wendigo',
       'torama',
     ],
-    gilReward: 175,
+    gilReward: 350,
   },
   {
     id: 'trabia_scout',
@@ -1390,7 +1390,7 @@ export const NPCS: NPC[] = ([
       'imp',
       'blue_dragon',
     ],
-    gilReward: 175,
+    gilReward: 350,
   },
   {
     id: 'selphie',
@@ -1428,7 +1428,7 @@ export const NPCS: NPC[] = ([
       'chimera',
       'pupu',
     ],
-    gilReward: 250,
+    gilReward: 500,
   },
   {
     id: 'shumi_artisan',
@@ -1439,11 +1439,11 @@ export const NPCS: NPC[] = ([
       text: 'We craft the finest cards. Each one is a work of art.',
     },
     shopItems: [
-      { cardId: 'bomb', buyPrice: 500 },
-      { cardId: 'blitz', buyPrice: 500 },
-      { cardId: 'wendigo', buyPrice: 500 },
-      { cardId: 'torama', buyPrice: 550 },
-      { cardId: 'imp', buyPrice: 600 },
+      { cardId: 'bomb' },
+      { cardId: 'blitz' },
+      { cardId: 'wendigo' },
+      { cardId: 'torama' },
+      { cardId: 'imp' },
     ],
   },
   {
@@ -1486,7 +1486,7 @@ export const NPCS: NPC[] = ([
       'behemoth',
       'chimera',
     ],
-    gilReward: 225,
+    gilReward: 400,
   },
   {
     id: 'white_seed_captain',
@@ -1512,7 +1512,7 @@ export const NPCS: NPC[] = ([
       'malboro',
       'ruby_dragon',
     ],
-    gilReward: 250,
+    gilReward: 500,
   },
   {
     id: 'edea',
@@ -1533,10 +1533,10 @@ export const NPCS: NPC[] = ([
       text: "I've excavated some rare cards from the ruins. I sell them here where it's safe.",
     },
     shopItems: [
-      { cardId: 'blue_dragon', buyPrice: 650 },
-      { cardId: 'adamantoise', buyPrice: 650 },
-      { cardId: 'hexadragon', buyPrice: 700 },
-      { cardId: 'iron_giant', buyPrice: 800 },
+      { cardId: 'blue_dragon' },
+      { cardId: 'adamantoise' },
+      { cardId: 'hexadragon' },
+      { cardId: 'iron_giant' },
     ],
   },
   {
@@ -1573,7 +1573,7 @@ export const NPCS: NPC[] = ([
       'behemoth',
       'chimera',
     ],
-    gilReward: 75,
+    gilReward: 200,
     floorOrder: 0,
     isBoss: false,
   },
@@ -1599,7 +1599,7 @@ export const NPCS: NPC[] = ([
       'malboro',
       'ruby_dragon',
     ],
-    gilReward: 100,
+    gilReward: 300,
     floorOrder: 1,
     isBoss: false,
   },
@@ -1629,7 +1629,7 @@ export const NPCS: NPC[] = ([
       'malboro',
       'ruby_dragon',
     ],
-    gilReward: 275,
+    gilReward: 600,
     floorOrder: 2,
     isBoss: true,
   },
@@ -1663,7 +1663,7 @@ export const NPCS: NPC[] = ([
       'wedge_biggs',
       'fujin_raijin',
     ],
-    gilReward: 300,
+    gilReward: 750,
   },
   {
     id: 'esthar_soldier',
@@ -1689,7 +1689,7 @@ export const NPCS: NPC[] = ([
       'fujin_raijin',
       'elvoret',
     ],
-    gilReward: 300,
+    gilReward: 750,
   },
   {
     id: 'esthar_card_lab',
@@ -1700,11 +1700,11 @@ export const NPCS: NPC[] = ([
       text: 'State-of-the-art cards, engineered for victory.',
     },
     shopItems: [
-      { cardId: 'behemoth', buyPrice: 900 },
-      { cardId: 'malboro', buyPrice: 900 },
-      { cardId: 'ruby_dragon', buyPrice: 950 },
-      { cardId: 'elnoyle', buyPrice: 1000 },
-      { cardId: 'iron_giant', buyPrice: 850 },
+      { cardId: 'behemoth' },
+      { cardId: 'malboro' },
+      { cardId: 'ruby_dragon' },
+      { cardId: 'elnoyle' },
+      { cardId: 'iron_giant' },
     ],
   },
   {
@@ -1735,7 +1735,7 @@ export const NPCS: NPC[] = ([
     dialogue: {
       text: 'The prestigious Esthar City Tournament. Only the elite may enter.',
     },
-    tournamentEntryFee: 300,
+    tournamentEntryFee: 2000,
     tournamentPrizePool: [
       'iron_giant',
       'behemoth',
@@ -1770,7 +1770,7 @@ export const NPCS: NPC[] = ([
       'wedge_biggs',
       'fujin_raijin',
     ],
-    gilReward: 100,
+    gilReward: 300,
     floorOrder: 0,
     isBoss: false,
   },
@@ -1798,7 +1798,7 @@ export const NPCS: NPC[] = ([
       'tri_point',
       'gargantua',
     ],
-    gilReward: 150,
+    gilReward: 500,
     floorOrder: 1,
     isBoss: false,
   },
@@ -1828,7 +1828,7 @@ export const NPCS: NPC[] = ([
       'gargantua',
       'mobile_type_8',
     ],
-    gilReward: 400,
+    gilReward: 1000,
     floorOrder: 2,
     isBoss: true,
   },
@@ -1856,7 +1856,7 @@ export const NPCS: NPC[] = ([
       'wedge_biggs',
       'fujin_raijin',
     ],
-    gilReward: 100,
+    gilReward: 300,
     floorOrder: 0,
     isBoss: false,
   },
@@ -1882,7 +1882,7 @@ export const NPCS: NPC[] = ([
       'propagator',
       'jumbo_cactuar',
     ],
-    gilReward: 150,
+    gilReward: 400,
     floorOrder: 1,
     isBoss: false,
   },
@@ -1908,7 +1908,7 @@ export const NPCS: NPC[] = ([
       'tiamat',
       'bgh251f2',
     ],
-    gilReward: 200,
+    gilReward: 500,
     floorOrder: 2,
     isBoss: false,
   },
@@ -1939,7 +1939,7 @@ export const NPCS: NPC[] = ([
       'catoblepas',
       'ultima_weapon',
     ],
-    gilReward: 500,
+    gilReward: 1500,
     floorOrder: 3,
     isBoss: true,
   },
@@ -2025,7 +2025,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'sam08g', 'death_claw', 'cactuar', 'tonberry', 'abyss_worm', 'turtapod', 'vysage', 't_rexaur', 'bomb', 'blitz',
     ],
-    gilReward: 200,
+    gilReward: 500,
   },
   {
     id: 'quistis_gg',
@@ -2128,7 +2128,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'geezard', 'funguar', 'bite_bug', 'red_bat', 'blobra', 'gayla', 'gesper', 'fastitocalon_f',
     ],
-    gilReward: 40,
+    gilReward: 75,
     floorOrder: 0,
     isBoss: false,
   },
@@ -2145,7 +2145,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'red_bat', 'blobra', 'gayla', 'cockatrice', 'grat', 'buel', 'blood_soul', 'caterchipillar',
     ],
-    gilReward: 60,
+    gilReward: 100,
     floorOrder: 1,
     isBoss: false,
   },
@@ -2163,7 +2163,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'gayla', 'cockatrice', 'grat', 'buel', 'mesmerize', 'glacial_eye', 'belhelmel', 'thrustaevis',
     ],
-    gilReward: 125,
+    gilReward: 200,
     floorOrder: 2,
     isBoss: true,
   },
@@ -2185,7 +2185,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'blood_soul', 'caterchipillar', 'cockatrice', 'grat', 'buel', 'mesmerize', 'glacial_eye', 'belhelmel',
     ],
-    gilReward: 60,
+    gilReward: 100,
     floorOrder: 0,
     isBoss: false,
   },
@@ -2202,7 +2202,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'mesmerize', 'glacial_eye', 'belhelmel', 'thrustaevis', 'anacondaur', 'creeps', 'grendel', 'jelleye',
     ],
-    gilReward: 80,
+    gilReward: 150,
     floorOrder: 1,
     isBoss: false,
   },
@@ -2220,7 +2220,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'glacial_eye', 'belhelmel', 'thrustaevis', 'anacondaur', 'creeps', 'grendel', 'jelleye', 'grand_mantis', 'forbidden',
     ],
-    gilReward: 150,
+    gilReward: 300,
     floorOrder: 2,
     isBoss: true,
   },
@@ -2242,7 +2242,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'blood_soul', 'caterchipillar', 'cockatrice', 'grat', 'buel', 'mesmerize', 'glacial_eye', 'belhelmel',
     ],
-    gilReward: 50,
+    gilReward: 75,
     floorOrder: 0,
     isBoss: false,
   },
@@ -2259,7 +2259,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'mesmerize', 'glacial_eye', 'belhelmel', 'thrustaevis', 'anacondaur', 'creeps', 'grendel', 'jelleye',
     ],
-    gilReward: 70,
+    gilReward: 125,
     floorOrder: 1,
     isBoss: false,
   },
@@ -2277,7 +2277,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'thrustaevis', 'anacondaur', 'creeps', 'grendel', 'jelleye', 'grand_mantis', 'forbidden', 'armadodo',
     ],
-    gilReward: 150,
+    gilReward: 250,
     floorOrder: 2,
     isBoss: true,
   },
@@ -2299,7 +2299,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'mesmerize', 'glacial_eye', 'belhelmel', 'thrustaevis', 'anacondaur', 'creeps', 'grendel', 'jelleye',
     ],
-    gilReward: 70,
+    gilReward: 125,
     floorOrder: 0,
     isBoss: false,
   },
@@ -2316,7 +2316,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'thrustaevis', 'anacondaur', 'creeps', 'grendel', 'jelleye', 'grand_mantis', 'forbidden', 'armadodo',
     ],
-    gilReward: 90,
+    gilReward: 175,
     floorOrder: 1,
     isBoss: false,
   },
@@ -2334,7 +2334,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'anacondaur', 'creeps', 'grendel', 'jelleye', 'grand_mantis', 'forbidden', 'armadodo', 'tri_face', 'sam08g',
     ],
-    gilReward: 175,
+    gilReward: 350,
     floorOrder: 2,
     isBoss: true,
   },
@@ -2356,7 +2356,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'mesmerize', 'glacial_eye', 'belhelmel', 'thrustaevis', 'anacondaur', 'creeps', 'grendel', 'jelleye',
     ],
-    gilReward: 70,
+    gilReward: 125,
     floorOrder: 0,
     isBoss: false,
   },
@@ -2373,7 +2373,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'thrustaevis', 'anacondaur', 'creeps', 'grendel', 'jelleye', 'grand_mantis', 'forbidden', 'armadodo',
     ],
-    gilReward: 90,
+    gilReward: 175,
     floorOrder: 1,
     isBoss: false,
   },
@@ -2391,7 +2391,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'grendel', 'jelleye', 'grand_mantis', 'forbidden', 'armadodo', 'tri_face', 'sam08g', 'death_claw',
     ],
-    gilReward: 200,
+    gilReward: 400,
     floorOrder: 2,
     isBoss: true,
   },
@@ -2413,7 +2413,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'thrustaevis', 'anacondaur', 'creeps', 'grendel', 'jelleye', 'grand_mantis', 'forbidden', 'armadodo',
     ],
-    gilReward: 80,
+    gilReward: 150,
     floorOrder: 0,
     isBoss: false,
   },
@@ -2430,7 +2430,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'grand_mantis', 'forbidden', 'armadodo', 'tri_face', 'sam08g', 'death_claw', 'cactuar', 'tonberry',
     ],
-    gilReward: 120,
+    gilReward: 225,
     floorOrder: 1,
     isBoss: false,
   },
@@ -2448,7 +2448,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'forbidden', 'armadodo', 'tri_face', 'sam08g', 'death_claw', 'cactuar', 'tonberry', 'abyss_worm', 'turtapod',
     ],
-    gilReward: 200,
+    gilReward: 400,
     floorOrder: 2,
     isBoss: true,
   },
@@ -2470,7 +2470,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'sam08g', 'death_claw', 'cactuar', 'tonberry', 'abyss_worm', 'turtapod', 'vysage', 't_rexaur',
     ],
-    gilReward: 100,
+    gilReward: 175,
     floorOrder: 0,
     isBoss: false,
   },
@@ -2487,7 +2487,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'death_claw', 'cactuar', 'tonberry', 'abyss_worm', 'turtapod', 'vysage', 't_rexaur', 'bomb', 'blitz',
     ],
-    gilReward: 120,
+    gilReward: 225,
     floorOrder: 1,
     isBoss: false,
   },
@@ -2505,7 +2505,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'cactuar', 'tonberry', 'abyss_worm', 'turtapod', 'vysage', 't_rexaur', 'bomb', 'blitz', 'wendigo', 'torama',
     ],
-    gilReward: 200,
+    gilReward: 400,
     floorOrder: 2,
     isBoss: true,
   },
@@ -2527,7 +2527,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'sam08g', 'death_claw', 'cactuar', 'tonberry', 'abyss_worm', 'turtapod', 'vysage', 't_rexaur', 'bomb',
     ],
-    gilReward: 100,
+    gilReward: 200,
     floorOrder: 0,
     isBoss: false,
   },
@@ -2544,7 +2544,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'tonberry', 'abyss_worm', 'turtapod', 'vysage', 't_rexaur', 'bomb', 'blitz', 'wendigo', 'torama', 'imp',
     ],
-    gilReward: 150,
+    gilReward: 300,
     floorOrder: 1,
     isBoss: false,
   },
@@ -2562,7 +2562,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'torama', 'imp', 'blue_dragon', 'adamantoise', 'hexadragon', 'iron_giant', 'behemoth', 'chimera',
     ],
-    gilReward: 300,
+    gilReward: 600,
     floorOrder: 2,
     isBoss: true,
   },
@@ -2578,10 +2578,10 @@ export const NPCS: NPC[] = ([
     type: 'shop',
     dialogue: { text: "We've collected cards from every port. Take a look." },
     shopItems: [
-      { cardId: 'torama', buyPrice: 550 },
-      { cardId: 'imp', buyPrice: 550 },
-      { cardId: 'blue_dragon', buyPrice: 650 },
-      { cardId: 'adamantoise', buyPrice: 650 },
+      { cardId: 'torama' },
+      { cardId: 'imp' },
+      { cardId: 'blue_dragon' },
+      { cardId: 'adamantoise' },
     ],
   },
 
@@ -2602,7 +2602,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'torama', 'imp', 'blue_dragon', 'adamantoise', 'hexadragon', 'iron_giant', 'behemoth', 'chimera',
     ],
-    gilReward: 120,
+    gilReward: 250,
     floorOrder: 0,
     isBoss: false,
   },
@@ -2619,7 +2619,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'blue_dragon', 'adamantoise', 'hexadragon', 'iron_giant', 'behemoth', 'chimera', 'malboro', 'ruby_dragon',
     ],
-    gilReward: 175,
+    gilReward: 375,
     floorOrder: 1,
     isBoss: false,
   },
@@ -2637,7 +2637,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'hexadragon', 'iron_giant', 'behemoth', 'chimera', 'malboro', 'ruby_dragon', 'elnoyle', 'tonberry_king',
     ],
-    gilReward: 275,
+    gilReward: 600,
     floorOrder: 2,
     isBoss: true,
   },
@@ -2660,7 +2660,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'iron_giant', 'behemoth', 'malboro', 'ruby_dragon', 'elnoyle', 'tonberry_king', 'wedge_biggs', 'fujin_raijin',
     ],
-    gilReward: 250,
+    gilReward: 600,
   },
   {
     id: 'memorial_scholar',
@@ -2676,7 +2676,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'behemoth', 'malboro', 'ruby_dragon', 'elnoyle', 'tonberry_king', 'wedge_biggs', 'fujin_raijin', 'chimera',
     ],
-    gilReward: 250,
+    gilReward: 600,
   },
   {
     id: 'memorial_curator',
@@ -2685,9 +2685,9 @@ export const NPCS: NPC[] = ([
     type: 'shop',
     dialogue: { text: 'These cards were recovered from the memorial vaults. Handle them with care.' },
     shopItems: [
-      { cardId: 'elnoyle', buyPrice: 1000 },
-      { cardId: 'tonberry_king', buyPrice: 950 },
-      { cardId: 'wedge_biggs', buyPrice: 800 },
+      { cardId: 'elnoyle' },
+      { cardId: 'tonberry_king' },
+      { cardId: 'wedge_biggs' },
     ],
   },
 
@@ -2708,7 +2708,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'elvoret', 'x_atm092', 'granaldo', 'gerogero', 'iguion', 'abadon', 'propagator', 'jumbo_cactuar',
     ],
-    gilReward: 175,
+    gilReward: 400,
     floorOrder: 0,
     isBoss: false,
   },
@@ -2725,7 +2725,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'x_atm092', 'granaldo', 'gerogero', 'iguion', 'abadon', 'propagator', 'jumbo_cactuar', 'tri_point', 'gargantua',
     ],
-    gilReward: 225,
+    gilReward: 600,
     floorOrder: 1,
     isBoss: false,
   },
@@ -2743,7 +2743,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'propagator', 'jumbo_cactuar', 'tri_point', 'gargantua', 'mobile_type_8', 'sphinxara', 'tiamat', 'bgh251f2',
     ],
-    gilReward: 400,
+    gilReward: 1000,
     floorOrder: 2,
     isBoss: true,
   },
@@ -2765,7 +2765,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'elvoret', 'x_atm092', 'granaldo', 'gerogero', 'iguion', 'abadon', 'propagator', 'jumbo_cactuar',
     ],
-    gilReward: 175,
+    gilReward: 400,
     floorOrder: 0,
     isBoss: false,
   },
@@ -2782,7 +2782,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'x_atm092', 'granaldo', 'gerogero', 'iguion', 'abadon', 'propagator', 'jumbo_cactuar', 'tri_point', 'gargantua',
     ],
-    gilReward: 225,
+    gilReward: 600,
     floorOrder: 1,
     isBoss: false,
   },
@@ -2800,7 +2800,7 @@ export const NPCS: NPC[] = ([
     deckPool: [
       'propagator', 'jumbo_cactuar', 'tri_point', 'gargantua', 'mobile_type_8', 'sphinxara', 'tiamat', 'bgh251f2', 'red_giant', 'catoblepas', 'ultima_weapon',
     ],
-    gilReward: 500,
+    gilReward: 1500,
     floorOrder: 2,
     isBoss: true,
   },

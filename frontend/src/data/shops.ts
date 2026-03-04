@@ -5,6 +5,11 @@
  */
 
 import { getNpcs } from './world'
+import { getCardBuyPrice } from './cardValue'
+import cardsData from './cards.json'
+import type { Card } from '../types/card'
+
+const cardMap = new Map((cardsData.cards as Card[]).map(c => [c.id, c]))
 
 export interface ShopItem {
   cardId: string
@@ -34,7 +39,10 @@ export function getShopAtLocation(id: string): Shop | undefined {
   if (npc?.shopItems) {
     return {
       locationId: npc.id,
-      items: npc.shopItems.map((si) => ({ cardId: si.cardId, price: si.buyPrice })),
+      items: npc.shopItems.map((si) => {
+        const card = cardMap.get(si.cardId)
+        return { cardId: si.cardId, price: card ? getCardBuyPrice(card) : 100 }
+      }),
     }
   }
   // Fallback: find any shop NPC in a location with this ID
@@ -42,7 +50,10 @@ export function getShopAtLocation(id: string): Shop | undefined {
   if (shopNpc?.shopItems) {
     return {
       locationId: shopNpc.id,
-      items: shopNpc.shopItems.map((si) => ({ cardId: si.cardId, price: si.buyPrice })),
+      items: shopNpc.shopItems.map((si) => {
+        const card = cardMap.get(si.cardId)
+        return { cardId: si.cardId, price: card ? getCardBuyPrice(card) : 100 }
+      }),
     }
   }
   return undefined

@@ -4,7 +4,7 @@ import type { Card } from '../../types/card'
 import type { WorldPlayerState, } from '../../data/worldState'
 import { isStarterCard, getActiveRegionRules } from '../../data/worldState'
 import { getRegions, formatRules } from '../../data/world'
-import { getCardSellPrice } from '../../data/cardValue'
+import { getCardBuyPrice, getCardSellPrice } from '../../data/cardValue'
 import { getQuestsByNpc, getQuestStatus, isQuestComplete } from '../../data/quests'
 import { rankLabel } from '../../types/card'
 import cardsData from '../../data/cards.json'
@@ -201,7 +201,8 @@ function ShopPanel({
             const card = getCard(item.cardId)
             if (!card) return null
             const owned = worldState.inventory[item.cardId] ?? 0
-            const canAfford = worldState.gil >= item.buyPrice
+            const price = getCardBuyPrice(card)
+            const canAfford = worldState.gil >= price
             return (
               <div key={item.cardId} className="wm-shop-item">
                 <div className="wm-shop-item-info">
@@ -215,12 +216,12 @@ function ShopPanel({
                   </div>
                 </div>
                 <div className="wm-shop-item-action">
-                  <span className="wm-shop-price">{item.buyPrice} Gil</span>
+                  <span className="wm-shop-price">{price} Gil</span>
                   <button
                     type="button"
                     className="wm-shop-buy-btn"
                     disabled={!canAfford}
-                    onClick={() => onBuyCard(item.cardId, item.buyPrice)}
+                    onClick={() => onBuyCard(item.cardId, price)}
                   >
                     Buy
                   </button>

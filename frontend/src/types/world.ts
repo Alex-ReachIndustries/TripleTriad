@@ -84,8 +84,6 @@ export interface NpcDialogue {
 
 export interface ShopInventory {
   cardId: string
-  buyPrice: number
-  /** Sell price is auto-calculated as floor(buyPrice / 2). */
 }
 
 export interface NPC {
