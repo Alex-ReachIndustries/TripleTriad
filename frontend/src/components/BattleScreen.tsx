@@ -473,6 +473,7 @@ export function BattleScreen({
 
         {tutorialQueue.length > 0 && (
           <TutorialPopup
+            key={tutorialQueue[0].id}
             tutorial={tutorialQueue[0]}
             onComplete={handleTutorialComplete}
           />

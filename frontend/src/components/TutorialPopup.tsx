@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { Tutorial } from '../data/tutorials'
 
 interface TutorialPopupProps {
@@ -8,9 +8,17 @@ interface TutorialPopupProps {
 
 export function TutorialPopup({ tutorial, onComplete }: TutorialPopupProps) {
   const [page, setPage] = useState(0)
-  const current = tutorial.pages[page]
-  const isLast = page === tutorial.pages.length - 1
-  const isFirst = page === 0
+
+  // Reset to page 0 whenever the tutorial changes
+  useEffect(() => {
+    setPage(0)
+  }, [tutorial.id])
+
+  // Guard against stale page index during tutorial transitions
+  const safePage = page < tutorial.pages.length ? page : 0
+  const current = tutorial.pages[safePage]
+  const isLast = safePage === tutorial.pages.length - 1
+  const isFirst = safePage === 0
 
   return (
     <div className="tutorial-overlay" onClick={onComplete} role="presentation">
