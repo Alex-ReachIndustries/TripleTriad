@@ -465,7 +465,7 @@ export const LOCATIONS: Location[] = [
 
 // ─── NPCs ───────────────────────────────────────────────────────────────────
 
-export const NPCS: NPC[] = [
+export const NPCS: NPC[] = ([
   // ═══════════════════════════════════════════════════════════════════════════
   // REGION 0: BALAMB
   // ═══════════════════════════════════════════════════════════════════════════
@@ -2794,7 +2794,7 @@ export const NPCS: NPC[] = [
     floorOrder: 2,
     isBoss: true,
   },
-].map(npc => ({ ...npc, portrait: npc.portrait ?? `/portraits/${npc.id}.png` }))
+] as NPC[]).map(npc => ({ ...npc, portrait: npc.portrait ?? `/portraits/${npc.id}.png` }))
 
 // ─── Map Override Persistence ────────────────────────────────────────────────
 
