@@ -6,7 +6,6 @@ import { isStarterCard, getActiveRegionRules } from '../../data/worldState'
 import { getRegions, formatRules } from '../../data/world'
 import { getCardSellPrice } from '../../data/cardValue'
 import { getQuestsByNpc, getQuestStatus, isQuestComplete } from '../../data/quests'
-import { getDeckById, isDeckValid } from '../../data/deckManager'
 import { rankLabel } from '../../types/card'
 import cardsData from '../../data/cards.json'
 
@@ -281,15 +280,11 @@ function DuelPanel({
   worldState: WorldPlayerState
   onInitiateDuel: (npcId: string) => void
 }) {
-  const [selectedDeckId, setSelectedDeckId] = useState(worldState.lastDeckId ?? 'starter')
   const wins = worldState.npcWins[npc.id] ?? 0
 
   const dialogueText = wins > 0
     ? (npc.dialogue.rematch ?? npc.dialogue.challenge ?? 'Ready for another round?')
     : (npc.dialogue.challenge ?? 'Let\'s play!')
-
-  const selectedDeck = getDeckById(worldState.savedDecks, selectedDeckId)
-  const deckValid = selectedDeck ? isDeckValid(selectedDeck, worldState.inventory) : false
 
   return (
     <div className="wm-interact-duel">
@@ -309,46 +304,13 @@ function DuelPanel({
         <div className="wm-duel-wins">Wins: {wins}</div>
       )}
 
-      <div className="wm-duel-deck-select">
-        <label htmlFor={`deck-select-${npc.id}`} className="wm-duel-deck-label">Select Deck:</label>
-        <select
-          id={`deck-select-${npc.id}`}
-          className="wm-duel-deck-dropdown"
-          value={selectedDeckId}
-          onChange={(e) => setSelectedDeckId(e.target.value)}
-        >
-          {worldState.savedDecks.map(deck => (
-            <option key={deck.id} value={deck.id}>
-              {deck.name} {isDeckValid(deck, worldState.inventory) ? '' : '(invalid)'}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {selectedDeck && (
-        <div className="wm-duel-deck-preview">
-          {selectedDeck.cardIds.map((cardId, i) => {
-            const card = getCard(cardId)
-            return (
-              <div key={`${cardId}-${i}`} className="wm-duel-preview-card">
-                <img src={`/cards/${cardId}.png`} alt={card?.name ?? cardId} className="wm-duel-card-img" />
-              </div>
-            )
-          })}
-        </div>
-      )}
-
       <button
         type="button"
         className="wm-duel-start-btn"
-        disabled={!deckValid}
         onClick={() => onInitiateDuel(npc.id)}
       >
         {wins > 0 ? 'Rematch!' : 'Challenge!'}
       </button>
-      {!deckValid && (
-        <p className="wm-duel-invalid-msg">Selected deck is invalid — check your cards.</p>
-      )}
     </div>
   )
 }
@@ -364,15 +326,11 @@ function TournamentPanel({
   worldState: WorldPlayerState
   onEnterTournament: (npcId: string) => void
 }) {
-  const [selectedDeckId, setSelectedDeckId] = useState(worldState.lastDeckId ?? 'starter')
   const entryFee = npc.tournamentEntryFee ?? 0
   const prizePool = npc.tournamentPrizePool ?? []
   const canAfford = worldState.gil >= entryFee
 
   const dialogueText = npc.dialogue.challenge ?? npc.dialogue.text ?? 'Welcome to the tournament!'
-
-  const selectedDeck = getDeckById(worldState.savedDecks, selectedDeckId)
-  const deckValid = selectedDeck ? isDeckValid(selectedDeck, worldState.inventory) : false
 
   return (
     <div className="wm-interact-tournament">
@@ -398,45 +356,16 @@ function TournamentPanel({
         </div>
       </div>
 
-      <div className="wm-duel-deck-select">
-        <label htmlFor={`tourney-deck-${npc.id}`} className="wm-duel-deck-label">Select Deck:</label>
-        <select
-          id={`tourney-deck-${npc.id}`}
-          className="wm-duel-deck-dropdown"
-          value={selectedDeckId}
-          onChange={(e) => setSelectedDeckId(e.target.value)}
-        >
-          {worldState.savedDecks.map(deck => (
-            <option key={deck.id} value={deck.id}>
-              {deck.name} {isDeckValid(deck, worldState.inventory) ? '' : '(invalid)'}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {selectedDeck && (
-        <div className="wm-duel-deck-preview">
-          {selectedDeck.cardIds.map((cardId, i) => {
-            const card = getCard(cardId)
-            return (
-              <div key={`${cardId}-${i}`} className="wm-duel-preview-card">
-                <img src={`/cards/${cardId}.png`} alt={card?.name ?? cardId} className="wm-duel-card-img" />
-              </div>
-            )
-          })}
-        </div>
-      )}
-
       <button
         type="button"
         className="wm-duel-start-btn"
-        disabled={!deckValid || !canAfford}
+        disabled={!canAfford}
         onClick={() => onEnterTournament(npc.id)}
       >
         Enter Tournament
       </button>
-      {!deckValid && (
-        <p className="wm-duel-invalid-msg">Selected deck is invalid — check your cards.</p>
+      {!canAfford && (
+        <p className="wm-duel-invalid-msg">Not enough Gil for the entry fee.</p>
       )}
     </div>
   )

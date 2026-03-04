@@ -205,14 +205,17 @@ export function BattleScreen({
     if (tutorialQueue.length > 0) {
       const current = tutorialQueue[0]
       onMarkTutorialSeen(current.id)
-      const remaining = tutorialQueue.slice(1)
-      setTutorialQueue(remaining)
-      if (remaining.length === 0 && pendingDuelStart) {
-        setPendingDuelStart(false)
-        beginDuel()
-      }
+      setTutorialQueue(prev => prev.slice(1))
     }
-  }, [tutorialQueue, pendingDuelStart, onMarkTutorialSeen, beginDuel])
+  }, [tutorialQueue, onMarkTutorialSeen])
+
+  // --- Auto-start duel when tutorials are done ---
+  useEffect(() => {
+    if (pendingDuelStart && tutorialQueue.length === 0) {
+      setPendingDuelStart(false)
+      beginDuel()
+    }
+  }, [pendingDuelStart, tutorialQueue.length, beginDuel])
 
   // --- Start duel (checks tutorials first) ---
   const handleStartDuel = useCallback(() => {

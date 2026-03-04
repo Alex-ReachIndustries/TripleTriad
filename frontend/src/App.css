@@ -330,7 +330,9 @@
 .how-to-play-v3 {
   max-width: 52rem;
   margin: 0 auto;
-  padding: 0 1rem 3rem;
+  padding: var(--app-pt) 1rem calc(var(--app-pb) + 1rem);
+  padding-left: calc(var(--sal) + 1rem);
+  padding-right: calc(var(--sar) + 1rem);
 }
 .htp-header {
   display: flex;
