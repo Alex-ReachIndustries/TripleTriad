@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react'
-import { loadWorldState, saveWorldState, addToInventory, markDiscovered, isStarterCard, acceptQuest, claimQuestReward, removeCardAndCleanHand } from './data/worldState'
+import { loadWorldState, saveWorldState, addToInventory, markDiscovered, isStarterCard, acceptQuest, claimQuestReward, removeCardAndCleanHand, spreadRuleToRegion, abolishRuleFromRegion } from './data/worldState'
 import { getTournamentAtLocation } from './data/shops'
 import { getNpcById } from './data/world'
 import { DeckManager } from './components/DeckManager'
@@ -11,10 +11,11 @@ import { HowToPlay } from './components/HowToPlay'
 import { HomePage } from './components/HomePage'
 import { StoryCutscene, OPENING_PANELS } from './components/StoryCutscene'
 import { MapEditor } from './components/admin/MapEditor'
+import { TutorialsMenu } from './components/TutorialsMenu'
 import './App.css'
 
 type AppView = 'title' | 'howto' | 'home' | 'game' | 'cutscene'
-type GameTab = 'world' | 'deck' | 'duel' | 'battle' | 'admin'
+type GameTab = 'world' | 'deck' | 'duel' | 'battle' | 'admin' | 'guide'
 
 const STORAGE_KEY = 'tripletriad-world'
 
@@ -135,6 +136,21 @@ function App() {
     setWorldState((prev) => claimQuestReward(prev, questId))
   }, [])
 
+  // Queen of Cards: spread/abolish rules for a gil cost
+  const handleSpreadRule = useCallback((rule: import('./types/world').SpecialRule, regionId: string) => {
+    setWorldState((prev) => {
+      if (prev.gil < 1000) return prev
+      return { ...spreadRuleToRegion(prev, rule, regionId), gil: prev.gil - 1000 }
+    })
+  }, [])
+
+  const handleAbolishRule = useCallback((rule: import('./types/world').SpecialRule, regionId: string) => {
+    setWorldState((prev) => {
+      if (prev.gil < 500) return prev
+      return { ...abolishRuleFromRegion(prev, rule, regionId), gil: prev.gil - 500 }
+    })
+  }, [])
+
   const handleSelectMode = useCallback((selectedTab: GameTab) => {
     setTab(selectedTab)
     setView('game')
@@ -245,6 +261,14 @@ function App() {
           </button>
           <button
             type="button"
+            className={tab === 'guide' ? 'active' : ''}
+            onClick={() => setTab('guide')}
+            aria-current={tab === 'guide' ? 'page' : undefined}
+          >
+            Guide
+          </button>
+          <button
+            type="button"
             className={tab === 'admin' ? 'active' : ''}
             onClick={() => setTab('admin')}
             aria-current={tab === 'admin' ? 'page' : undefined}
@@ -262,6 +286,8 @@ function App() {
             onEnterTournament={handleWorldEnterTournament}
             onAcceptQuest={handleAcceptQuest}
             onClaimQuest={handleClaimQuest}
+            onSpreadRule={handleSpreadRule}
+            onAbolishRule={handleAbolishRule}
           />
         </div>
         {tab === 'deck' && (
@@ -283,6 +309,12 @@ function App() {
             onUpdateDecks={(decks) => setWorldState(prev => ({ ...prev, savedDecks: decks }))}
           />
         )}
+        {tab === 'guide' && (
+          <TutorialsMenu
+            seenTutorials={worldState.seenTutorials}
+            onBack={() => setTab('world')}
+          />
+        )}
         {tab === 'admin' && (
           <MapEditor />
         )}
@@ -294,9 +326,19 @@ function App() {
             tournamentPrize={battleContext.tournamentPrize}
             worldPlayerInventory={worldState.inventory}
             lastHand={worldState.lastHand}
+            storyChapter={worldState.storyChapter}
+            lastPlayedRegionId={worldState.lastPlayedRegionId}
+            regionRuleMods={worldState.regionRuleMods}
             onSetLastHand={(hand) => setWorldState(prev => ({ ...prev, lastHand: hand }))}
+            onRuleSpread={(newMods) => setWorldState(prev => ({ ...prev, regionRuleMods: newMods }))}
+            onDuelRegionUpdate={(regionId) => setWorldState(prev => ({ ...prev, lastPlayedRegionId: regionId }))}
             onMatchComplete={handleBattleComplete}
             onCancel={handleBattleCancel}
+            seenTutorials={worldState.seenTutorials}
+            onMarkTutorialSeen={(tutorialId) => setWorldState(prev => ({
+              ...prev,
+              seenTutorials: prev.seenTutorials.includes(tutorialId) ? prev.seenTutorials : [...prev.seenTutorials, tutorialId],
+            }))}
           />
         )}
       </main>

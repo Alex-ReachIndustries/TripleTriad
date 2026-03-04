@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback } from 'react'
 import type { Region } from '../../types/world'
 import type { WorldPlayerState } from '../../data/worldState'
+import { getActiveRegionRules } from '../../data/worldState'
 import { getRegions, formatRules } from '../../data/world'
 import { isRegionUnlocked } from '../../data/unlock'
 import { getRegionMarkers } from '../../data/markers'
@@ -160,7 +161,7 @@ export function WorldMapView({ worldState, onSelectRegion, onOpenQuestLog }: Wor
                   onMouseLeave={() => setHoveredRegion(null)}
                   tabIndex={unlocked ? 0 : -1}
                   role="button"
-                  aria-label={unlocked ? `${region.name} — ${formatRules(region.rules)}` : `Locked region`}
+                  aria-label={unlocked ? `${region.name} — ${formatRules(getActiveRegionRules(region.rules, region.id, worldState.regionRuleMods))}` : `Locked region`}
                   onKeyDown={(e) => {
                     if ((e.key === 'Enter' || e.key === ' ') && unlocked) {
                       e.preventDefault()
@@ -217,7 +218,7 @@ export function WorldMapView({ worldState, onSelectRegion, onOpenQuestLog }: Wor
             <h3 className="wm-info-name">{hovered.name}</h3>
             <p className="wm-info-desc">{hovered.description}</p>
             <div className="wm-info-details">
-              <span className="wm-info-rules">Rules: {formatRules(hovered.rules)}</span>
+              <span className="wm-info-rules">Rules: {formatRules(getActiveRegionRules(hovered.rules, hovered.id, worldState.regionRuleMods))}</span>
               <span className="wm-info-trade">Trade: {hovered.tradeRule}</span>
             </div>
             <p className="wm-info-hint">Click to explore this region</p>

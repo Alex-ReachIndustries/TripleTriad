@@ -1,4 +1,5 @@
 import type { Region, Location } from '../../types/world'
+import { getActiveRegionRules } from '../../data/worldState'
 import type { WorldPlayerState } from '../../data/worldState'
 import { getLocationsByRegion, formatRules, getVisibleNpcs } from '../../data/world'
 import { isLocationUnlocked } from '../../data/unlock'
@@ -40,7 +41,7 @@ export function RegionView({ region, worldState, onSelectLocation, onBack }: Reg
         <div className="wm-region-title-area">
           <h2 className="wm-region-name">{region.name}</h2>
           <div className="wm-region-meta">
-            <span className="wm-region-rules-badge">Rules: {formatRules(region.rules)}</span>
+            <span className="wm-region-rules-badge">Rules: {formatRules(getActiveRegionRules(region.rules, region.id, worldState.regionRuleMods))}</span>
             <span className="wm-region-trade-badge">Trade: {region.tradeRule}</span>
             <span className="wm-region-loc-count">{unlockedCount}/{locations.length} Locations</span>
           </div>

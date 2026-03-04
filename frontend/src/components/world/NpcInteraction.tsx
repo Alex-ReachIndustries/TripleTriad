@@ -1,8 +1,9 @@
 import { useState, useMemo } from 'react'
-import type { NPC } from '../../types/world'
+import type { NPC, SpecialRule } from '../../types/world'
 import type { Card } from '../../types/card'
 import type { WorldPlayerState, } from '../../data/worldState'
-import { isStarterCard } from '../../data/worldState'
+import { isStarterCard, getActiveRegionRules } from '../../data/worldState'
+import { getRegions, formatRules } from '../../data/world'
 import { getCardSellPrice } from '../../data/cardValue'
 import { getQuestsByNpc, getQuestStatus, isQuestComplete } from '../../data/quests'
 import { getDeckById, isDeckValid } from '../../data/deckManager'
@@ -26,6 +27,8 @@ interface NpcInteractionProps {
   onEnterTournament: (npcId: string) => void
   onAcceptQuest: (questId: string) => void
   onClaimQuest: (questId: string) => void
+  onSpreadRule?: (rule: SpecialRule, regionId: string) => void
+  onAbolishRule?: (rule: SpecialRule, regionId: string) => void
 }
 
 export function NpcInteraction({
@@ -38,6 +41,8 @@ export function NpcInteraction({
   onEnterTournament,
   onAcceptQuest,
   onClaimQuest,
+  onSpreadRule,
+  onAbolishRule,
 }: NpcInteractionProps) {
   return (
     <div className="wm-npc-modal-overlay" onClick={onClose} role="presentation">
@@ -54,7 +59,10 @@ export function NpcInteraction({
           <h3 className="wm-npc-modal-name">{npc.name}</h3>
         </div>
         <div className="wm-npc-modal-body">
-          {npc.type === 'dialogue' && (
+          {npc.type === 'dialogue' && npc.id === 'queen_of_cards' && onSpreadRule && onAbolishRule && (
+            <QueenOfCardsPanel npc={npc} worldState={worldState} onSpreadRule={onSpreadRule} onAbolishRule={onAbolishRule} />
+          )}
+          {npc.type === 'dialogue' && npc.id !== 'queen_of_cards' && (
             <DialoguePanel npc={npc} worldState={worldState} onAcceptQuest={onAcceptQuest} onClaimQuest={onClaimQuest} />
           )}
           {npc.type === 'shop' && (
@@ -429,6 +437,200 @@ function TournamentPanel({
       </button>
       {!deckValid && (
         <p className="wm-duel-invalid-msg">Selected deck is invalid — check your cards.</p>
+      )}
+    </div>
+  )
+}
+
+/* ── Queen of Cards Panel ───────────────── */
+
+const ALL_SPECIAL_RULES: SpecialRule[] = ['Open', 'Same', 'Same Wall', 'Plus', 'Combo', 'Elemental', 'Random', 'Sudden Death']
+const SPREAD_COST = 1000
+const ABOLISH_COST = 500
+
+function QueenOfCardsPanel({
+  npc,
+  worldState,
+  onSpreadRule,
+  onAbolishRule,
+}: {
+  npc: NPC
+  worldState: WorldPlayerState
+  onSpreadRule: (rule: SpecialRule, regionId: string) => void
+  onAbolishRule: (rule: SpecialRule, regionId: string) => void
+}) {
+  const [tab, setTab] = useState<'spread' | 'abolish' | 'view'>('view')
+  const [selectedRule, setSelectedRule] = useState<SpecialRule | null>(null)
+  const [selectedRegion, setSelectedRegion] = useState<string | null>(null)
+  const [feedback, setFeedback] = useState<string | null>(null)
+
+  const regions = getRegions()
+
+  const handleSpread = () => {
+    if (!selectedRule || !selectedRegion) return
+    if (worldState.gil < SPREAD_COST) {
+      setFeedback('Not enough Gil!')
+      return
+    }
+    const activeRules = getActiveRegionRules(
+      regions.find(r => r.id === selectedRegion)?.rules ?? [],
+      selectedRegion,
+      worldState.regionRuleMods,
+    )
+    if (activeRules.includes(selectedRule)) {
+      setFeedback(`${regions.find(r => r.id === selectedRegion)?.name} already has ${selectedRule}!`)
+      return
+    }
+    onSpreadRule(selectedRule, selectedRegion)
+    setFeedback(`${selectedRule} has been spread to ${regions.find(r => r.id === selectedRegion)?.name ?? selectedRegion}!`)
+    setSelectedRule(null)
+    setSelectedRegion(null)
+  }
+
+  const handleAbolish = () => {
+    if (!selectedRule || !selectedRegion) return
+    if (worldState.gil < ABOLISH_COST) {
+      setFeedback('Not enough Gil!')
+      return
+    }
+    const activeRules = getActiveRegionRules(
+      regions.find(r => r.id === selectedRegion)?.rules ?? [],
+      selectedRegion,
+      worldState.regionRuleMods,
+    )
+    if (!activeRules.includes(selectedRule)) {
+      setFeedback(`${regions.find(r => r.id === selectedRegion)?.name} doesn't have ${selectedRule}!`)
+      return
+    }
+    if (activeRules.length <= 1) {
+      setFeedback('Cannot abolish the last rule in a region!')
+      return
+    }
+    onAbolishRule(selectedRule, selectedRegion)
+    setFeedback(`${selectedRule} has been abolished from ${regions.find(r => r.id === selectedRegion)?.name ?? selectedRegion}!`)
+    setSelectedRule(null)
+    setSelectedRegion(null)
+  }
+
+  return (
+    <div className="wm-queen-panel">
+      <p className="wm-interact-text">{npc.dialogue.text}</p>
+      <div className="wm-shop-gil">{'\u{1F4B0}'} {worldState.gil} Gil</div>
+
+      <div className="wm-shop-tabs">
+        <button type="button" className={`wm-shop-tab ${tab === 'view' ? 'active' : ''}`} onClick={() => { setTab('view'); setFeedback(null) }}>
+          View Rules
+        </button>
+        <button type="button" className={`wm-shop-tab ${tab === 'spread' ? 'active' : ''}`} onClick={() => { setTab('spread'); setFeedback(null); setSelectedRule(null); setSelectedRegion(null) }}>
+          Spread ({SPREAD_COST}G)
+        </button>
+        <button type="button" className={`wm-shop-tab ${tab === 'abolish' ? 'active' : ''}`} onClick={() => { setTab('abolish'); setFeedback(null); setSelectedRule(null); setSelectedRegion(null) }}>
+          Abolish ({ABOLISH_COST}G)
+        </button>
+      </div>
+
+      {feedback && <p className="wm-queen-feedback">{feedback}</p>}
+
+      {tab === 'view' && (
+        <div className="wm-queen-regions">
+          {regions.map(region => {
+            const activeRules = getActiveRegionRules(region.rules, region.id, worldState.regionRuleMods)
+            return (
+              <div key={region.id} className="wm-queen-region-row">
+                <span className="wm-queen-region-name">{region.name}</span>
+                <span className="wm-queen-region-rules">{formatRules(activeRules)}</span>
+                <span className="wm-queen-region-trade">Trade: {region.tradeRule}</span>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {tab === 'spread' && (
+        <div className="wm-queen-action">
+          <label className="wm-queen-label">Rule to spread:</label>
+          <div className="wm-queen-rule-grid">
+            {ALL_SPECIAL_RULES.map(rule => (
+              <button
+                key={rule}
+                type="button"
+                className={`wm-queen-rule-btn ${selectedRule === rule ? 'selected' : ''}`}
+                onClick={() => setSelectedRule(rule)}
+              >
+                {rule}
+              </button>
+            ))}
+          </div>
+          <label className="wm-queen-label">Target region:</label>
+          <div className="wm-queen-region-btns">
+            {regions.map(region => (
+              <button
+                key={region.id}
+                type="button"
+                className={`wm-queen-region-btn ${selectedRegion === region.id ? 'selected' : ''}`}
+                onClick={() => setSelectedRegion(region.id)}
+              >
+                {region.name}
+              </button>
+            ))}
+          </div>
+          <button
+            type="button"
+            className="wm-duel-start-btn"
+            disabled={!selectedRule || !selectedRegion || worldState.gil < SPREAD_COST}
+            onClick={handleSpread}
+          >
+            Spread Rule ({SPREAD_COST} Gil)
+          </button>
+        </div>
+      )}
+
+      {tab === 'abolish' && (
+        <div className="wm-queen-action">
+          <label className="wm-queen-label">Select region:</label>
+          <div className="wm-queen-region-btns">
+            {regions.map(region => (
+              <button
+                key={region.id}
+                type="button"
+                className={`wm-queen-region-btn ${selectedRegion === region.id ? 'selected' : ''}`}
+                onClick={() => { setSelectedRegion(region.id); setSelectedRule(null) }}
+              >
+                {region.name}
+              </button>
+            ))}
+          </div>
+          {selectedRegion && (() => {
+            const region = regions.find(r => r.id === selectedRegion)
+            const activeRules = getActiveRegionRules(region?.rules ?? [], selectedRegion, worldState.regionRuleMods)
+            return (
+              <>
+                <label className="wm-queen-label">Rule to abolish:</label>
+                <div className="wm-queen-rule-grid">
+                  {activeRules.map(rule => (
+                    <button
+                      key={rule}
+                      type="button"
+                      className={`wm-queen-rule-btn ${selectedRule === rule ? 'selected' : ''}`}
+                      onClick={() => setSelectedRule(rule)}
+                      disabled={activeRules.length <= 1}
+                    >
+                      {rule}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )
+          })()}
+          <button
+            type="button"
+            className="wm-duel-start-btn"
+            disabled={!selectedRule || !selectedRegion || worldState.gil < ABOLISH_COST}
+            onClick={handleAbolish}
+          >
+            Abolish Rule ({ABOLISH_COST} Gil)
+          </button>
+        </div>
       )}
     </div>
   )

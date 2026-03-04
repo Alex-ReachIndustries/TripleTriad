@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Location, NPC } from '../../types/world'
+import { getActiveRegionRules } from '../../data/worldState'
 import type { WorldPlayerState } from '../../data/worldState'
 import { getRegionById, getVisibleNpcs, getLocationsByParentTown, formatRules } from '../../data/world'
 import { isLocationUnlocked } from '../../data/unlock'
@@ -89,7 +90,7 @@ export function TownView({ location, worldState, onSelectNpc, onSelectLocation, 
         <div className="wm-town-title-area">
           <h2 className="wm-town-name">{location.name}</h2>
           <div className="wm-town-meta">
-            <span className="wm-town-rules">Rules: {formatRules(region?.rules ?? [])}</span>
+            <span className="wm-town-rules">Rules: {formatRules(getActiveRegionRules(region?.rules ?? [], region?.id ?? '', worldState.regionRuleMods))}</span>
             <span className="wm-town-gil">{'\u{1F4B0}'} {worldState.gil} Gil</span>
             <span className="wm-town-npc-count">{npcs.length} NPC{npcs.length !== 1 ? 's' : ''}</span>
           </div>

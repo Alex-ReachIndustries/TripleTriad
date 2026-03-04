@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import type { Region, Location, NPC } from '../../types/world'
+import type { Region, Location, NPC, SpecialRule } from '../../types/world'
 import type { WorldPlayerState } from '../../data/worldState'
 import { getRegionById, getLocationById } from '../../data/world'
 import { WorldMapView } from './WorldMapView'
@@ -23,6 +23,8 @@ export interface WorldModeCallbacks {
   onEnterTournament?: (npcId: string, locationId: string) => void
   onAcceptQuest?: (questId: string) => void
   onClaimQuest?: (questId: string) => void
+  onSpreadRule?: (rule: SpecialRule, regionId: string) => void
+  onAbolishRule?: (rule: SpecialRule, regionId: string) => void
 }
 
 interface WorldModeProps extends WorldModeCallbacks {
@@ -37,6 +39,8 @@ export function WorldMode({
   onEnterTournament,
   onAcceptQuest,
   onClaimQuest,
+  onSpreadRule,
+  onAbolishRule,
 }: WorldModeProps) {
   const [screen, setScreen] = useState<WorldScreen>({ type: 'map' })
   const [selectedNpc, setSelectedNpc] = useState<NPC | null>(null)
@@ -110,6 +114,8 @@ export function WorldMode({
       onEnterTournament={handleEnterTournament}
       onAcceptQuest={handleAcceptQuest}
       onClaimQuest={handleClaimQuest}
+      onSpreadRule={onSpreadRule}
+      onAbolishRule={onAbolishRule}
     />
   ) : null
 

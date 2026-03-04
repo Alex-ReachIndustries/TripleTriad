@@ -1,19 +1,23 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import type { GameState } from '../game'
 import type { Card } from '../types/card'
-import type { NPC } from '../types/world'
+import type { NPC, SpecialRule } from '../types/world'
 import type { Difficulty } from '../game'
 import type { TradeResult } from '../data/tradeRules'
 import { createGame, placeCard, continueSuddenDeath, getAiMove, getDifficultyForTier } from '../game'
 import { getLocationById, getRegionById, formatRules } from '../data/world'
 import { computeTradeResult } from '../data/tradeRules'
-import { cleanLastHand } from '../data/worldState'
+import { cleanLastHand, getActiveRegionRules, attemptRuleSpreading } from '../data/worldState'
+import { getTutorialsForRules, TUTORIALS } from '../data/tutorials'
+import type { TutorialDef } from '../data/tutorials'
+import { TutorialPopup } from './TutorialPopup'
 import { GameBoard } from './GameBoard'
 import cardsData from '../data/cards.json'
 
 const allCards: Card[] = cardsData.cards as Card[]
 const cardMap = new Map(allCards.map(c => [c.id, c]))
 const DECK_SIZE = 5
+const TUTORIALS_LOOKUP = new Map(TUTORIALS.map(t => [t.id, t]))
 
 function getCard(id: string): Card | undefined {
   return cardMap.get(id)
@@ -41,9 +45,16 @@ export interface BattleScreenProps {
   tournamentPrize: string | null
   worldPlayerInventory: Record<string, number>
   lastHand: string[]
+  storyChapter: number
+  lastPlayedRegionId: string | null
+  regionRuleMods: Record<string, { added: SpecialRule[]; removed: SpecialRule[] }>
   onSetLastHand: (hand: string[]) => void
+  onRuleSpread: (newMods: Record<string, { added: SpecialRule[]; removed: SpecialRule[] }>) => void
+  onDuelRegionUpdate: (regionId: string) => void
   onMatchComplete: (result: BattleResult) => void
   onCancel: () => void
+  seenTutorials: string[]
+  onMarkTutorialSeen: (tutorialId: string) => void
 }
 
 type BattlePhase = 'pre-duel' | 'game' | 'reward'
@@ -55,9 +66,16 @@ export function BattleScreen({
   tournamentPrize,
   worldPlayerInventory,
   lastHand,
+  storyChapter,
+  lastPlayedRegionId,
+  regionRuleMods,
   onSetLastHand,
+  onRuleSpread,
+  onDuelRegionUpdate,
   onMatchComplete,
   onCancel,
+  seenTutorials,
+  onMarkTutorialSeen,
 }: BattleScreenProps) {
   const [phase, setPhase] = useState<BattlePhase>('pre-duel')
   const [localGameState, setLocalGameState] = useState<GameState | null>(null)
@@ -103,10 +121,23 @@ export function BattleScreen({
 
   const deckReady = resolvedDeck.length === DECK_SIZE
 
-  // Resolve region + rules
+  // Resolve region + rules (dynamic: base + mods)
   const location = useMemo(() => getLocationById(locationId), [locationId])
   const region = useMemo(() => location ? getRegionById(location.regionId) : null, [location])
-  const activeRules = useMemo(() => region?.rules ?? [], [region])
+  const activeRules = useMemo(
+    () => region ? getActiveRegionRules(region.rules, region.id, regionRuleMods) : [],
+    [region, regionRuleMods]
+  )
+
+  // Rule spread notification
+  const [spreadNotification, setSpreadNotification] = useState<{
+    spreadRule: SpecialRule | null
+    abolishedRule: SpecialRule | null
+  } | null>(null)
+
+  // Tutorial queue — shown before duel starts
+  const [tutorialQueue, setTutorialQueue] = useState<TutorialDef[]>([])
+  const [pendingDuelStart, setPendingDuelStart] = useState(false)
 
   // --- Add card to selection ---
   const addCard = useCallback((cardId: string) => {
@@ -122,10 +153,33 @@ export function BattleScreen({
     setSelectedCardIds(prev => prev.filter((_, i) => i !== index))
   }, [])
 
-  // --- Start duel ---
-  const handleStartDuel = useCallback(() => {
-    if (resolvedDeck.length !== DECK_SIZE) return
-    onSetLastHand(selectedCardIds)
+  // --- Actually begin the duel (after tutorials) ---
+  const beginDuel = useCallback(() => {
+    // Attempt rule spreading
+    let effectiveRules = activeRules
+    if (region) {
+      const lastRegion = lastPlayedRegionId ? getRegionById(lastPlayedRegionId) : null
+      const lastRegionRules = lastRegion
+        ? getActiveRegionRules(lastRegion.rules, lastRegion.id, regionRuleMods)
+        : []
+      const spread = attemptRuleSpreading(
+        region.id, activeRules, lastPlayedRegionId, lastRegionRules,
+        storyChapter, regionRuleMods,
+      )
+      if (spread.spreadRule || spread.abolishedRule) {
+        onRuleSpread(spread.newRegionRuleMods)
+        setSpreadNotification({ spreadRule: spread.spreadRule, abolishedRule: spread.abolishedRule })
+        effectiveRules = getActiveRegionRules(region.rules, region.id, spread.newRegionRuleMods)
+        // Trigger rule spreading tutorial if unseen
+        if (!seenTutorials.includes('tut_rule_spreading')) {
+          const spreadTut = TUTORIALS_LOOKUP.get('tut_rule_spreading')
+          if (spreadTut) {
+            setTutorialQueue([spreadTut])
+            onMarkTutorialSeen('tut_rule_spreading')
+          }
+        }
+      }
+    }
 
     const npcDeckPool = npc?.deckPool?.length
       ? allCards.filter(c => npc.deckPool!.includes(c.id))
@@ -138,13 +192,44 @@ export function BattleScreen({
     setDifficulty(diff)
 
     const firstPlayer = Math.random() < 0.5 ? 0 : 1
-    const initial = createGame(resolvedDeck, aiDeck, firstPlayer as 0 | 1, activeRules)
+    const initial = createGame(resolvedDeck, aiDeck, firstPlayer as 0 | 1, effectiveRules)
     setLocalGameState(initial)
     resultComputedRef.current = false
     setTradeResult(null)
     setSelectedTradeIndices(new Set())
     setPhase('game')
-  }, [resolvedDeck, selectedCardIds, npc, activeRules, onSetLastHand])
+  }, [resolvedDeck, npc, activeRules, region, lastPlayedRegionId, regionRuleMods, storyChapter, onRuleSpread, seenTutorials, onMarkTutorialSeen])
+
+  // --- Handle tutorial completion ---
+  const handleTutorialComplete = useCallback(() => {
+    if (tutorialQueue.length > 0) {
+      const current = tutorialQueue[0]
+      onMarkTutorialSeen(current.id)
+      const remaining = tutorialQueue.slice(1)
+      setTutorialQueue(remaining)
+      if (remaining.length === 0 && pendingDuelStart) {
+        setPendingDuelStart(false)
+        beginDuel()
+      }
+    }
+  }, [tutorialQueue, pendingDuelStart, onMarkTutorialSeen, beginDuel])
+
+  // --- Start duel (checks tutorials first) ---
+  const handleStartDuel = useCallback(() => {
+    if (resolvedDeck.length !== DECK_SIZE) return
+    onSetLastHand(selectedCardIds)
+
+    // Check for unseen tutorials before starting
+    const isFirstDuel = !seenTutorials.includes('tut_basic_gameplay')
+    const tutorials = getTutorialsForRules(activeRules, region?.tradeRule ?? 'One', seenTutorials, isFirstDuel)
+    if (tutorials.length > 0) {
+      setTutorialQueue(tutorials)
+      setPendingDuelStart(true)
+      return
+    }
+
+    beginDuel()
+  }, [resolvedDeck, selectedCardIds, activeRules, onSetLastHand, region, seenTutorials, beginDuel])
 
   // --- Player move ---
   const handleLocalPlace = useCallback(
@@ -253,8 +338,11 @@ export function BattleScreen({
   }, [tradeResult])
 
   const handleDismissReward = useCallback(() => {
-    if (battleResult) onMatchComplete(battleResult)
-  }, [battleResult, onMatchComplete])
+    if (battleResult) {
+      if (region) onDuelRegionUpdate(region.id)
+      onMatchComplete(battleResult)
+    }
+  }, [battleResult, onMatchComplete, onDuelRegionUpdate, region])
 
   const handleRematch = useCallback(() => {
     setLocalGameState(null)
@@ -304,6 +392,17 @@ export function BattleScreen({
               <><span className="battle-rules-label">Rules:</span> {formatRules(activeRules)}</>
             )}
             {region?.tradeRule && <span className="battle-trade"> | Trade: {region.tradeRule}</span>}
+          </div>
+        )}
+
+        {spreadNotification && (
+          <div className="battle-spread-notification">
+            {spreadNotification.spreadRule && (
+              <div className="spread-added">The <strong>{spreadNotification.spreadRule}</strong> rule has spread to this region!</div>
+            )}
+            {spreadNotification.abolishedRule && (
+              <div className="spread-removed">The <strong>{spreadNotification.abolishedRule}</strong> rule was abolished.</div>
+            )}
           </div>
         )}
 
@@ -368,6 +467,13 @@ export function BattleScreen({
         >
           {deckReady ? 'Start Duel' : `Select ${DECK_SIZE - selectedCardIds.length} more card${DECK_SIZE - selectedCardIds.length !== 1 ? 's' : ''}`}
         </button>
+
+        {tutorialQueue.length > 0 && (
+          <TutorialPopup
+            tutorial={tutorialQueue[0]}
+            onComplete={handleTutorialComplete}
+          />
+        )}
       </div>
     )
   }

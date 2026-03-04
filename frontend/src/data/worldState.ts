@@ -4,6 +4,7 @@
  */
 
 import type { SavedDeck } from './deckManager'
+import type { SpecialRule } from '../types/world'
 import { createStarterDeck, parseSavedDecks } from './deckManager'
 import { getQuestById, isQuestComplete } from './quests'
 
@@ -39,6 +40,12 @@ export interface WorldPlayerState {
   seenContent: Record<string, string[]>
   /** Last 5 cards used in a 1P duel (card IDs). Used as default hand. */
   lastHand: string[]
+  /** Last region where the player completed a 1P duel (for rule spreading). */
+  lastPlayedRegionId: string | null
+  /** Per-region rule overrides from spreading/abolishing. */
+  regionRuleMods: Record<string, { added: SpecialRule[]; removed: SpecialRule[] }>
+  /** Tutorial IDs the player has already seen. */
+  seenTutorials: string[]
 }
 
 /** 5 starter cards – always protected (count can never drop below 1). */
@@ -68,6 +75,9 @@ function defaultState(): WorldPlayerState {
     mainQuestLog: [],
     seenContent: {},
     lastHand: [...STARTER_DECK_IDS],
+    lastPlayedRegionId: null,
+    regionRuleMods: {},
+    seenTutorials: [],
   }
 }
 
@@ -171,7 +181,27 @@ export function loadWorldState(): WorldPlayerState {
       ? (o.lastHand as unknown[]).filter((v): v is string => typeof v === 'string')
       : [...STARTER_DECK_IDS]
 
-    return { unlockedOrder, inventory, discoveredCards, gil, npcWins, savedDecks, lastDeckId, activeQuests, completedQuests, clearedDungeons, storyChapter, mainQuestLog, seenContent, lastHand }
+    const lastPlayedRegionId = typeof o.lastPlayedRegionId === 'string' ? o.lastPlayedRegionId : null
+
+    const regionRuleMods: Record<string, { added: SpecialRule[]; removed: SpecialRule[] }> = {}
+    if (typeof o.regionRuleMods === 'object' && o.regionRuleMods !== null && !Array.isArray(o.regionRuleMods)) {
+      for (const [regionId, mods] of Object.entries(o.regionRuleMods as Record<string, unknown>)) {
+        if (typeof mods === 'object' && mods !== null) {
+          const m = mods as Record<string, unknown>
+          const added = Array.isArray(m.added) ? (m.added as unknown[]).filter((v): v is SpecialRule => typeof v === 'string') : []
+          const removed = Array.isArray(m.removed) ? (m.removed as unknown[]).filter((v): v is SpecialRule => typeof v === 'string') : []
+          if (added.length > 0 || removed.length > 0) {
+            regionRuleMods[regionId] = { added, removed }
+          }
+        }
+      }
+    }
+
+    const seenTutorials = Array.isArray(o.seenTutorials)
+      ? (o.seenTutorials as unknown[]).filter((v): v is string => typeof v === 'string')
+      : []
+
+    return { unlockedOrder, inventory, discoveredCards, gil, npcWins, savedDecks, lastDeckId, activeQuests, completedQuests, clearedDungeons, storyChapter, mainQuestLog, seenContent, lastHand, lastPlayedRegionId, regionRuleMods, seenTutorials }
   } catch {
     return defaultState()
   }
@@ -319,6 +349,101 @@ export function claimQuestReward(state: WorldPlayerState, questId: string): Worl
 export function markDungeonCleared(state: WorldPlayerState, dungeonLocationId: string): WorldPlayerState {
   if (state.clearedDungeons.includes(dungeonLocationId)) return state
   return { ...state, clearedDungeons: [...state.clearedDungeons, dungeonLocationId] }
+}
+
+// ─── Rule spreading helpers ───
+
+const MAX_RULES_PER_REGION = 5
+
+/** Compute active rules for a region = base rules + mods (added/removed). */
+export function getActiveRegionRules(
+  baseRules: SpecialRule[],
+  regionId: string,
+  regionRuleMods: Record<string, { added: SpecialRule[]; removed: SpecialRule[] }>,
+): SpecialRule[] {
+  const mods = regionRuleMods[regionId]
+  if (!mods) return baseRules
+  let result = baseRules.filter(r => !mods.removed.includes(r))
+  for (const rule of mods.added) {
+    if (!result.includes(rule)) result.push(rule)
+  }
+  return result
+}
+
+export interface SpreadResult {
+  spreadRule: SpecialRule | null
+  abolishedRule: SpecialRule | null
+  newRegionRuleMods: Record<string, { added: SpecialRule[]; removed: SpecialRule[] }>
+}
+
+/**
+ * Attempt rule spreading when starting a duel.
+ * 30% spread chance, 15% abolish chance. Gated by ch≥5 and different region.
+ */
+export function attemptRuleSpreading(
+  currentRegionId: string,
+  currentActiveRules: SpecialRule[],
+  lastPlayedRegionId: string | null,
+  lastRegionActiveRules: SpecialRule[],
+  storyChapter: number,
+  regionRuleMods: Record<string, { added: SpecialRule[]; removed: SpecialRule[] }>,
+): SpreadResult {
+  const noChange: SpreadResult = { spreadRule: null, abolishedRule: null, newRegionRuleMods: regionRuleMods }
+  if (storyChapter < 5) return noChange
+  if (!lastPlayedRegionId || lastPlayedRegionId === currentRegionId) return noChange
+
+  let spreadRule: SpecialRule | null = null
+  let abolishedRule: SpecialRule | null = null
+  let newMods = { ...regionRuleMods }
+
+  // 30% chance: spread a rule from last region
+  if (Math.random() < 0.30 && currentActiveRules.length < MAX_RULES_PER_REGION) {
+    const candidates = lastRegionActiveRules.filter(r => !currentActiveRules.includes(r))
+    if (candidates.length > 0) {
+      spreadRule = candidates[Math.floor(Math.random() * candidates.length)]
+      const existing = newMods[currentRegionId] ?? { added: [], removed: [] }
+      newMods = { ...newMods, [currentRegionId]: { ...existing, added: [...existing.added, spreadRule] } }
+    }
+  }
+
+  // 15% chance: abolish a rule from current region
+  if (Math.random() < 0.15) {
+    const pool = spreadRule ? [...currentActiveRules, spreadRule] : currentActiveRules
+    if (pool.length > 1) {
+      abolishedRule = pool[Math.floor(Math.random() * pool.length)]
+      const existing = newMods[currentRegionId] ?? { added: [], removed: [] }
+      newMods = { ...newMods, [currentRegionId]: { ...existing, removed: [...existing.removed, abolishedRule] } }
+    }
+  }
+
+  if (!spreadRule && !abolishedRule) return noChange
+  return { spreadRule, abolishedRule, newRegionRuleMods: newMods }
+}
+
+/** Manually spread a rule to a region (Queen of Cards). */
+export function spreadRuleToRegion(state: WorldPlayerState, rule: SpecialRule, regionId: string): WorldPlayerState {
+  const existing = state.regionRuleMods[regionId] ?? { added: [], removed: [] }
+  if (existing.added.includes(rule)) return state
+  return {
+    ...state,
+    regionRuleMods: {
+      ...state.regionRuleMods,
+      [regionId]: { ...existing, added: [...existing.added, rule] },
+    },
+  }
+}
+
+/** Manually abolish a rule from a region (Queen of Cards). */
+export function abolishRuleFromRegion(state: WorldPlayerState, rule: SpecialRule, regionId: string): WorldPlayerState {
+  const existing = state.regionRuleMods[regionId] ?? { added: [], removed: [] }
+  if (existing.removed.includes(rule)) return state
+  return {
+    ...state,
+    regionRuleMods: {
+      ...state.regionRuleMods,
+      [regionId]: { ...existing, removed: [...existing.removed, rule] },
+    },
+  }
 }
 
 // Trade rules are now handled by tradeRules.ts using capture-based logic.
