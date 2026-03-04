@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import type { Location, NPC } from '../../types/world'
 import type { WorldPlayerState } from '../../data/worldState'
-import { getRegionById, getNpcsByLocation, formatRules } from '../../data/world'
+import { getRegionById, getVisibleNpcs, getLocationsByParentTown, formatRules } from '../../data/world'
+import { isLocationUnlocked } from '../../data/unlock'
 import { getQuestsByNpc, getQuestStatus } from '../../data/quests'
 
 /** NPC type → human-readable label */
@@ -52,13 +53,18 @@ interface TownViewProps {
   location: Location
   worldState: WorldPlayerState
   onSelectNpc: (npc: NPC) => void
+  onSelectLocation?: (location: Location) => void
   onBack: () => void
 }
 
-export function TownView({ location, worldState, onSelectNpc, onBack }: TownViewProps) {
+export function TownView({ location, worldState, onSelectNpc, onSelectLocation, onBack }: TownViewProps) {
   const [hoveredNpc, setHoveredNpc] = useState<string | null>(null)
   const region = getRegionById(location.regionId)
-  const npcs = getNpcsByLocation(location.id)
+  const npcs = getVisibleNpcs(location.id, worldState.storyChapter)
+
+  // TD (Town-Dungeon) child locations that are accessed from this town
+  const tdLocations = getLocationsByParentTown(location.id)
+    .filter(td => isLocationUnlocked(td, worldState))
 
   // Group NPCs by type for visual organization
   const duelNpcs = npcs.filter(n => n.type === 'duel')
@@ -93,6 +99,29 @@ export function TownView({ location, worldState, onSelectNpc, onBack }: TownView
 
       {/* NPC Grid */}
       <div className="wm-npc-grid" role="list" aria-label="NPCs in this location">
+        {/* TD dungeon entrances */}
+        {tdLocations.map(td => (
+          <button
+            key={td.id}
+            type="button"
+            className="wm-npc-card dungeon-entrance"
+            role="listitem"
+            onClick={() => onSelectLocation?.(td)}
+            aria-label={`Enter ${td.name}`}
+          >
+            <div className="wm-npc-avatar" style={{ backgroundColor: 'var(--danger, #dc2626)' }}>
+              <span className="wm-npc-initials">{'\u2694'}</span>
+            </div>
+            <div className="wm-npc-info">
+              <span className="wm-npc-name">{td.name}</span>
+              <span className="wm-npc-type-badge">
+                <span className="wm-npc-type-icon">{'\u{1F5E1}\uFE0F'}</span>
+                Dungeon
+              </span>
+              <span className="wm-npc-desc">{td.flavour ?? 'Enter the dungeon...'}</span>
+            </div>
+          </button>
+        ))}
         {orderedNpcs.map(npc => {
           const isHovered = hoveredNpc === npc.id
           const questsForNpc = getQuestsByNpc(npc.id)

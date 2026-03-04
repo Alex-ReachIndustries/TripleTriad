@@ -137,7 +137,7 @@ Todos:
 ---
 
 ### Phase 4: Notification Marker System
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 Goal: Show notification markers at world map, region map, and town levels for new/unseen content.
 
@@ -157,7 +157,7 @@ Todos:
 ---
 
 ### Phase 5: Quest Log & Story Screen
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 Goal: Add a quest management screen with main quest log, active quests, and story progression.
 

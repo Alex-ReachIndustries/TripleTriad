@@ -1,6 +1,6 @@
 import type { Region, Location } from '../../types/world'
 import type { WorldPlayerState } from '../../data/worldState'
-import { getLocationsByRegion, formatRules, getNpcsByLocation } from '../../data/world'
+import { getLocationsByRegion, formatRules, getVisibleNpcs } from '../../data/world'
 import { isLocationUnlocked } from '../../data/unlock'
 import { getLocationMarkers } from '../../data/markers'
 
@@ -110,7 +110,7 @@ export function RegionView({ region, worldState, onSelectLocation, onBack }: Reg
             const absX = bbox.x1 + (loc.mapX / 100) * regionW
             const absY = bbox.y1 + (loc.mapY / 100) * regionH
             const unlocked = isLocationUnlocked(loc, worldState)
-            const npcCount = getNpcsByLocation(loc.id).length
+            const npcCount = getVisibleNpcs(loc.id, worldState.storyChapter).length
             const isDungeon = loc.type === 'dungeon'
 
             return (
@@ -232,7 +232,7 @@ export function RegionView({ region, worldState, onSelectLocation, onBack }: Reg
       <div className="wm-region-loc-list">
         {locations.map(loc => {
           const unlocked = isLocationUnlocked(loc, worldState)
-          const npcCount = getNpcsByLocation(loc.id).length
+          const npcCount = getVisibleNpcs(loc.id, worldState.storyChapter).length
           return (
             <button
               key={loc.id}

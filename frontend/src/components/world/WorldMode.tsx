@@ -151,6 +151,7 @@ export function WorldMode({
             location={loc}
             worldState={worldState}
             onSelectNpc={handleSelectNpc}
+            onSelectLocation={handleSelectLocation}
             onBack={() => handleBackToRegion(screen.regionId)}
           />
           {npcModal}
