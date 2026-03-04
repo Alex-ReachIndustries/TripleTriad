@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { loadWorldState, saveWorldState, addToInventory, markDiscovered, isStarterCard, acceptQuest, claimQuestReward, removeCardAndCleanHand, spreadRuleToRegion, abolishRuleFromRegion } from './data/worldState'
 import { getTournamentAtLocation } from './data/shops'
 import { getNpcById } from './data/world'
@@ -13,6 +13,7 @@ import { HomePage } from './components/HomePage'
 import { StoryCutscene, OPENING_PANELS } from './components/StoryCutscene'
 import { TutorialsMenu } from './components/TutorialsMenu'
 import { SettingsScreen, loadSettings, applySettingsToDOM } from './components/SettingsScreen'
+import { App as CapApp } from '@capacitor/app'
 import './App.css'
 
 type AppView = 'title' | 'howto' | 'home' | 'game' | 'cutscene' | 'settings'
@@ -44,6 +45,39 @@ function App() {
   // Apply saved settings on mount
   useEffect(() => {
     applySettingsToDOM(loadSettings())
+  }, [])
+
+  // Track current view/tab in refs so the back button listener always reads fresh values
+  const viewRef = useRef(view)
+  const tabRef = useRef(tab)
+  useEffect(() => { viewRef.current = view }, [view])
+  useEffect(() => { tabRef.current = tab }, [tab])
+
+  // Android system back button navigation
+  useEffect(() => {
+    const listener = CapApp.addListener('backButton', () => {
+      const v = viewRef.current
+      const t = tabRef.current
+      if (v === 'settings' || v === 'howto' || v === 'home') {
+        setView('title')
+      } else if (v === 'game') {
+        if (t === 'battle') {
+          // During battle, cancel returns to world
+          setBattleContext(null)
+          setTab('world')
+        } else if (t === 'duel') {
+          setView('title')
+        } else if (t !== 'world') {
+          setTab('world')
+        } else {
+          setView('title')
+        }
+      } else if (v === 'title') {
+        CapApp.minimizeApp()
+      }
+      // Cutscene: ignore back button
+    })
+    return () => { listener.then(l => l.remove()) }
   }, [])
 
   useEffect(() => {
