@@ -6,6 +6,7 @@ import { DeckManager } from './components/DeckManager'
 import { PlayPage } from './components/PlayPage'
 import { BattleScreen, type BattleResult } from './components/BattleScreen'
 import { WorldMode } from './components/world/WorldMode'
+import { QuestLog } from './components/world/QuestLog'
 import { TitleScreen } from './components/TitleScreen'
 import { HowToPlay } from './components/HowToPlay'
 import { HomePage } from './components/HomePage'
@@ -14,7 +15,7 @@ import { TutorialsMenu } from './components/TutorialsMenu'
 import './App.css'
 
 type AppView = 'title' | 'howto' | 'home' | 'game' | 'cutscene'
-type GameTab = 'world' | 'deck' | 'duel' | 'battle' | 'guide'
+type GameTab = 'world' | 'deck' | 'quests' | 'duel' | 'battle' | 'guide'
 
 const STORAGE_KEY = 'tripletriad-world'
 
@@ -223,9 +224,9 @@ function App() {
   }
 
   return (
-    <div className="app">
+    <div className="app app-game">
       <a href="#main-content" className="skip-link">Skip to main content</a>
-        <nav className="app-nav" aria-label="Main navigation" style={{ display: tab === 'battle' ? 'none' : undefined }}>
+        <nav className="app-nav" aria-label="Main navigation" style={{ display: tab === 'battle' || tab === 'duel' ? 'none' : undefined }}>
           <button
             type="button"
             className="app-nav-home"
@@ -252,11 +253,11 @@ function App() {
           </button>
           <button
             type="button"
-            className={tab === 'duel' ? 'active' : ''}
-            onClick={() => setTab('duel')}
-            aria-current={tab === 'duel' ? 'page' : undefined}
+            className={tab === 'quests' ? 'active' : ''}
+            onClick={() => setTab('quests')}
+            aria-current={tab === 'quests' ? 'page' : undefined}
           >
-            Duel
+            Quests
           </button>
           <button
             type="button"
@@ -287,6 +288,12 @@ function App() {
             inventory={worldState.inventory}
             discoveredCards={worldState.discoveredCards}
             onUpdateDecks={(decks) => setWorldState(prev => ({ ...prev, savedDecks: decks }))}
+            onBack={() => setTab('world')}
+          />
+        )}
+        {tab === 'quests' && (
+          <QuestLog
+            worldState={worldState}
             onBack={() => setTab('world')}
           />
         )}
