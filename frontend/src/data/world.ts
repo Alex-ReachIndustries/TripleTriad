@@ -1314,8 +1314,25 @@ export const NPCS: NPC[] = [
     locationId: 'fishermans_horizon',
     type: 'dialogue',
     dialogue: {
-      text: "Triple Triad? I suppose it's a peaceful pursuit...",
+      text: "Triple Triad? I suppose it's a peaceful pursuit... But prove yourself against our best player first.",
     },
+    questId: 'mq_the_bridge',
+  },
+  {
+    id: 'fh_master',
+    name: 'FH Master',
+    locationId: 'fishermans_horizon',
+    type: 'duel',
+    dialogue: {
+      challenge: "I'm the best card player in FH. Pacifist by nature, competitor by cards.",
+      defeated: "You've earned the respect of FH. The Mayor will want to meet you.",
+      rematch: "The tides shift, and so do my strategies. Another round?",
+    },
+    difficultyTier: 3,
+    deckPool: [
+      'sam08g', 'death_claw', 'cactuar', 'tonberry', 'abyss_worm', 'turtapod', 'vysage', 't_rexaur', 'bomb', 'blitz',
+    ],
+    gilReward: 200,
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -1448,7 +1465,7 @@ export const NPCS: NPC[] = [
   {
     id: 'white_seed',
     name: 'White SeeD',
-    locationId: 'edeas_house',
+    locationId: 'white_seed_ship',
     type: 'duel',
     dialogue: {
       challenge:
@@ -1474,7 +1491,7 @@ export const NPCS: NPC[] = [
   {
     id: 'white_seed_captain',
     name: 'White SeeD Captain',
-    locationId: 'edeas_house',
+    locationId: 'white_seed_ship',
     type: 'duel',
     dialogue: {
       challenge:
@@ -1936,6 +1953,846 @@ export const NPCS: NPC[] = [
     dialogue: {
       text: 'You have proven yourself worthy. The ultimate card master.',
     },
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // MAIN QUEST GIVER NPCs (dialogue type with questId)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  {
+    id: 'cid',
+    name: 'Headmaster Cid',
+    locationId: 'balamb_garden',
+    type: 'dialogue',
+    dialogue: {
+      text: 'Your SeeD field exam awaits. Clear the Radio Tower in Dollet and return to me. Good luck, cadet.',
+    },
+    questId: 'mq_seed_exam',
+  },
+  {
+    id: 'rinoa_timber',
+    name: 'Rinoa',
+    locationId: 'timber',
+    type: 'dialogue',
+    dialogue: {
+      text: "The Galbadian Missile Base threatens everything we've fought for. We need someone to infiltrate it. Will you go?",
+    },
+    questId: 'mq_galbadian_offensive',
+  },
+  {
+    id: 'xu',
+    name: 'Xu',
+    locationId: 'balamb_garden',
+    type: 'dialogue',
+    dialogue: {
+      text: "There's something beneath the Garden — an ancient mechanism. The Headmaster wants you to investigate the basement.",
+    },
+    questId: 'mq_gardens_secret',
+    minChapter: 3,
+  },
+  {
+    id: 'zell_balamb',
+    name: 'Zell',
+    locationId: 'balamb_town',
+    type: 'dialogue',
+    dialogue: {
+      text: "Dude! Galbadian soldiers took over Balamb! We gotta drive 'em out! Are you with me?!",
+    },
+    questId: 'mq_reclaiming_balamb',
+    minChapter: 5,
+  },
+  {
+    id: 'selphie_trabia',
+    name: 'Selphie',
+    locationId: 'trabia_garden',
+    type: 'dialogue',
+    dialogue: {
+      text: "Our Garden was hit... but we're not giving up! Beat our champion and show everyone we can still fight!",
+    },
+    questId: 'mq_memories',
+  },
+  {
+    id: 'trabia_champion',
+    name: 'Trabia Champion',
+    locationId: 'trabia_garden',
+    type: 'duel',
+    dialogue: {
+      challenge: "I'm the strongest player left at Trabia Garden. Don't underestimate us!",
+      defeated: "You're strong... stronger than the missiles that hit us. Selphie was right about you.",
+      rematch: "We rebuilt our decks from the rubble. Trabia doesn't stay down!",
+    },
+    difficultyTier: 3,
+    deckPool: [
+      'sam08g', 'death_claw', 'cactuar', 'tonberry', 'abyss_worm', 'turtapod', 'vysage', 't_rexaur', 'bomb', 'blitz',
+    ],
+    gilReward: 200,
+  },
+  {
+    id: 'quistis_gg',
+    name: 'Quistis',
+    locationId: 'galbadia_garden',
+    type: 'dialogue',
+    dialogue: {
+      text: "Galbadia Garden has been taken over. We need to storm it and end this. Are you ready for the Battle of the Gardens?",
+    },
+    questId: 'mq_garden_clash',
+    minChapter: 7,
+  },
+  {
+    id: 'edea_centra',
+    name: 'Edea',
+    locationId: 'edeas_house',
+    type: 'dialogue',
+    dialogue: {
+      text: 'Children... seek the White SeeD Ship. Their captain holds the key to reaching Esthar.',
+    },
+    questId: 'mq_the_orphanage',
+  },
+  {
+    id: 'esthar_official',
+    name: 'Esthar Official',
+    locationId: 'esthar_city',
+    type: 'dialogue',
+    dialogue: {
+      text: 'The Sorceress has been taken to the Lunar Base. You must go to space and stop her before the Lunar Cry is triggered.',
+    },
+    questId: 'mq_contact',
+  },
+  {
+    id: 'dr_odine',
+    name: 'Dr. Odine',
+    locationId: 'esthar_city',
+    type: 'dialogue',
+    dialogue: {
+      text: "Ze Deep Sea Research Centre! Zere iz ancient Centra technology hidden below. You must retrieve it — for science, of course!",
+    },
+    questId: 'mq_into_the_deep',
+    minChapter: 10,
+  },
+  {
+    id: 'shumi_attendant',
+    name: 'Shumi Attendant',
+    locationId: 'shumi_village',
+    type: 'dialogue',
+    dialogue: {
+      text: 'The Elder has been expecting you. He holds wisdom about time and space. Seek him out.',
+    },
+    questId: 'mq_shumis_wisdom',
+  },
+  {
+    id: 'laguna_esthar',
+    name: 'Laguna',
+    locationId: 'esthar_city',
+    type: 'dialogue',
+    dialogue: {
+      text: "Lunatic Pandora has appeared above Esthar. I'm too old for this... but you're not. Go stop it!",
+    },
+    questId: 'mq_pandoras_box',
+    minChapter: 12,
+  },
+  {
+    id: 'edea_final',
+    name: 'Edea',
+    locationId: 'centra_excavation_site',
+    type: 'dialogue',
+    dialogue: {
+      text: 'The Sorceress has fled to the deepest ruins of Centra. This is the final battle. End this once and for all.',
+    },
+    questId: 'mq_time_compression',
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // NEW DUNGEON NPCs — Radio Tower (Ch1)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  {
+    id: 'galbadian_soldier',
+    name: 'Galbadian Soldier',
+    locationId: 'radio_tower',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'A Galbadian soldier blocks the entrance. "No one gets past without a fight!"',
+      floorDefeated: 'The soldier steps aside, muttering about transfer requests...',
+    },
+    difficultyTier: 1,
+    deckPool: [
+      'geezard', 'funguar', 'bite_bug', 'red_bat', 'blobra', 'gayla', 'gesper', 'fastitocalon_f',
+    ],
+    gilReward: 40,
+    floorOrder: 0,
+    isBoss: false,
+  },
+  {
+    id: 'elite_soldier',
+    name: 'Elite Soldier',
+    locationId: 'radio_tower',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'An officer in polished armour appears on the upper level. "You made it this far? Impressive."',
+      floorDefeated: '"Stand down..." The officer retreats upstairs.',
+    },
+    difficultyTier: 1,
+    deckPool: [
+      'red_bat', 'blobra', 'gayla', 'cockatrice', 'grat', 'buel', 'blood_soul', 'caterchipillar',
+    ],
+    gilReward: 60,
+    floorOrder: 1,
+    isBoss: false,
+  },
+  {
+    id: 'biggs_wedge',
+    name: 'Biggs & Wedge',
+    locationId: 'radio_tower',
+    type: 'duel',
+    dialogue: {
+      challenge: '"You again?! Wedge, get the cards!" "Sir, yes sir!"',
+      defeated: '"Retreat! RETREAT!" The duo scrambles down the tower.',
+      rematch: '"We\'ve been reassigned to card combat duty. This time we\'re ready!"',
+    },
+    difficultyTier: 2,
+    deckPool: [
+      'gayla', 'cockatrice', 'grat', 'buel', 'mesmerize', 'glacial_eye', 'belhelmel', 'thrustaevis',
+    ],
+    gilReward: 125,
+    floorOrder: 2,
+    isBoss: true,
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // NEW DUNGEON NPCs — Tomb of the Unknown King (Ch2)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  {
+    id: 'tomb_wraith',
+    name: 'Tomb Wraith',
+    locationId: 'tomb_of_unknown_king',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'A ghostly figure drifts through the tomb walls, cards floating around it.',
+      floorDefeated: 'The wraith dissolves, leaving a path deeper into the tomb...',
+    },
+    difficultyTier: 2,
+    deckPool: [
+      'blood_soul', 'caterchipillar', 'cockatrice', 'grat', 'buel', 'mesmerize', 'glacial_eye', 'belhelmel',
+    ],
+    gilReward: 60,
+    floorOrder: 0,
+    isBoss: false,
+  },
+  {
+    id: 'tomb_knight',
+    name: 'Tomb Knight',
+    locationId: 'tomb_of_unknown_king',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'An armoured knight materialises, sword replaced by a hand of cards.',
+      floorDefeated: 'The knight kneels in defeat, armour clattering as it fades...',
+    },
+    difficultyTier: 2,
+    deckPool: [
+      'mesmerize', 'glacial_eye', 'belhelmel', 'thrustaevis', 'anacondaur', 'creeps', 'grendel', 'jelleye',
+    ],
+    gilReward: 80,
+    floorOrder: 1,
+    isBoss: false,
+  },
+  {
+    id: 'sacred_minotaur',
+    name: 'Sacred & Minotaur',
+    locationId: 'tomb_of_unknown_king',
+    type: 'duel',
+    dialogue: {
+      challenge: '"WE GUARD THIS TOMB!" "Brother, let\'s crush them at cards!"',
+      defeated: '"Impossible!" "Brother, we lost..." The brothers fade into stone.',
+      rematch: '"WE HAVE RETURNED!" "This time, brother, we win!"',
+    },
+    difficultyTier: 2,
+    deckPool: [
+      'glacial_eye', 'belhelmel', 'thrustaevis', 'anacondaur', 'creeps', 'grendel', 'jelleye', 'grand_mantis', 'forbidden',
+    ],
+    gilReward: 150,
+    floorOrder: 2,
+    isBoss: true,
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // NEW DUNGEON NPCs — Deling City Sewers (TD, Ch2)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  {
+    id: 'sewer_rat',
+    name: 'Sewer Rat',
+    locationId: 'deling_sewers',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'Something scurries in the darkness. A giant rat clutches a deck of soggy cards.',
+      floorDefeated: 'The rat squeaks and dashes further into the tunnels...',
+    },
+    difficultyTier: 2,
+    deckPool: [
+      'blood_soul', 'caterchipillar', 'cockatrice', 'grat', 'buel', 'mesmerize', 'glacial_eye', 'belhelmel',
+    ],
+    gilReward: 50,
+    floorOrder: 0,
+    isBoss: false,
+  },
+  {
+    id: 'sewer_creep',
+    name: 'Sewer Creep',
+    locationId: 'deling_sewers',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'A mass of tentacles emerges from the murky water, holding cards aloft.',
+      floorDefeated: 'The creature sinks back into the water with a gurgle...',
+    },
+    difficultyTier: 2,
+    deckPool: [
+      'mesmerize', 'glacial_eye', 'belhelmel', 'thrustaevis', 'anacondaur', 'creeps', 'grendel', 'jelleye',
+    ],
+    gilReward: 70,
+    floorOrder: 1,
+    isBoss: false,
+  },
+  {
+    id: 'sewer_guardian',
+    name: 'Sewer Guardian',
+    locationId: 'deling_sewers',
+    type: 'duel',
+    dialogue: {
+      challenge: 'The sewers are my domain. None pass without defeating me!',
+      defeated: "You've earned passage through my tunnels. The exit is ahead.",
+      rematch: 'The sewers shift and change. My deck has evolved with them!',
+    },
+    difficultyTier: 2,
+    deckPool: [
+      'thrustaevis', 'anacondaur', 'creeps', 'grendel', 'jelleye', 'grand_mantis', 'forbidden', 'armadodo',
+    ],
+    gilReward: 150,
+    floorOrder: 2,
+    isBoss: true,
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // NEW DUNGEON NPCs — Galbadia Missile Base (Ch2)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  {
+    id: 'base_guard',
+    name: 'Base Guard',
+    locationId: 'galbadia_missile_base',
+    type: 'duel',
+    dialogue: {
+      floorIntro: '"Halt! Authorised personnel only!" The guard reaches for his cards instead of his weapon.',
+      floorDefeated: '"I... I\'ll pretend I didn\'t see you. Move along!"',
+    },
+    difficultyTier: 2,
+    deckPool: [
+      'mesmerize', 'glacial_eye', 'belhelmel', 'thrustaevis', 'anacondaur', 'creeps', 'grendel', 'jelleye',
+    ],
+    gilReward: 70,
+    floorOrder: 0,
+    isBoss: false,
+  },
+  {
+    id: 'base_technician',
+    name: 'Base Technician',
+    locationId: 'galbadia_missile_base',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'A technician blocks the control room door. "I can\'t let you sabotage the launch... unless you beat me."',
+      floorDefeated: '"Fine, the codes are yours. I never liked this job anyway."',
+    },
+    difficultyTier: 2,
+    deckPool: [
+      'thrustaevis', 'anacondaur', 'creeps', 'grendel', 'jelleye', 'grand_mantis', 'forbidden', 'armadodo',
+    ],
+    gilReward: 90,
+    floorOrder: 1,
+    isBoss: false,
+  },
+  {
+    id: 'base_commander',
+    name: 'Base Commander',
+    locationId: 'galbadia_missile_base',
+    type: 'duel',
+    dialogue: {
+      challenge: "You think you can stop the launch? The missiles are Galbadia's pride! Defeat me first!",
+      defeated: 'The missiles... the base... it was all for nothing. You win.',
+      rematch: "I've rebuilt my deck from the wreckage. Galbadia will have its revenge!",
+    },
+    difficultyTier: 3,
+    deckPool: [
+      'anacondaur', 'creeps', 'grendel', 'jelleye', 'grand_mantis', 'forbidden', 'armadodo', 'tri_face', 'sam08g',
+    ],
+    gilReward: 175,
+    floorOrder: 2,
+    isBoss: true,
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // NEW DUNGEON NPCs — Balamb Garden Basement (TD, Ch3)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  {
+    id: 'basement_creature',
+    name: 'Basement Creature',
+    locationId: 'balamb_garden_basement',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'Something lurks in the rusted corridors beneath the Garden. It challenges you!',
+      floorDefeated: 'The creature retreats deeper into the ancient shelter...',
+    },
+    difficultyTier: 2,
+    deckPool: [
+      'mesmerize', 'glacial_eye', 'belhelmel', 'thrustaevis', 'anacondaur', 'creeps', 'grendel', 'jelleye',
+    ],
+    gilReward: 70,
+    floorOrder: 0,
+    isBoss: false,
+  },
+  {
+    id: 'basement_guardian',
+    name: 'Basement Guardian',
+    locationId: 'balamb_garden_basement',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'An ancient defence mechanism activates! A holographic card board appears.',
+      floorDefeated: 'The mechanism powers down, revealing a passage to the control room...',
+    },
+    difficultyTier: 2,
+    deckPool: [
+      'thrustaevis', 'anacondaur', 'creeps', 'grendel', 'jelleye', 'grand_mantis', 'forbidden', 'armadodo',
+    ],
+    gilReward: 90,
+    floorOrder: 1,
+    isBoss: false,
+  },
+  {
+    id: 'norg',
+    name: 'NORG',
+    locationId: 'balamb_garden_basement',
+    type: 'duel',
+    dialogue: {
+      challenge: 'MONEY! PROFIT! My Garden, MY rules! You want to fly? Beat me first, you UNGRATEFUL SeeDs!',
+      defeated: 'NOOOOO! My beautiful investment... ruined by a card game!',
+      rematch: "I've been scheming in the dark. My new deck will bankrupt you!",
+    },
+    difficultyTier: 3,
+    deckPool: [
+      'grendel', 'jelleye', 'grand_mantis', 'forbidden', 'armadodo', 'tri_face', 'sam08g', 'death_claw',
+    ],
+    gilReward: 200,
+    floorOrder: 2,
+    isBoss: true,
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // NEW DUNGEON NPCs — Balamb Under Siege (TD, Ch5)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  {
+    id: 'galbadian_invader',
+    name: 'Galbadian Invader',
+    locationId: 'balamb_under_siege',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'A Galbadian soldier patrols the occupied streets. "This town belongs to Galbadia now!"',
+      floorDefeated: '"Maybe occupying a town of card players was a bad idea..."',
+    },
+    difficultyTier: 2,
+    deckPool: [
+      'thrustaevis', 'anacondaur', 'creeps', 'grendel', 'jelleye', 'grand_mantis', 'forbidden', 'armadodo',
+    ],
+    gilReward: 80,
+    floorOrder: 0,
+    isBoss: false,
+  },
+  {
+    id: 'raijin_boss',
+    name: 'Raijin',
+    locationId: 'balamb_under_siege',
+    type: 'duel',
+    dialogue: {
+      floorIntro: '"Yo, you think you can just walk in here, ya know?! Raijin don\'t back down from a card game!"',
+      floorDefeated: '"Aw man... Fujin\'s gonna be mad at me, ya know?"',
+    },
+    difficultyTier: 3,
+    deckPool: [
+      'grand_mantis', 'forbidden', 'armadodo', 'tri_face', 'sam08g', 'death_claw', 'cactuar', 'tonberry',
+    ],
+    gilReward: 120,
+    floorOrder: 1,
+    isBoss: false,
+  },
+  {
+    id: 'fujin_boss',
+    name: 'Fujin',
+    locationId: 'balamb_under_siege',
+    type: 'duel',
+    dialogue: {
+      challenge: 'CARDS. NOW.',
+      defeated: 'RAGE... RETREAT.',
+      rematch: 'REMATCH. PREPARE.',
+    },
+    difficultyTier: 3,
+    deckPool: [
+      'forbidden', 'armadodo', 'tri_face', 'sam08g', 'death_claw', 'cactuar', 'tonberry', 'abyss_worm', 'turtapod',
+    ],
+    gilReward: 200,
+    floorOrder: 2,
+    isBoss: true,
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // NEW DUNGEON NPCs — Roaming Forest (Ch6)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  {
+    id: 'forest_sprite',
+    name: 'Forest Sprite',
+    locationId: 'roaming_forest',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'A tiny glowing creature flits through the trees and lays down cards on a mossy stump.',
+      floorDefeated: 'The sprite giggles and vanishes into the canopy...',
+    },
+    difficultyTier: 3,
+    deckPool: [
+      'sam08g', 'death_claw', 'cactuar', 'tonberry', 'abyss_worm', 'turtapod', 'vysage', 't_rexaur',
+    ],
+    gilReward: 100,
+    floorOrder: 0,
+    isBoss: false,
+  },
+  {
+    id: 'forest_wolf',
+    name: 'Forest Wolf',
+    locationId: 'roaming_forest',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'A massive wolf blocks the forest path. It drops a deck of cards from its jaws.',
+      floorDefeated: 'The wolf howls and bounds deeper into the forest...',
+    },
+    difficultyTier: 3,
+    deckPool: [
+      'death_claw', 'cactuar', 'tonberry', 'abyss_worm', 'turtapod', 'vysage', 't_rexaur', 'bomb', 'blitz',
+    ],
+    gilReward: 120,
+    floorOrder: 1,
+    isBoss: false,
+  },
+  {
+    id: 'forest_guardian',
+    name: 'Forest Guardian',
+    locationId: 'roaming_forest',
+    type: 'duel',
+    dialogue: {
+      challenge: 'This forest has wandered for centuries. I have guarded it just as long. Prove your worth!',
+      defeated: 'The forest accepts you. Its wisdom is yours.',
+      rematch: 'The forest has grown new strategies since you last visited.',
+    },
+    difficultyTier: 3,
+    deckPool: [
+      'cactuar', 'tonberry', 'abyss_worm', 'turtapod', 'vysage', 't_rexaur', 'bomb', 'blitz', 'wendigo', 'torama',
+    ],
+    gilReward: 200,
+    floorOrder: 2,
+    isBoss: true,
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // NEW DUNGEON NPCs — Galbadia Garden Revolution (TD, Ch7)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  {
+    id: 'gg_loyalist',
+    name: 'GG Loyalist',
+    locationId: 'galbadia_garden_revolution',
+    type: 'duel',
+    dialogue: {
+      floorIntro: '"For Galbadia Garden! For the Sorceress!" A fanatical student raises her cards.',
+      floorDefeated: '"This... this isn\'t how it was supposed to go..." She flees down the corridor.',
+    },
+    difficultyTier: 3,
+    deckPool: [
+      'sam08g', 'death_claw', 'cactuar', 'tonberry', 'abyss_worm', 'turtapod', 'vysage', 't_rexaur', 'bomb',
+    ],
+    gilReward: 100,
+    floorOrder: 0,
+    isBoss: false,
+  },
+  {
+    id: 'gg_elite',
+    name: 'GG Elite Guard',
+    locationId: 'galbadia_garden_revolution',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'The Garden\'s elite guard stands before the Headmaster\'s office. "No one gets through!"',
+      floorDefeated: '"The Sorceress\'s power wanes... I can feel it." He lowers his cards.',
+    },
+    difficultyTier: 3,
+    deckPool: [
+      'tonberry', 'abyss_worm', 'turtapod', 'vysage', 't_rexaur', 'bomb', 'blitz', 'wendigo', 'torama', 'imp',
+    ],
+    gilReward: 150,
+    floorOrder: 1,
+    isBoss: false,
+  },
+  {
+    id: 'seifer',
+    name: 'Seifer',
+    locationId: 'galbadia_garden_revolution',
+    type: 'duel',
+    dialogue: {
+      challenge: "This is MY Garden now. You want it back? You'll have to take it from me, one card at a time!",
+      defeated: "Tch... this isn't over. The Sorceress will have the last word.",
+      rematch: "I've been training with the Sorceress's own cards. This time, you lose!",
+    },
+    difficultyTier: 4,
+    deckPool: [
+      'torama', 'imp', 'blue_dragon', 'adamantoise', 'hexadragon', 'iron_giant', 'behemoth', 'chimera',
+    ],
+    gilReward: 300,
+    floorOrder: 2,
+    isBoss: true,
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // NEW TOWN NPCs — White SeeD Ship (Ch8)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  {
+    id: 'white_seed_merchant',
+    name: 'White SeeD Merchant',
+    locationId: 'white_seed_ship',
+    type: 'shop',
+    dialogue: { text: "We've collected cards from every port. Take a look." },
+    shopItems: [
+      { cardId: 'torama', buyPrice: 550 },
+      { cardId: 'imp', buyPrice: 550 },
+      { cardId: 'blue_dragon', buyPrice: 650 },
+      { cardId: 'adamantoise', buyPrice: 650 },
+    ],
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // NEW DUNGEON NPCs — Great Salt Lake (Ch9)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  {
+    id: 'salt_creature',
+    name: 'Salt Creature',
+    locationId: 'great_salt_lake',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'A crystalline creature rises from the salt flats. Cards gleam between its translucent fingers.',
+      floorDefeated: 'The creature crumbles back into salt, clearing the path ahead...',
+    },
+    difficultyTier: 4,
+    deckPool: [
+      'torama', 'imp', 'blue_dragon', 'adamantoise', 'hexadragon', 'iron_giant', 'behemoth', 'chimera',
+    ],
+    gilReward: 120,
+    floorOrder: 0,
+    isBoss: false,
+  },
+  {
+    id: 'salt_behemoth',
+    name: 'Salt Behemoth',
+    locationId: 'great_salt_lake',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'The ground trembles. A massive beast encrusted with salt crystals emerges, bellowing a challenge.',
+      floorDefeated: 'The behemoth collapses, its salt shell shattering. The way to Esthar opens...',
+    },
+    difficultyTier: 4,
+    deckPool: [
+      'blue_dragon', 'adamantoise', 'hexadragon', 'iron_giant', 'behemoth', 'chimera', 'malboro', 'ruby_dragon',
+    ],
+    gilReward: 175,
+    floorOrder: 1,
+    isBoss: false,
+  },
+  {
+    id: 'abadon_boss',
+    name: 'Abadon',
+    locationId: 'great_salt_lake',
+    type: 'duel',
+    dialogue: {
+      challenge: 'The undying guardian of the Salt Lake. None have passed beyond this point.',
+      defeated: 'Even the undying can be defeated... Esthar lies beyond.',
+      rematch: 'Death has no hold on me. Neither does defeat. Come!',
+    },
+    difficultyTier: 4,
+    deckPool: [
+      'hexadragon', 'iron_giant', 'behemoth', 'chimera', 'malboro', 'ruby_dragon', 'elnoyle', 'tonberry_king',
+    ],
+    gilReward: 275,
+    floorOrder: 2,
+    isBoss: true,
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // NEW TOWN NPCs — Sorceress Memorial (Ch9)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  {
+    id: 'memorial_guard',
+    name: 'Memorial Guard',
+    locationId: 'sorceress_memorial',
+    type: 'duel',
+    dialogue: {
+      challenge: "I guard the Sorceress Memorial. No one enters without proving themselves.",
+      defeated: "Your resolve is clear. The memorial's secrets are open to you.",
+      rematch: "Standing guard all day gives me time to perfect my strategy.",
+    },
+    difficultyTier: 4,
+    deckPool: [
+      'iron_giant', 'behemoth', 'malboro', 'ruby_dragon', 'elnoyle', 'tonberry_king', 'wedge_biggs', 'fujin_raijin',
+    ],
+    gilReward: 250,
+  },
+  {
+    id: 'memorial_scholar',
+    name: 'Memorial Scholar',
+    locationId: 'sorceress_memorial',
+    type: 'duel',
+    dialogue: {
+      challenge: "I study the history of Sorceresses. Care to test your knowledge... in cards?",
+      defeated: "Fascinating. Your card skills are worthy of the archives.",
+      rematch: "I've uncovered new card techniques in the ancient texts!",
+    },
+    difficultyTier: 4,
+    deckPool: [
+      'behemoth', 'malboro', 'ruby_dragon', 'elnoyle', 'tonberry_king', 'wedge_biggs', 'fujin_raijin', 'chimera',
+    ],
+    gilReward: 250,
+  },
+  {
+    id: 'memorial_curator',
+    name: 'Memorial Curator',
+    locationId: 'sorceress_memorial',
+    type: 'shop',
+    dialogue: { text: 'These cards were recovered from the memorial vaults. Handle them with care.' },
+    shopItems: [
+      { cardId: 'elnoyle', buyPrice: 1000 },
+      { cardId: 'tonberry_king', buyPrice: 950 },
+      { cardId: 'wedge_biggs', buyPrice: 800 },
+    ],
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // NEW DUNGEON NPCs — Lunatic Pandora (Ch12)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  {
+    id: 'pandora_soldier',
+    name: 'Pandora Soldier',
+    locationId: 'lunatic_pandora',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'A Galbadian soldier stands amidst the crystal pillars. "The Sorceress commands this place!"',
+      floorDefeated: '"The Pandora... it\'s breaking apart!" The soldier flees.',
+    },
+    difficultyTier: 5,
+    deckPool: [
+      'elvoret', 'x_atm092', 'granaldo', 'gerogero', 'iguion', 'abadon', 'propagator', 'jumbo_cactuar',
+    ],
+    gilReward: 175,
+    floorOrder: 0,
+    isBoss: false,
+  },
+  {
+    id: 'pandora_guardian',
+    name: 'Pandora Guardian',
+    locationId: 'lunatic_pandora',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'A massive crystalline entity pulses with energy. It manifests a card board from pure light.',
+      floorDefeated: 'The guardian shatters. The path to the summit is clear...',
+    },
+    difficultyTier: 5,
+    deckPool: [
+      'x_atm092', 'granaldo', 'gerogero', 'iguion', 'abadon', 'propagator', 'jumbo_cactuar', 'tri_point', 'gargantua',
+    ],
+    gilReward: 225,
+    floorOrder: 1,
+    isBoss: false,
+  },
+  {
+    id: 'seifer_final',
+    name: 'Seifer',
+    locationId: 'lunatic_pandora',
+    type: 'duel',
+    dialogue: {
+      challenge: "This is it. The Sorceress gave me everything. I won't let you take it away!",
+      defeated: "I... I was wrong. About all of it. Go. Stop her.",
+      rematch: 'Even after everything... I still have my pride. And my cards.',
+    },
+    difficultyTier: 5,
+    deckPool: [
+      'propagator', 'jumbo_cactuar', 'tri_point', 'gargantua', 'mobile_type_8', 'sphinxara', 'tiamat', 'bgh251f2',
+    ],
+    gilReward: 400,
+    floorOrder: 2,
+    isBoss: true,
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // NEW DUNGEON NPCs — Centra Excavation Site (Ch13)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  {
+    id: 'excavation_drone',
+    name: 'Excavation Drone',
+    locationId: 'centra_excavation_site',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'An ancient Centra drone reactivates, projecting a holographic card board.',
+      floorDefeated: 'SYSTEM ERROR. ALLOWING PASSAGE TO LEVEL 2...',
+    },
+    difficultyTier: 5,
+    deckPool: [
+      'elvoret', 'x_atm092', 'granaldo', 'gerogero', 'iguion', 'abadon', 'propagator', 'jumbo_cactuar',
+    ],
+    gilReward: 175,
+    floorOrder: 0,
+    isBoss: false,
+  },
+  {
+    id: 'excavation_golem',
+    name: 'Excavation Golem',
+    locationId: 'centra_excavation_site',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'A colossal stone golem awakens from millennia of slumber. It raises cards made of ancient crystal.',
+      floorDefeated: 'The golem crumbles. The deepest chamber awaits...',
+    },
+    difficultyTier: 5,
+    deckPool: [
+      'x_atm092', 'granaldo', 'gerogero', 'iguion', 'abadon', 'propagator', 'jumbo_cactuar', 'tri_point', 'gargantua',
+    ],
+    gilReward: 225,
+    floorOrder: 1,
+    isBoss: false,
+  },
+  {
+    id: 'omega_weapon',
+    name: 'Omega Weapon',
+    locationId: 'centra_excavation_site',
+    type: 'duel',
+    dialogue: {
+      challenge: 'THE ULTIMATE WEAPON AWAKENS. YOUR CARDS... WILL BE JUDGED.',
+      defeated: 'SYSTEM... SHUTDOWN... YOU HAVE PROVEN... WORTHY...',
+      rematch: 'REACTIVATING. ULTIMATE PROTOCOL ENGAGED.',
+    },
+    difficultyTier: 5,
+    deckPool: [
+      'propagator', 'jumbo_cactuar', 'tri_point', 'gargantua', 'mobile_type_8', 'sphinxara', 'tiamat', 'bgh251f2', 'red_giant', 'catoblepas', 'ultima_weapon',
+    ],
+    gilReward: 500,
+    floorOrder: 2,
+    isBoss: true,
   },
 ]
 

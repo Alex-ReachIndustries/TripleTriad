@@ -62,7 +62,7 @@ function defaultState(): WorldPlayerState {
     activeQuests: [],
     completedQuests: [],
     clearedDungeons: [],
-    storyChapter: 0,
+    storyChapter: 1,
     mainQuestLog: [],
     seenContent: {},
   }
@@ -263,7 +263,7 @@ export function claimQuestReward(state: WorldPlayerState, questId: string): Worl
     discoveredCards = markDiscovered(discoveredCards, quest.reward.cardId)
   }
 
-  return {
+  let next: WorldPlayerState = {
     ...state,
     inventory,
     discoveredCards,
@@ -271,6 +271,13 @@ export function claimQuestReward(state: WorldPlayerState, questId: string): Worl
     activeQuests: state.activeQuests.filter((id) => id !== questId),
     completedQuests: [...state.completedQuests, questId],
   }
+
+  // Main quests advance the story chapter
+  if (quest.isMainQuest) {
+    next = advanceStoryChapter(next, questId)
+  }
+
+  return next
 }
 
 /** Mark a dungeon as cleared (used when player beats the boss floor). */
