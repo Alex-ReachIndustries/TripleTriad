@@ -8,9 +8,10 @@ import { getRegionMarkers } from '../../data/markers'
 interface WorldMapViewProps {
   worldState: WorldPlayerState
   onSelectRegion: (region: Region) => void
+  onOpenQuestLog?: () => void
 }
 
-export function WorldMapView({ worldState, onSelectRegion }: WorldMapViewProps) {
+export function WorldMapView({ worldState, onSelectRegion, onOpenQuestLog }: WorldMapViewProps) {
   const [hoveredRegion, setHoveredRegion] = useState<string | null>(null)
   const regions = getRegions()
 
@@ -43,6 +44,11 @@ export function WorldMapView({ worldState, onSelectRegion }: WorldMapViewProps) 
             <span className="wm-gil-icon" aria-hidden>G</span>
             {worldState.gil.toLocaleString()}
           </div>
+          {onOpenQuestLog && (
+            <button type="button" className="wm-quest-log-btn" onClick={onOpenQuestLog}>
+              {'\u{1F4D6}'} Quests
+            </button>
+          )}
         </div>
       </div>
 

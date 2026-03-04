@@ -20,6 +20,10 @@ export function getLocationMarkers(
   let hasSideQuest = false
 
   for (const npc of npcs) {
+    // Skip NPCs not visible at current story chapter
+    if (npc.minChapter != null && worldState.storyChapter < npc.minChapter) continue
+    if (npc.maxChapter != null && worldState.storyChapter > npc.maxChapter) continue
+
     const quests = getQuestsByNpc(npc.id)
     for (const quest of quests) {
       const status = getQuestStatus(quest.id, worldState.activeQuests, worldState.completedQuests)

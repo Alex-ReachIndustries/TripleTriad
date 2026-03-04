@@ -1,4 +1,7 @@
 import type { Quest, QuestStatus } from '../types/quest'
+import type { WorldPlayerState } from './worldState'
+import { getNpcById, getLocationById } from './world'
+import { isLocationUnlocked } from './unlock'
 
 /**
  * Main story quests (13 chapters) + side quests (~15).
@@ -336,4 +339,26 @@ export function getQuestStatus(
   if (completedQuests.includes(questId)) return 'completed'
   if (activeQuests.includes(questId)) return 'active'
   return 'available'
+}
+
+/**
+ * Check if a quest is accessible to the player right now.
+ * A quest is accessible when:
+ * 1. Its giver NPC exists and is visible (within minChapter/maxChapter range)
+ * 2. The giver NPC's location is unlocked
+ */
+export function isQuestAccessible(quest: Quest, worldState: WorldPlayerState): boolean {
+  const npc = getNpcById(quest.giverNpcId)
+  if (!npc) return false
+
+  // Check NPC chapter visibility
+  if (npc.minChapter != null && worldState.storyChapter < npc.minChapter) return false
+  if (npc.maxChapter != null && worldState.storyChapter > npc.maxChapter) return false
+
+  // Check location unlock
+  const location = getLocationById(npc.locationId)
+  if (!location) return false
+  if (!isLocationUnlocked(location, worldState)) return false
+
+  return true
 }

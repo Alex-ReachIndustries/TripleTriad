@@ -1612,6 +1612,22 @@
   font-weight: 800;
 }
 
+.wm-quest-log-btn {
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius);
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 200ms, border-color 200ms;
+}
+.wm-quest-log-btn:hover {
+  background: var(--surface);
+  border-color: var(--accent);
+}
+
 /* Map container with SVG overlay */
 .wm-map-container {
   position: relative;
@@ -2711,6 +2727,228 @@
 @media (prefers-reduced-motion: reduce) {
   .wm-floor-node.current .wm-floor-marker {
     animation: none;
+  }
+}
+
+/* ── Quest Log ────────────────────────────── */
+
+.ql-container {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.ql-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.ql-title-area {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.ql-title {
+  font-size: 1.6rem;
+  margin: 0;
+  color: var(--accent);
+}
+
+.ql-chapter-badge {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.2rem 0.6rem;
+}
+
+.ql-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+}
+
+.ql-section-title {
+  font-size: 1.1rem;
+  margin: 0 0 0.75rem;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ql-section-icon {
+  font-size: 1rem;
+}
+
+.ql-count {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--bg);
+  background: var(--accent);
+  border-radius: 999px;
+  padding: 0.1rem 0.5rem;
+  margin-left: auto;
+}
+
+.ql-empty {
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Story entries */
+.ql-story-entries {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ql-story-entry {
+  padding: 0.75rem 1rem;
+  background: var(--surface-alt);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.ql-story-chapter {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 0.35rem;
+}
+
+.ql-story-text {
+  font-size: 0.85rem;
+  color: var(--text);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Quest cards */
+.ql-quest-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ql-quest-card {
+  padding: 0.75rem 1rem;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: border-color 200ms;
+}
+
+.ql-quest-card.active {
+  border-left: 3px solid var(--player-0);
+}
+
+.ql-quest-card.available {
+  border-left: 3px solid var(--accent);
+}
+
+.ql-quest-card.completed {
+  border-left: 3px solid var(--success);
+  opacity: 0.8;
+}
+
+.ql-quest-badge-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.ql-quest-type {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+}
+
+.ql-quest-type.main {
+  background: #d4a017;
+  color: #1a1a2e;
+}
+
+.ql-quest-type.side {
+  background: #3b82f6;
+  color: #fff;
+}
+
+.ql-quest-status {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.ql-quest-status.active {
+  color: var(--player-0);
+  border-color: var(--player-0);
+}
+
+.ql-quest-status.completed {
+  color: var(--success);
+  border-color: var(--success);
+}
+
+.ql-quest-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.2rem;
+}
+
+.ql-quest-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.4rem;
+  line-height: 1.4;
+}
+
+.ql-quest-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.ql-quest-objective {
+  color: var(--text-muted);
+  text-transform: capitalize;
+}
+
+.ql-quest-reward {
+  color: var(--accent);
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+/* Quest Log Mobile */
+@media (max-width: 600px) {
+  .ql-title {
+    font-size: 1.3rem;
+  }
+  .ql-section {
+    padding: 0.75rem;
   }
 }
 

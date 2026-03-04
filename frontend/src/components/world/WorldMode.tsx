@@ -7,12 +7,14 @@ import { RegionView } from './RegionView'
 import { TownView } from './TownView'
 import { DungeonView } from './DungeonView'
 import { NpcInteraction } from './NpcInteraction'
+import { QuestLog } from './QuestLog'
 
 export type WorldScreen =
   | { type: 'map' }
   | { type: 'region'; regionId: string }
   | { type: 'town'; locationId: string; regionId: string }
   | { type: 'dungeon'; locationId: string; regionId: string }
+  | { type: 'quest_log' }
 
 export interface WorldModeCallbacks {
   onInitiateDuel?: (npcId: string, locationId: string) => void
@@ -115,7 +117,11 @@ export function WorldMode({
     case 'map':
       return (
         <>
-          <WorldMapView worldState={worldState} onSelectRegion={handleSelectRegion} />
+          <WorldMapView
+            worldState={worldState}
+            onSelectRegion={handleSelectRegion}
+            onOpenQuestLog={() => setScreen({ type: 'quest_log' })}
+          />
           {npcModal}
         </>
       )
@@ -167,5 +173,13 @@ export function WorldMode({
         </>
       )
     }
+
+    case 'quest_log':
+      return (
+        <QuestLog
+          worldState={worldState}
+          onBack={handleBackToMap}
+        />
+      )
   }
 }
