@@ -3,6 +3,7 @@ import type { NPC } from '../../types/world'
 import type { Card } from '../../types/card'
 import type { WorldPlayerState, } from '../../data/worldState'
 import { isStarterCard } from '../../data/worldState'
+import { getCardSellPrice } from '../../data/cardValue'
 import { getQuestsByNpc, getQuestStatus, isQuestComplete } from '../../data/quests'
 import { getDeckById, isDeckValid } from '../../data/deckManager'
 import { rankLabel } from '../../types/card'
@@ -158,7 +159,7 @@ function ShopPanel({
         if (!card) return null
         const minCount = isStarterCard(cardId) ? 1 : 0
         const sellable = count - minCount
-        const sellPrice = Math.floor((card.level * 50) / 2) // Base sell price from level
+        const sellPrice = getCardSellPrice(card)
         return { cardId, card, count, sellable, sellPrice }
       })
       .filter((item): item is NonNullable<typeof item> => item !== null && item.sellable > 0)
