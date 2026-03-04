@@ -786,6 +786,13 @@
 .play-page.game .game-board-wrap {
   flex: 1;
   min-height: 0;
+  overflow: hidden;
+}
+.play-page.game .game-board {
+  max-height: 100%;
+  width: auto;
+  aspect-ratio: 1 / 1;
+  margin: 0 auto;
 }
 
 .play-page.game .board-cell {
@@ -814,7 +821,6 @@
   position: relative;
   max-width: 480px;
   width: 100%;
-  aspect-ratio: 93 / 120;
 }
 
 /* Score bar */
@@ -883,7 +889,8 @@
   border-radius: 12px;
   border: 1px solid var(--border);
   box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3);
-  height: 100%;
+  aspect-ratio: 1 / 1;
+  width: 100%;
   box-sizing: border-box;
 }
 
@@ -896,6 +903,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 .board-cell.has-card {
   background: var(--surface);
@@ -912,23 +920,35 @@
 /* Ownership border on the board cell itself */
 .board-cell.owner-0 { border-color: var(--player-0); }
 .board-cell.owner-1 { border-color: var(--player-1); }
-/* CardView inside a board cell: seamless fill, no nested border */
-.board-cell > .card-view {
+/* CardView inside a board cell: absolute-fill so card stretches to cell */
+.board-cell > .card-view,
+.board-cell > .card-view.compact {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  height: auto;
   border: none;
   border-radius: 0;
   box-shadow: none;
   transform: none;
   cursor: default;
-  width: 100%;
-  height: 100%;
   min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 /* Prevent hover lift on board cards (animations override this via @keyframes) */
 .board-cell > .card-view:hover { transform: none; }
 .board-cell > .card-view .card-face {
-  height: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
 }
-.board-cell > .card-view .card-image {
+.board-cell > .card-view .card-image,
+.board-cell > .card-view.compact .card-image {
+  position: absolute;
+  inset: 0;
   max-height: none;
   min-height: 0;
   width: 100%;
@@ -937,9 +957,9 @@
 }
 
 .board-cell-empty { opacity: 0.5; font-size: 1.5rem; color: var(--text-muted); }
-.game-hand { margin-top: 1rem; border-radius: 8px; padding: 0.4rem; max-width: 480px; }
-.game-hand h3 { font-family: var(--font); margin-bottom: 0.5rem; color: var(--text); }
-.game-hand .hint { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; }
+.game-hand { margin-top: 0.5rem; border-radius: 8px; padding: 0.4rem; max-width: 480px; }
+.game-hand h3 { font-family: var(--font); margin-bottom: 0.25rem; color: var(--text); font-size: 0.75rem; }
+.game-hand .hint { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; }
 .hand-cards-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -1167,11 +1187,11 @@
 
 .card-view.compact .card-image {
   max-height: 68px;
-  min-height: 48px;
+  min-height: 0;
 }
 
 .card-view.compact {
-  min-height: 70px;
+  min-height: 0;
 }
 
 /* Rank overlay — fills the entire card face */
@@ -2098,6 +2118,25 @@
   gap: 0.75rem;
   margin-bottom: 1.25rem;
   flex-shrink: 0;
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px;
+  padding: 1rem;
+  min-height: 120px;
+  justify-content: flex-end;
+  overflow: hidden;
+}
+.wm-town-header-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(10, 14, 26, 0.92) 0%, rgba(10, 14, 26, 0.5) 60%, rgba(10, 14, 26, 0.3) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+.wm-town-header > * {
+  position: relative;
+  z-index: 1;
 }
 
 .wm-town-title-area {
@@ -2401,6 +2440,25 @@
   flex-direction: column;
   gap: 0.75rem;
   margin-bottom: 1.25rem;
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px;
+  padding: 1rem;
+  min-height: 120px;
+  justify-content: flex-end;
+  overflow: hidden;
+}
+.wm-dungeon-header-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(10, 14, 26, 0.92) 0%, rgba(10, 14, 26, 0.5) 60%, rgba(10, 14, 26, 0.3) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+.wm-dungeon-header > * {
+  position: relative;
+  z-index: 1;
 }
 
 .wm-dungeon-title-area {
@@ -4937,6 +4995,13 @@
 .battle-game .game-board-wrap {
   flex: 1;
   min-height: 0;
+  overflow: hidden;
+}
+.battle-game .game-board {
+  max-height: 100%;
+  width: auto;
+  aspect-ratio: 1 / 1;
+  margin: 0 auto;
 }
 
 .battle-game .board-cell {
@@ -4946,6 +5011,36 @@
 .battle-game .game-hand {
   flex-shrink: 0;
   margin-top: 0.5rem;
+}
+
+/* Opponent hand — compact row above the board */
+.opponent-hand {
+  margin-top: 0;
+  margin-bottom: 0.25rem;
+}
+.opponent-hand h3 {
+  font-size: 0.7rem;
+  margin-bottom: 0.25rem;
+  color: var(--player-1);
+}
+
+/* Card back — face-down opponent cards */
+.card-back.compact {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+}
+.card-back-design {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  opacity: 0.5;
 }
 
 /* ── Reward screen ── */

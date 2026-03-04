@@ -78,7 +78,11 @@ export function TownView({ location, worldState, onSelectNpc, onSelectLocation, 
   return (
     <div className="wm-town">
       {/* Header */}
-      <div className="wm-town-header">
+      <div
+        className="wm-town-header"
+        style={{ backgroundImage: `url(/locations/${location.id}.png)` }}
+      >
+        <div className="wm-town-header-overlay" />
         <button type="button" className="wm-back-btn" onClick={onBack}>
           &#8592; Back to {region?.name ?? 'Region'}
         </button>

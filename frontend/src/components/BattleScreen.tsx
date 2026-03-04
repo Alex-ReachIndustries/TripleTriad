@@ -42,6 +42,7 @@ export interface BattleScreenProps {
   locationId: string
   tournamentPrize: string | null
   worldPlayerInventory: Record<string, number>
+  discoveredCards?: string[]
   savedDecks: SavedDeck[]
   lastDeckId: string | null
   onSetLastDeckId: (deckId: string) => void
@@ -58,6 +59,7 @@ export function BattleScreen({
   locationId,
   tournamentPrize,
   worldPlayerInventory,
+  discoveredCards,
   savedDecks,
   lastDeckId,
   onSetLastDeckId,
@@ -214,6 +216,7 @@ export function BattleScreen({
         <DeckManager
           savedDecks={savedDecks}
           inventory={worldPlayerInventory}
+          discoveredCards={discoveredCards}
           onUpdateDecks={onUpdateDecks}
           onBack={() => setShowDeckManager(false)}
         />

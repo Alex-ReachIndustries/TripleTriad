@@ -21,6 +21,8 @@ export function GameBoard({ state, myPlayer, onPlace, onPlayAgain, onReturnToWor
   const isMyTurn = state.phase === 'playing' && state.turn === myPlayer
   const hand = state.hands[myPlayer]
   const opponentId: PlayerId = myPlayer === 0 ? 1 : 0
+  const opponentHand = state.hands[opponentId]
+  const isOpenRule = state.activeRules.includes('Open')
 
   // Score: hand cards + board cards owned by each player
   const boardCells = state.board.flat()
@@ -105,6 +107,26 @@ export function GameBoard({ state, myPlayer, onPlace, onPlayAgain, onReturnToWor
             <span key={rule} className="rule-badge">{rule}</span>
           ))}
         </div>
+      )}
+
+      {/* Opponent hand */}
+      {opponentHand.length > 0 && (
+        <section className="game-hand opponent-hand" aria-labelledby="opponent-hand-heading">
+          <h3 id="opponent-hand-heading">Opponent</h3>
+          <div className="hand-cards-grid">
+            {opponentHand.map((card, idx) => (
+              <div key={`opp-${card.id}-${idx}`} className="hand-card-btn opponent">
+                {isOpenRule ? (
+                  <CardView card={card} compact showName={false} />
+                ) : (
+                  <div className="card-back compact">
+                    <div className="card-back-design">?</div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
       )}
 
       <div className="game-board-wrap">

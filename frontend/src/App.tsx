@@ -291,6 +291,7 @@ function App() {
             locationId={battleContext.locationId}
             tournamentPrize={battleContext.tournamentPrize}
             worldPlayerInventory={worldState.inventory}
+            discoveredCards={worldState.discoveredCards}
             savedDecks={worldState.savedDecks}
             lastDeckId={worldState.lastDeckId}
             onSetLastDeckId={(deckId) => setWorldState(prev => ({ ...prev, lastDeckId: deckId }))}

@@ -23,7 +23,11 @@ export function DungeonView({ location, worldState, onStartFloor, onBack }: Dung
   return (
     <div className="wm-dungeon">
       {/* Header */}
-      <div className="wm-dungeon-header">
+      <div
+        className="wm-dungeon-header"
+        style={{ backgroundImage: `url(/locations/${location.id}.png)` }}
+      >
+        <div className="wm-dungeon-header-overlay" />
         <button type="button" className="wm-back-btn" onClick={onBack}>
           &#8592; Back to {region?.name ?? 'Region'}
         </button>
