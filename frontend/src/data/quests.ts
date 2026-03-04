@@ -119,7 +119,7 @@ export const QUESTS: Quest[] = [
     description: 'A space engineer challenges you to clear the Lunar Gate dungeon.',
     giverNpcId: 'space_engineer',
     type: 'clear_dungeon',
-    targetId: 'lunar_gate',
+    targetId: 'lunar_base',
     reward: { gil: 2000, cardId: 'mobile_type_8' },
   },
 ]

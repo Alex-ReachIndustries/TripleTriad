@@ -112,7 +112,6 @@ function distToSegment(px: number, py: number, ax: number, ay: number, bx: numbe
 
 const REGION_COLORS: Record<string, string> = {
   balamb: 'rgba(59,130,246,0.3)',   // blue
-  dollet: 'rgba(168,85,247,0.3)',   // purple
   galbadia: 'rgba(239,68,68,0.3)', // red
   fh: 'rgba(34,197,94,0.3)',       // green
   trabia: 'rgba(56,189,248,0.3)',  // cyan
@@ -122,7 +121,6 @@ const REGION_COLORS: Record<string, string> = {
 
 const REGION_STROKE: Record<string, string> = {
   balamb: 'rgba(59,130,246,0.8)',
-  dollet: 'rgba(168,85,247,0.8)',
   galbadia: 'rgba(239,68,68,0.8)',
   fh: 'rgba(34,197,94,0.8)',
   trabia: 'rgba(56,189,248,0.8)',

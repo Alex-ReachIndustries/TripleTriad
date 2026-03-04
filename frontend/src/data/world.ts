@@ -1,6 +1,7 @@
 /**
- * V3 World data: 7 regions, 17 locations (12 towns + 5 dungeons), ~50 NPCs.
- * Source of truth: .cursor/projects/triple-triad-v3/world-design.md
+ * V3 Campaign world data: 6 regions, ~30 locations, ~100+ NPCs.
+ * 13-chapter FF8 storyline with backtracking and TD (Town-Dungeon) locations.
+ * Source of truth: .cursor/projects/triple-triad-v3-campaign.md
  */
 
 import type {
@@ -25,117 +26,92 @@ export const REGIONS: Region[] = [
     tradeRule: 'One',
     order: 0,
     description:
-      'A small peaceful island with the prestigious Balamb Garden SeeD academy.',
-    mapBounds: '19,55 29,55 29,64 19,64 19,55',
+      'Home to Balamb Garden and the coastal town of Dollet. Open rules let you see your opponent\'s hand — a fair start for new players.',
+    mapBounds: '17,30 32,30 32,47 29,47 29,55 29,64 19,64 19,55 17,47 17,30',
     unlockCondition: null,
-  },
-  {
-    id: 'dollet',
-    name: 'Dollet',
-    rules: ['Random', 'Elemental'],
-    tradeRule: 'One',
-    order: 1,
-    description:
-      'An independent dukedom known for its communication tower. Tricky rules make card games here unpredictable.',
-    mapBounds: '17,30 30,30 32,47 17,47 17,30',
-    unlockCondition: { type: 'beat_npc', targetId: 'ifrit_guardian' },
   },
   {
     id: 'galbadia',
     name: 'Galbadia',
     rules: ['Same'],
     tradeRule: 'One',
-    order: 2,
+    order: 1,
     description:
       'The militaristic Galbadian continent. The Same rule makes positioning crucial — one wrong move and your cards get chain-captured.',
     mapBounds: '30,37 52,37 52,59 28,59 30,37',
-    unlockCondition: {
-      type: 'unique_wins_in_location',
-      targetId: 'dollet_city',
-      count: 2,
-    },
+    unlockCondition: { type: 'story_chapter', count: 2 },
   },
   {
     id: 'fh',
     name: "Fisherman's Horizon",
     rules: ['Elemental', 'Sudden Death'],
     tradeRule: 'One',
-    order: 3,
+    order: 2,
     description:
       'A pacifist settlement on the transcontinental bridge. Sudden Death means draws never end — you keep playing until someone wins.',
     mapBounds: '49,46 57,46 57,54 49,54 49,46',
-    unlockCondition: {
-      type: 'unique_wins_in_location',
-      targetId: 'winhill',
-      count: 1,
-    },
+    unlockCondition: { type: 'story_chapter', count: 4 },
   },
   {
     id: 'trabia',
     name: 'Trabia',
     rules: ['Random', 'Plus'],
     tradeRule: 'One',
-    order: 4,
+    order: 3,
     description:
       'The frozen northern continent. The Plus rule rewards mathematical thinking, but Random hands make it a gamble.',
     mapBounds: '44,14 72,14 74,36 46,36 44,14',
-    unlockCondition: {
-      type: 'unique_wins_in_location',
-      targetId: 'fishermans_horizon',
-      count: 2,
-    },
+    unlockCondition: { type: 'story_chapter', count: 6 },
   },
   {
     id: 'centra',
     name: 'Centra',
     rules: ['Same', 'Plus', 'Random'],
     tradeRule: 'One',
-    order: 5,
+    order: 4,
     description:
       'The ruined southern continent, devastated by the Lunar Cry. The toughest rule combination — Same + Plus + Random together make every match brutal.',
     mapBounds: '30,67 60,67 62,88 32,88 30,67',
-    unlockCondition: { type: 'beat_npc', targetId: 'shumi_elder' },
+    unlockCondition: { type: 'story_chapter', count: 8 },
   },
   {
     id: 'esthar',
     name: 'Esthar',
     rules: ['Elemental', 'Same Wall'],
     tradeRule: 'One',
-    order: 6,
+    order: 5,
     description:
-      'The technologically advanced Esthar continent and the Lunar Gate. Same Wall makes board edges dangerous — every edge acts like a rank-10 card for the Same rule.',
+      'The technologically advanced Esthar continent. Same Wall makes board edges dangerous — every edge acts like a rank-10 card for the Same rule.',
     mapBounds: '60,30 90,30 92,65 62,65 60,30',
-    unlockCondition: { type: 'beat_npc', targetId: 'centra_guardian' },
+    unlockCondition: { type: 'story_chapter', count: 9 },
   },
 ]
 
 // ─── Locations ──────────────────────────────────────────────────────────────
 
 export const LOCATIONS: Location[] = [
-  // ── Region 0: Balamb ──
-  {
-    id: 'balamb_town',
-    name: 'Balamb Town',
-    regionId: 'balamb',
-    type: 'town',
-    order: 0,
-    mapX: 35,
-    mapY: 75,
-    unlockCondition: null,
-  },
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CHAPTER 1 — BALAMB REGION
+  // ═══════════════════════════════════════════════════════════════════════════
   {
     id: 'balamb_garden',
     name: 'Balamb Garden',
     regionId: 'balamb',
     type: 'town',
+    order: 0,
+    mapX: 65,
+    mapY: 70,
+    unlockCondition: null,
+  },
+  {
+    id: 'balamb_town',
+    name: 'Balamb',
+    regionId: 'balamb',
+    type: 'town',
     order: 1,
     mapX: 55,
-    mapY: 35,
-    unlockCondition: {
-      type: 'unique_wins_in_location',
-      targetId: 'balamb_town',
-      count: 1,
-    },
+    mapY: 85,
+    unlockCondition: { type: 'unique_wins_in_location', targetId: 'balamb_garden', count: 1 },
   },
   {
     id: 'fire_cavern',
@@ -143,30 +119,36 @@ export const LOCATIONS: Location[] = [
     regionId: 'balamb',
     type: 'dungeon',
     order: 2,
-    mapX: 70,
-    mapY: 55,
-    unlockCondition: {
-      type: 'unique_wins_in_location',
-      targetId: 'balamb_garden',
-      count: 2,
-    },
-    flavour:
-      'A volcanic cave where fire spirits dwell. The heat rises as you descend...',
+    mapX: 80,
+    mapY: 60,
+    unlockCondition: { type: 'unique_wins_in_location', targetId: 'balamb_town', count: 1 },
+    flavour: 'A volcanic cave where fire spirits dwell. The heat rises as you descend...',
   },
-
-  // ── Region 1: Dollet ──
   {
-    id: 'dollet_city',
-    name: 'Dollet City',
-    regionId: 'dollet',
+    id: 'dollet',
+    name: 'Dollet',
+    regionId: 'balamb',
     type: 'town',
-    order: 0,
-    mapX: 50,
-    mapY: 50,
-    unlockCondition: null,
+    order: 3,
+    mapX: 30,
+    mapY: 25,
+    unlockCondition: { type: 'clear_dungeon', targetId: 'fire_cavern' },
+  },
+  {
+    id: 'radio_tower',
+    name: 'Radio Tower',
+    regionId: 'balamb',
+    type: 'dungeon',
+    order: 4,
+    mapX: 15,
+    mapY: 15,
+    unlockCondition: { type: 'unique_wins_in_location', targetId: 'dollet', count: 1 },
+    flavour: 'The Dollet Communication Tower looms above. Galbadian soldiers guard every floor...',
   },
 
-  // ── Region 2: Galbadia ──
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CHAPTER 2 — GALBADIA REGION
+  // ═══════════════════════════════════════════════════════════════════════════
   {
     id: 'timber',
     name: 'Timber',
@@ -174,7 +156,7 @@ export const LOCATIONS: Location[] = [
     type: 'town',
     order: 0,
     mapX: 35,
-    mapY: 40,
+    mapY: 25,
     unlockCondition: null,
   },
   {
@@ -183,13 +165,9 @@ export const LOCATIONS: Location[] = [
     regionId: 'galbadia',
     type: 'town',
     order: 1,
-    mapX: 45,
-    mapY: 55,
-    unlockCondition: {
-      type: 'unique_wins_in_location',
-      targetId: 'timber',
-      count: 2,
-    },
+    mapX: 55,
+    mapY: 35,
+    unlockCondition: { type: 'unique_wins_in_location', targetId: 'timber', count: 1 },
   },
   {
     id: 'deling_city',
@@ -199,44 +177,83 @@ export const LOCATIONS: Location[] = [
     order: 2,
     mapX: 25,
     mapY: 50,
-    unlockCondition: {
-      type: 'unique_wins_in_location',
-      targetId: 'galbadia_garden',
-      count: 1,
-    },
+    unlockCondition: { type: 'unique_wins_in_location', targetId: 'galbadia_garden', count: 1 },
   },
   {
-    id: 'd_district_prison',
-    name: 'D-District Prison',
+    id: 'tomb_of_unknown_king',
+    name: 'Tomb of the Unknown King',
     regionId: 'galbadia',
     type: 'dungeon',
     order: 3,
-    mapX: 60,
-    mapY: 45,
-    unlockCondition: {
-      type: 'unique_wins_in_location',
-      targetId: 'deling_city',
-      count: 1,
-    },
-    flavour:
-      'A towering desert prison. Fight your way through the guards to escape...',
+    mapX: 40,
+    mapY: 55,
+    unlockCondition: { type: 'unique_wins_in_location', targetId: 'deling_city', count: 1 },
+    flavour: 'An ancient tomb where a forgotten king rests. The corridors shift and change...',
+  },
+  {
+    id: 'deling_sewers',
+    name: 'Deling City Sewers',
+    regionId: 'galbadia',
+    type: 'dungeon',
+    order: 5,
+    mapX: 25,
+    mapY: 50,
+    unlockCondition: { type: 'clear_dungeon', targetId: 'tomb_of_unknown_king' },
+    parentTownId: 'deling_city',
+    flavour: 'The sewers beneath Deling City. Dark, damp, and full of desperate card players...',
   },
   {
     id: 'winhill',
     name: 'Winhill',
     regionId: 'galbadia',
     type: 'town',
-    order: 4,
+    order: 6,
     mapX: 15,
-    mapY: 65,
-    unlockCondition: {
-      type: 'unique_wins_in_location',
-      targetId: 'd_district_prison',
-      count: 1,
-    },
+    mapY: 70,
+    unlockCondition: { type: 'clear_dungeon', targetId: 'deling_sewers' },
+  },
+  {
+    id: 'd_district_prison',
+    name: 'D-District Prison',
+    regionId: 'galbadia',
+    type: 'dungeon',
+    order: 7,
+    mapX: 70,
+    mapY: 50,
+    unlockCondition: { type: 'unique_wins_in_location', targetId: 'winhill', count: 1 },
+    flavour: 'A towering desert prison. Fight your way through the guards to escape...',
+  },
+  {
+    id: 'galbadia_missile_base',
+    name: 'Galbadia Missile Base',
+    regionId: 'galbadia',
+    type: 'dungeon',
+    order: 8,
+    mapX: 85,
+    mapY: 40,
+    unlockCondition: { type: 'clear_dungeon', targetId: 'd_district_prison' },
+    flavour: 'A top-secret military installation. The self-destruct countdown has begun...',
   },
 
-  // ── Region 3: Fisherman's Horizon ──
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CHAPTER 3 — BALAMB REGION (backtrack)
+  // ═══════════════════════════════════════════════════════════════════════════
+  {
+    id: 'balamb_garden_basement',
+    name: 'Balamb Garden Basement',
+    regionId: 'balamb',
+    type: 'dungeon',
+    order: 10,
+    mapX: 65,
+    mapY: 70,
+    unlockCondition: { type: 'story_chapter', count: 3 },
+    parentTownId: 'balamb_garden',
+    flavour: 'Hidden passages beneath the Garden. The MD Level holds secrets the faculty tried to bury...',
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CHAPTER 4 — FISHERMAN'S HORIZON REGION
+  // ═══════════════════════════════════════════════════════════════════════════
   {
     id: 'fishermans_horizon',
     name: "Fisherman's Horizon",
@@ -248,33 +265,66 @@ export const LOCATIONS: Location[] = [
     unlockCondition: null,
   },
 
-  // ── Region 4: Trabia ──
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CHAPTER 5 — BALAMB REGION (backtrack)
+  // ═══════════════════════════════════════════════════════════════════════════
+  {
+    id: 'balamb_under_siege',
+    name: 'Balamb Under Siege!',
+    regionId: 'balamb',
+    type: 'dungeon',
+    order: 11,
+    mapX: 55,
+    mapY: 85,
+    unlockCondition: { type: 'story_chapter', count: 5 },
+    parentTownId: 'balamb_town',
+    flavour: 'Galbadian soldiers have occupied Balamb! Card battles are the only way to reclaim the town...',
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CHAPTER 6 — TRABIA REGION
+  // ═══════════════════════════════════════════════════════════════════════════
+  {
+    id: 'roaming_forest',
+    name: 'Roaming Forest',
+    regionId: 'trabia',
+    type: 'dungeon',
+    order: 0,
+    mapX: 30,
+    mapY: 65,
+    unlockCondition: null,
+    flavour: 'A mysterious forest that seems to move on its own. Strange creatures lurk within...',
+  },
   {
     id: 'trabia_garden',
     name: 'Trabia Garden',
     regionId: 'trabia',
     type: 'town',
-    order: 0,
-    mapX: 40,
-    mapY: 60,
-    unlockCondition: null,
-  },
-  {
-    id: 'shumi_village',
-    name: 'Shumi Village',
-    regionId: 'trabia',
-    type: 'town',
     order: 1,
-    mapX: 70,
-    mapY: 30,
-    unlockCondition: {
-      type: 'unique_wins_in_location',
-      targetId: 'trabia_garden',
-      count: 2,
-    },
+    mapX: 50,
+    mapY: 40,
+    unlockCondition: { type: 'clear_dungeon', targetId: 'roaming_forest' },
   },
 
-  // ── Region 5: Centra ──
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CHAPTER 7 — GALBADIA REGION (backtrack)
+  // ═══════════════════════════════════════════════════════════════════════════
+  {
+    id: 'galbadia_garden_revolution',
+    name: 'Galbadia Garden Revolution!',
+    regionId: 'galbadia',
+    type: 'dungeon',
+    order: 9,
+    mapX: 55,
+    mapY: 35,
+    unlockCondition: { type: 'story_chapter', count: 7 },
+    parentTownId: 'galbadia_garden',
+    flavour: 'The Gardens clash! Fight through Galbadia Garden\'s defenders in a hostile takeover...',
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CHAPTER 8 — CENTRA REGION
+  // ═══════════════════════════════════════════════════════════════════════════
   {
     id: 'edeas_house',
     name: "Edea's House",
@@ -282,68 +332,134 @@ export const LOCATIONS: Location[] = [
     type: 'town',
     order: 0,
     mapX: 50,
-    mapY: 85,
+    mapY: 80,
     unlockCondition: null,
+  },
+  {
+    id: 'white_seed_ship',
+    name: 'White SeeD Ship',
+    regionId: 'centra',
+    type: 'town',
+    order: 1,
+    mapX: 25,
+    mapY: 60,
+    unlockCondition: { type: 'unique_wins_in_location', targetId: 'edeas_house', count: 1 },
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CHAPTER 9 — ESTHAR REGION
+  // ═══════════════════════════════════════════════════════════════════════════
+  {
+    id: 'great_salt_lake',
+    name: 'Great Salt Lake',
+    regionId: 'esthar',
+    type: 'dungeon',
+    order: 0,
+    mapX: 15,
+    mapY: 55,
+    unlockCondition: null,
+    flavour: 'A vast dried-out salt flat at the edge of Esthar. The blinding white landscape hides dangers...',
+  },
+  {
+    id: 'esthar_city',
+    name: 'Esthar City',
+    regionId: 'esthar',
+    type: 'town',
+    order: 1,
+    mapX: 40,
+    mapY: 45,
+    unlockCondition: { type: 'clear_dungeon', targetId: 'great_salt_lake' },
+  },
+  {
+    id: 'lunar_base',
+    name: 'Lunar Base',
+    regionId: 'esthar',
+    type: 'dungeon',
+    order: 2,
+    mapX: 70,
+    mapY: 30,
+    unlockCondition: { type: 'unique_wins_in_location', targetId: 'esthar_city', count: 2 },
+    flavour: 'An orbital station above Esthar. The final launch sequence requires card clearance...',
+  },
+  {
+    id: 'sorceress_memorial',
+    name: 'Sorceress Memorial',
+    regionId: 'esthar',
+    type: 'town',
+    order: 3,
+    mapX: 55,
+    mapY: 65,
+    unlockCondition: { type: 'clear_dungeon', targetId: 'lunar_base' },
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CHAPTER 10 — CENTRA REGION (backtrack)
+  // ═══════════════════════════════════════════════════════════════════════════
+  {
+    id: 'deep_sea_research_center',
+    name: 'Deep Sea Research Centre',
+    regionId: 'centra',
+    type: 'dungeon',
+    order: 2,
+    mapX: 75,
+    mapY: 40,
+    unlockCondition: { type: 'story_chapter', count: 10 },
+    flavour: 'The deepest facility in the world. Four levels of increasingly dangerous opponents guard the ultimate prize...',
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CHAPTER 11 — TRABIA REGION (backtrack)
+  // ═══════════════════════════════════════════════════════════════════════════
+  {
+    id: 'shumi_village',
+    name: 'Shumi Village',
+    regionId: 'trabia',
+    type: 'town',
+    order: 2,
+    mapX: 75,
+    mapY: 20,
+    unlockCondition: { type: 'story_chapter', count: 11 },
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CHAPTER 12 — ESTHAR REGION (backtrack)
+  // ═══════════════════════════════════════════════════════════════════════════
+  {
+    id: 'lunatic_pandora',
+    name: 'Lunatic Pandora',
+    regionId: 'esthar',
+    type: 'dungeon',
+    order: 4,
+    mapX: 85,
+    mapY: 50,
+    unlockCondition: { type: 'story_chapter', count: 12 },
+    flavour: 'A massive crystalline structure floating above Esthar. The final Galbadian weapon...',
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CHAPTER 13 — CENTRA REGION (backtrack)
+  // ═══════════════════════════════════════════════════════════════════════════
+  {
+    id: 'centra_excavation_site',
+    name: 'Centra Excavation Site',
+    regionId: 'centra',
+    type: 'dungeon',
+    order: 3,
+    mapX: 40,
+    mapY: 30,
+    unlockCondition: { type: 'story_chapter', count: 13 },
+    flavour: 'Ancient ruins deep beneath the Centra continent. Archaeologists discovered something terrible here...',
   },
   {
     id: 'centra_ruins',
     name: 'Centra Ruins',
     regionId: 'centra',
     type: 'dungeon',
-    order: 1,
-    mapX: 40,
+    order: 4,
+    mapX: 60,
     mapY: 50,
-    unlockCondition: {
-      type: 'unique_wins_in_location',
-      targetId: 'edeas_house',
-      count: 2,
-    },
-    flavour:
-      'Ancient ruins of a lost civilisation. Strange energies pulse through crumbling corridors...',
-  },
-
-  // ── Region 6: Esthar ──
-  {
-    id: 'esthar_city',
-    name: 'Esthar City',
-    regionId: 'esthar',
-    type: 'town',
-    order: 0,
-    mapX: 30,
-    mapY: 50,
-    unlockCondition: null,
-  },
-  {
-    id: 'lunar_gate',
-    name: 'Lunar Gate',
-    regionId: 'esthar',
-    type: 'dungeon',
-    order: 1,
-    mapX: 70,
-    mapY: 35,
-    unlockCondition: {
-      type: 'unique_wins_in_location',
-      targetId: 'esthar_city',
-      count: 2,
-    },
-    flavour:
-      'The launch facility to space. Security clearance required — in the form of card battles.',
-  },
-  {
-    id: 'deep_sea_research_center',
-    name: 'Deep Sea Research Center',
-    regionId: 'esthar',
-    type: 'dungeon',
-    order: 2,
-    mapX: 15,
-    mapY: 70,
-    unlockCondition: {
-      type: 'clear_dungeon',
-      targetId: 'lunar_gate',
-      // Also requires 5 completed quests — enforced via quest_count in worldState
-    },
-    flavour:
-      'The deepest facility in the world. Four levels of increasingly dangerous opponents guard the ultimate prize...',
+    unlockCondition: { type: 'clear_dungeon', targetId: 'centra_excavation_site' },
+    flavour: 'The final dungeon. Ancient ruins of a lost civilisation. Strange energies pulse through crumbling corridors...',
   },
 ]
 
@@ -617,7 +733,7 @@ export const NPCS: NPC[] = [
   {
     id: 'dollet_citizen',
     name: 'Dollet Citizen',
-    locationId: 'dollet_city',
+    locationId: 'dollet',
     type: 'duel',
     dialogue: {
       challenge:
@@ -643,7 +759,7 @@ export const NPCS: NPC[] = [
   {
     id: 'dollet_soldier',
     name: 'Dollet Soldier',
-    locationId: 'dollet_city',
+    locationId: 'dollet',
     type: 'duel',
     dialogue: {
       challenge:
@@ -669,7 +785,7 @@ export const NPCS: NPC[] = [
   {
     id: 'dollet_pub_owner',
     name: 'Dollet Pub Owner',
-    locationId: 'dollet_city',
+    locationId: 'dollet',
     type: 'shop',
     dialogue: {
       text: 'Finest cards from across the sea.',
@@ -684,7 +800,7 @@ export const NPCS: NPC[] = [
   {
     id: 'queen_of_cards',
     name: 'Queen of Cards',
-    locationId: 'dollet_city',
+    locationId: 'dollet',
     type: 'dialogue',
     dialogue: {
       text: "I travel the world playing Triple Triad. Perhaps we'll meet again in your travels.",
@@ -694,7 +810,7 @@ export const NPCS: NPC[] = [
   {
     id: 'dollet_tournament',
     name: 'Dollet Tournament',
-    locationId: 'dollet_city',
+    locationId: 'dollet',
     type: 'tournament',
     dialogue: {
       text: 'The Dollet Tournament draws players from across the dukedom. Step up and test your mettle!',
@@ -1619,7 +1735,7 @@ export const NPCS: NPC[] = [
   {
     id: 'gate_sentry',
     name: 'Gate Sentry',
-    locationId: 'lunar_gate',
+    locationId: 'lunar_base',
     type: 'duel',
     dialogue: {
       floorIntro:
@@ -1644,7 +1760,7 @@ export const NPCS: NPC[] = [
   {
     id: 'lunar_soldier',
     name: 'Lunar Soldier',
-    locationId: 'lunar_gate',
+    locationId: 'lunar_base',
     type: 'duel',
     dialogue: {
       floorIntro:
@@ -1672,7 +1788,7 @@ export const NPCS: NPC[] = [
   {
     id: 'lunar_officer',
     name: 'Lunar Officer',
-    locationId: 'lunar_gate',
+    locationId: 'lunar_base',
     type: 'duel',
     dialogue: {
       challenge:
@@ -1895,9 +2011,9 @@ export function getLocationById(id: string): Location | undefined {
 }
 
 export function getLocationsByRegion(regionId: string): Location[] {
-  return getLocations().filter((l) => l.regionId === regionId).sort(
-    (a, b) => a.order - b.order
-  )
+  return getLocations()
+    .filter((l) => l.regionId === regionId && !l.parentTownId)
+    .sort((a, b) => a.order - b.order)
 }
 
 /** Get TD (Town-Dungeon) locations whose parent is a given town. */

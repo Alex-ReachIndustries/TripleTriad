@@ -89,18 +89,20 @@ Tasks:
 ---
 
 ### Phase 2: World Data Rewrite — 6 Regions, ~30 Locations
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 Goal: Completely rewrite `world.ts` with the new 6-region, ~30-location structure following the FF8 progression through 13 chapters.
 
 Todos:
-- [ ] `todo-regions-locations.md` — Rewrite REGIONS and LOCATIONS arrays:
+- [x] `todo-regions-locations.md` — Rewrite REGIONS and LOCATIONS arrays:
   - 6 regions with updated mapBounds (merge Dollet into Balamb)
-  - ~30 locations with correct chapter-based unlock conditions
-  - TD locations with `parentTownId` linking them to their parent town
+  - 30 locations with correct chapter-based unlock conditions
+  - 4 TD locations with `parentTownId` linking them to their parent town
   - Proper `mapX`/`mapY` placement within regions
   - Dungeon flavour text for all dungeon locations
   - All location `order` values for display sorting
+  - Updated getLocationsByRegion() to exclude TD locations from region map
+  - Renamed dollet_city→dollet, lunar_gate→lunar_base; updated all references
 
 ---
 
