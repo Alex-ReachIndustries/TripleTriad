@@ -173,19 +173,19 @@ Todos:
 ---
 
 ### Phase 6: Testing, Balance & Polish
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 Goal: Verify full campaign playthrough, balance progression, fix bugs, build APK.
 
 Tasks:
-- [ ] Test full chapter 1→13 progression in browser
-- [ ] Verify backtracking unlocks (chapters 3, 5, 7 return to earlier regions)
-- [ ] Verify TD locations appear correctly in parent towns
-- [ ] Verify notification markers appear/disappear properly
-- [ ] Balance NPC deck pools and shop prices for progression curve
-- [ ] Test quest acceptance, completion, and reward claiming
-- [ ] Verify quest log shows correct story progression
-- [ ] Mobile responsiveness check at 390x844
+- [x] Test full chapter 1→13 progression in browser
+- [x] Verify backtracking unlocks (chapters 3, 5, 7 return to earlier regions)
+- [x] Verify TD locations appear correctly in parent towns
+- [x] Verify notification markers appear/disappear properly
+- [x] Balance NPC deck pools and shop prices for progression curve
+- [x] Test quest acceptance, completion, and reward claiming
+- [x] Verify quest log shows correct story progression
+- [x] Mobile responsiveness check at 390x844
 - [ ] Build Android APK and update GitHub release v1.0.0
 
 ---
