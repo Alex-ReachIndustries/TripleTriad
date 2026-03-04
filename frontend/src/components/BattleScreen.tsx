@@ -4,16 +4,16 @@ import type { Card } from '../types/card'
 import type { NPC } from '../types/world'
 import type { SavedDeck } from '../data/deckManager'
 import type { Difficulty } from '../game'
+import type { TradeResult } from '../data/tradeRules'
 import { createGame, placeCard, continueSuddenDeath, getAiMove, getDifficultyForTier } from '../game'
 import { getLocationById, getRegionById, formatRules } from '../data/world'
 import { getDeckById, isDeckValid } from '../data/deckManager'
-import { isStarterCard } from '../data/worldState'
+import { computeTradeResult } from '../data/tradeRules'
 import { GameBoard } from './GameBoard'
 import { DeckManager } from './DeckManager'
 import cardsData from '../data/cards.json'
 
 const allCards: Card[] = cardsData.cards as Card[]
-const allCardIds = allCards.map(c => c.id)
 const cardMap = new Map(allCards.map(c => [c.id, c]))
 const DECK_SIZE = 5
 
@@ -32,8 +32,8 @@ export interface BattleResult {
   isTournament: boolean
   tournamentPrize: string | null
   gilReward: number
-  cardGained: string | null
-  cardLost: string | null
+  cardsGained: string[]
+  cardsLost: string[]
 }
 
 export interface BattleScreenProps {
@@ -73,8 +73,12 @@ export function BattleScreen({
   const [difficulty, setDifficulty] = useState<Difficulty>('medium')
   const [battleResult, setBattleResult] = useState<BattleResult | null>(null)
   const [showDeckManager, setShowDeckManager] = useState(false)
+  const [tradeResult, setTradeResult] = useState<TradeResult | null>(null)
+  const [selectedTradeIndices, setSelectedTradeIndices] = useState<Set<number>>(new Set())
   const aiScheduledRef = useRef(false)
   const resultComputedRef = useRef(false)
+  const aiDeckRef = useRef<Card[]>([])
+  const playerDeckRef = useRef<Card[]>([])
 
   // Resolve saved deck to Card[]
   const resolvedDeck = useMemo(() => {
@@ -100,6 +104,8 @@ export function BattleScreen({
       ? allCards.filter(c => npc.deckPool!.includes(c.id))
       : allCards
     const aiDeck = pickRandomDeck(npcDeckPool, DECK_SIZE)
+    aiDeckRef.current = aiDeck
+    playerDeckRef.current = [...resolvedDeck]
 
     const diff = npc?.difficultyTier ? getDifficultyForTier(npc.difficultyTier) : 'medium'
     setDifficulty(diff)
@@ -108,6 +114,8 @@ export function BattleScreen({
     const initial = createGame(resolvedDeck, aiDeck, firstPlayer as 0 | 1, activeRules)
     setLocalGameState(initial)
     resultComputedRef.current = false
+    setTradeResult(null)
+    setSelectedTradeIndices(new Set())
     setPhase('game')
   }, [resolvedDeck, npc, activeRules, selectedDeckId, onSetLastDeckId])
 
@@ -151,7 +159,7 @@ export function BattleScreen({
     return () => clearTimeout(id)
   }, [phase, localGameState])
 
-  // --- Game ended → compute result and transition to reward ---
+  // --- Game ended → compute trade result and transition to reward ---
   useEffect(() => {
     if (phase !== 'game' || !localGameState || localGameState.phase !== 'ended') return
     if (resultComputedRef.current) return
@@ -160,42 +168,65 @@ export function BattleScreen({
     const winner = localGameState.winner ?? 'draw'
     const gilReward = winner === 0 ? (npc?.gilReward ?? 0) : 0
     const isTournament = !!tournamentPrize
+    const tradeRule = region?.tradeRule ?? 'One'
 
-    // Pre-compute trade (matches applyTradeRuleOne logic)
-    let cardGained: string | null = null
-    let cardLost: string | null = null
+    // Compute trade based on captured cards
+    let trade: TradeResult | null = null
+    if (!isTournament) {
+      trade = computeTradeResult(localGameState, tradeRule, winner, playerDeckRef.current, aiDeckRef.current)
+      setTradeResult(trade)
+    }
 
-    if (!isTournament && winner !== 'draw') {
-      if (winner === 0) {
-        // Player won: gain random card from all cards
-        cardGained = allCardIds[Math.floor(Math.random() * allCardIds.length)]
-      } else {
-        // Player lost: lose random non-starter card
-        const canLose = Object.entries(worldPlayerInventory).filter(([id, count]) => {
-          if (count <= 0) return false
-          if (isStarterCard(id)) return count > 1
-          return true
-        }).map(([id]) => id)
-        if (canLose.length > 0) {
-          cardLost = canLose[Math.floor(Math.random() * canLose.length)]
-        }
+    // If trade doesn't require selection, build final result now
+    if (!trade || !trade.requiresSelection) {
+      const result: BattleResult = {
+        winner,
+        npcId,
+        isTournament,
+        tournamentPrize: winner === 0 ? tournamentPrize : null,
+        gilReward,
+        cardsGained: (trade?.cardsGained ?? []).map(c => c.id),
+        cardsLost: (trade?.cardsLost ?? []).map(c => c.id),
       }
+      setBattleResult(result)
     }
-
-    const result: BattleResult = {
-      winner,
-      npcId,
-      isTournament,
-      tournamentPrize: winner === 0 ? tournamentPrize : null,
-      gilReward,
-      cardGained,
-      cardLost,
-    }
-    setBattleResult(result)
 
     const timer = setTimeout(() => setPhase('reward'), 1500)
     return () => clearTimeout(timer)
-  }, [phase, localGameState, npc, npcId, tournamentPrize, worldPlayerInventory])
+  }, [phase, localGameState, npc, npcId, tournamentPrize, region])
+
+  // --- Handle trade card selection confirm ---
+  const handleConfirmTradeSelection = useCallback(() => {
+    if (!tradeResult || !localGameState) return
+    const winner = localGameState.winner ?? 'draw'
+    const gilReward = winner === 0 ? (npc?.gilReward ?? 0) : 0
+
+    const selectedCards = Array.from(selectedTradeIndices).map(i => tradeResult.selectionPool[i])
+    const result: BattleResult = {
+      winner,
+      npcId,
+      isTournament: !!tournamentPrize,
+      tournamentPrize: winner === 0 ? tournamentPrize : null,
+      gilReward,
+      cardsGained: selectedCards.map(c => c.id),
+      cardsLost: tradeResult.cardsLost.map(c => c.id),
+    }
+    setBattleResult(result)
+  }, [tradeResult, selectedTradeIndices, localGameState, npc, npcId, tournamentPrize])
+
+  // --- Toggle trade card selection ---
+  const toggleTradeCard = useCallback((index: number) => {
+    if (!tradeResult) return
+    setSelectedTradeIndices(prev => {
+      const next = new Set(prev)
+      if (next.has(index)) {
+        next.delete(index)
+      } else if (next.size < tradeResult.maxSelections) {
+        next.add(index)
+      }
+      return next
+    })
+  }, [tradeResult])
 
   // --- Reward screen actions ---
   const handleDismissReward = useCallback(() => {
@@ -205,6 +236,8 @@ export function BattleScreen({
   const handleRematch = useCallback(() => {
     setLocalGameState(null)
     setBattleResult(null)
+    setTradeResult(null)
+    setSelectedTradeIndices(new Set())
     resultComputedRef.current = false
     setPhase('pre-duel')
   }, [])
@@ -261,9 +294,11 @@ export function BattleScreen({
         )}
 
         {/* Active rules */}
-        {activeRules.length > 0 && (
+        {(activeRules.length > 0 || region?.tradeRule) && (
           <div className="battle-rules">
-            <span className="battle-rules-label">Rules:</span> {formatRules(activeRules)}
+            {activeRules.length > 0 && (
+              <><span className="battle-rules-label">Rules:</span> {formatRules(activeRules)}</>
+            )}
             {region?.tradeRule && <span className="battle-trade"> | Trade: {region.tradeRule}</span>}
           </div>
         )}
@@ -334,59 +369,118 @@ export function BattleScreen({
   }
 
   // ========== REWARD ==========
-  if (phase === 'reward' && battleResult) {
-    const resultClass = battleResult.winner === 0 ? 'victory' : battleResult.winner === 1 ? 'defeat' : 'draw'
-    const resultText = battleResult.winner === 0 ? 'VICTORY' : battleResult.winner === 1 ? 'DEFEAT' : 'DRAW'
-    const gainedCard = battleResult.cardGained ? getCard(battleResult.cardGained) : null
-    const lostCard = battleResult.cardLost ? getCard(battleResult.cardLost) : null
-    const prizeCard = battleResult.tournamentPrize ? getCard(battleResult.tournamentPrize) : null
+  if (phase === 'reward') {
+    const winner = localGameState?.winner ?? 'draw'
+    const resultClass = winner === 0 ? 'victory' : winner === 1 ? 'defeat' : 'draw'
+    const resultText = winner === 0 ? 'VICTORY' : winner === 1 ? 'DEFEAT' : 'DRAW'
+    const isTournament = !!tournamentPrize
+    const prizeCard = battleResult?.tournamentPrize ? getCard(battleResult.tournamentPrize) : null
+    const gilReward = winner === 0 ? (npc?.gilReward ?? 0) : 0
 
-    return (
-      <div className="battle-screen battle-reward-screen">
-        <div className={`battle-reward-result ${resultClass}`}>{resultText}</div>
+    // Trade selection phase (One/Diff — player picks cards)
+    if (tradeResult?.requiresSelection && !battleResult) {
+      return (
+        <div className="battle-screen battle-reward-screen">
+          <div className={`battle-reward-result ${resultClass}`}>{resultText}</div>
 
-        {battleResult.gilReward > 0 && (
-          <div className="battle-reward-gil">+{battleResult.gilReward} Gil</div>
-        )}
+          {gilReward > 0 && (
+            <div className="battle-reward-gil">+{gilReward} Gil</div>
+          )}
 
-        {prizeCard && (
-          <div className="battle-reward-card gained">
-            <p className="battle-reward-card-label">Prize Card</p>
-            <img src={`/cards/${prizeCard.id}.png`} alt={prizeCard.name} className="battle-reward-card-img" />
-            <span className="battle-reward-card-name">{prizeCard.name}</span>
+          <div className="battle-trade-pick">
+            <p className="battle-trade-pick-label">
+              Pick {tradeResult.maxSelections} card{tradeResult.maxSelections > 1 ? 's' : ''} to take:
+            </p>
+            <div className="battle-trade-pool">
+              {tradeResult.selectionPool.map((card, i) => (
+                <button
+                  key={`${card.id}-${i}`}
+                  type="button"
+                  className={`battle-trade-card ${selectedTradeIndices.has(i) ? 'selected' : ''}`}
+                  onClick={() => toggleTradeCard(i)}
+                >
+                  <img src={`/cards/${card.id}.png`} alt={card.name} className="battle-trade-card-img" />
+                  <span className="battle-trade-card-name">{card.name}</span>
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              className="battle-start-btn"
+              disabled={selectedTradeIndices.size !== tradeResult.maxSelections}
+              onClick={handleConfirmTradeSelection}
+            >
+              Confirm ({selectedTradeIndices.size}/{tradeResult.maxSelections})
+            </button>
           </div>
-        )}
-
-        {gainedCard && !battleResult.isTournament && (
-          <div className="battle-reward-card gained">
-            <p className="battle-reward-card-label">Card Won</p>
-            <img src={`/cards/${gainedCard.id}.png`} alt={gainedCard.name} className="battle-reward-card-img" />
-            <span className="battle-reward-card-name">{gainedCard.name}</span>
-          </div>
-        )}
-
-        {lostCard && (
-          <div className="battle-reward-card lost">
-            <p className="battle-reward-card-label">Card Lost</p>
-            <img src={`/cards/${lostCard.id}.png`} alt={lostCard.name} className="battle-reward-card-img" />
-            <span className="battle-reward-card-name">{lostCard.name}</span>
-          </div>
-        )}
-
-        {battleResult.winner === 'draw' && !battleResult.isTournament && (
-          <div className="battle-reward-trade-msg">No cards exchanged.</div>
-        )}
-
-        <div className="battle-reward-actions">
-          <button type="button" className="battle-reward-btn primary" onClick={handleDismissReward}>
-            {battleResult.winner === 0 ? 'Claim Rewards' : 'Continue'}
-          </button>
-          <button type="button" className="battle-reward-btn" onClick={handleRematch}>
-            Rematch
-          </button>
         </div>
-      </div>
-    )
+      )
+    }
+
+    // Final reward display
+    if (battleResult) {
+      const gainedCards = battleResult.cardsGained.map(id => getCard(id)).filter((c): c is Card => !!c)
+      const lostCards = battleResult.cardsLost.map(id => getCard(id)).filter((c): c is Card => !!c)
+
+      return (
+        <div className="battle-screen battle-reward-screen">
+          <div className={`battle-reward-result ${resultClass}`}>{resultText}</div>
+
+          {battleResult.gilReward > 0 && (
+            <div className="battle-reward-gil">+{battleResult.gilReward} Gil</div>
+          )}
+
+          {prizeCard && (
+            <div className="battle-reward-card gained">
+              <p className="battle-reward-card-label">Prize Card</p>
+              <img src={`/cards/${prizeCard.id}.png`} alt={prizeCard.name} className="battle-reward-card-img" />
+              <span className="battle-reward-card-name">{prizeCard.name}</span>
+            </div>
+          )}
+
+          {gainedCards.length > 0 && !isTournament && (
+            <div className="battle-reward-cards-list">
+              <p className="battle-reward-card-label">Cards Won</p>
+              <div className="battle-reward-cards-row">
+                {gainedCards.map((card, i) => (
+                  <div key={`gain-${card.id}-${i}`} className="battle-reward-card gained">
+                    <img src={`/cards/${card.id}.png`} alt={card.name} className="battle-reward-card-img" />
+                    <span className="battle-reward-card-name">{card.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {lostCards.length > 0 && (
+            <div className="battle-reward-cards-list">
+              <p className="battle-reward-card-label">Cards Lost</p>
+              <div className="battle-reward-cards-row">
+                {lostCards.map((card, i) => (
+                  <div key={`loss-${card.id}-${i}`} className="battle-reward-card lost">
+                    <img src={`/cards/${card.id}.png`} alt={card.name} className="battle-reward-card-img" />
+                    <span className="battle-reward-card-name">{card.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {battleResult.winner === 'draw' && !isTournament && gainedCards.length === 0 && lostCards.length === 0 && (
+            <div className="battle-reward-trade-msg">No cards exchanged.</div>
+          )}
+
+          <div className="battle-reward-actions">
+            <button type="button" className="battle-reward-btn primary" onClick={handleDismissReward}>
+              {battleResult.winner === 0 ? 'Claim Rewards' : 'Continue'}
+            </button>
+            <button type="button" className="battle-reward-btn" onClick={handleRematch}>
+              Rematch
+            </button>
+          </div>
+        </div>
+      )
+    }
   }
 
   return <div className="battle-screen">Loading...</div>

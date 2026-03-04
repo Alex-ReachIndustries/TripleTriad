@@ -286,29 +286,4 @@ export function markDungeonCleared(state: WorldPlayerState, dungeonLocationId: s
   return { ...state, clearedDungeons: [...state.clearedDungeons, dungeonLocationId] }
 }
 
-/**
- * Apply trade rule "One": winner gains one card, loser loses one (starter protected).
- * For world vs AI: player is always 0; if player wins they gain a random card from the
- * opponent's deck pool; if player loses they lose a random non-starter card.
- */
-export function applyTradeRuleOne(
-  state: WorldPlayerState,
-  playerWon: boolean,
-  allCardIds: string[]
-): WorldPlayerState {
-  if (playerWon) {
-    // Winner gains a random card (can be one they already own — multi-copy)
-    if (allCardIds.length === 0) return state
-    const add = allCardIds[Math.floor(Math.random() * allCardIds.length)]
-    return { ...state, inventory: addToInventory(state.inventory, add), discoveredCards: markDiscovered(state.discoveredCards, add) }
-  }
-  // Loser loses a random non-starter card (or one with count > 1 for starters)
-  const canLose = Object.entries(state.inventory).filter(([id, count]) => {
-    if (count <= 0) return false
-    if (isStarterCard(id)) return count > 1 // Can only lose extras of starters
-    return true
-  }).map(([id]) => id)
-  if (canLose.length === 0) return state
-  const remove = canLose[Math.floor(Math.random() * canLose.length)]
-  return { ...state, inventory: removeFromInventory(state.inventory, remove) }
-}
+// Trade rules are now handled by tradeRules.ts using capture-based logic.

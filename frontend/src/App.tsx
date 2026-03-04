@@ -93,13 +93,13 @@ function App() {
         next = { ...next, inventory: addToInventory(next.inventory, result.tournamentPrize), discoveredCards: markDiscovered(next.discoveredCards, result.tournamentPrize) }
       }
 
-      // Trade rule: apply pre-computed gain/loss
+      // Trade rule: apply all gained/lost cards
       if (!result.isTournament) {
-        if (result.cardGained) {
-          next = { ...next, inventory: addToInventory(next.inventory, result.cardGained), discoveredCards: markDiscovered(next.discoveredCards, result.cardGained) }
+        for (const cardId of result.cardsGained) {
+          next = { ...next, inventory: addToInventory(next.inventory, cardId), discoveredCards: markDiscovered(next.discoveredCards, cardId) }
         }
-        if (result.cardLost) {
-          next = { ...next, inventory: removeFromInventory(next.inventory, result.cardLost) }
+        for (const cardId of result.cardsLost) {
+          next = { ...next, inventory: removeFromInventory(next.inventory, cardId) }
         }
       }
 
