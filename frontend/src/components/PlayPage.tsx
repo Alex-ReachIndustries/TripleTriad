@@ -17,6 +17,8 @@ const DECK_SIZE = 5
 export interface PlayPageProps {
   /** Player's card inventory. */
   worldPlayerInventory?: Record<string, number>
+  /** Cards discovered (2P allows infinite copies of these). */
+  discoveredCards?: string[]
   /** Saved decks from world state */
   savedDecks?: SavedDeck[]
   /** Last used deck ID */
@@ -40,7 +42,8 @@ type Screen = 'home' | 'lobby' | 'game' | 'pre-duel' | 'deck-manager'
 type GameMode = 'online' | 'vs-ai'
 
 export function PlayPage({
-  worldPlayerInventory,
+  worldPlayerInventory: _worldPlayerInventory,
+  discoveredCards = [],
   savedDecks = [],
   lastDeckId = null,
   onSetLastDeckId,
@@ -119,6 +122,15 @@ export function PlayPage({
     }
   }, [screen, roomId, player])
 
+  // 2P mode: infinite copies of any discovered card
+  const infiniteInventory = useMemo(() => {
+    const inv: Record<string, number> = {}
+    for (const id of discoveredCards) {
+      inv[id] = 999
+    }
+    return inv
+  }, [discoveredCards])
+
   // --- Resolve saved deck to Card[] ---
   const resolvedDeck = useMemo(() => {
     const sd = getDeckById(savedDecks, selectedDeckId)
@@ -127,7 +139,7 @@ export function PlayPage({
   }, [savedDecks, selectedDeckId])
 
   const selectedSavedDeck = useMemo(() => getDeckById(savedDecks, selectedDeckId), [savedDecks, selectedDeckId])
-  const deckIsValid = selectedSavedDeck ? isDeckValid(selectedSavedDeck, worldPlayerInventory ?? {}) : false
+  const deckIsValid = selectedSavedDeck ? isDeckValid(selectedSavedDeck, infiniteInventory) : false
 
   const [lobbyStatus, setLobbyStatus] = useState<'waiting' | 'ready' | 'opponent-ready'>('waiting')
 
@@ -291,7 +303,7 @@ export function PlayPage({
             >
               {savedDecks.map(d => (
                 <option key={d.id} value={d.id}>
-                  {d.name} {isDeckValid(d, worldPlayerInventory ?? {}) ? '' : '(invalid)'}
+                  {d.name} {isDeckValid(d, infiniteInventory) ? '' : '(invalid)'}
                 </option>
               ))}
             </select>
@@ -342,7 +354,8 @@ export function PlayPage({
       <div className="play-page deck-manager-page">
         <DeckManager
           savedDecks={savedDecks}
-          inventory={worldPlayerInventory ?? {}}
+          inventory={infiniteInventory}
+          discoveredCards={discoveredCards}
           onUpdateDecks={(decks) => onUpdateDecks?.(decks)}
           onBack={() => setScreen('pre-duel')}
         />
@@ -411,7 +424,7 @@ export function PlayPage({
             >
               {savedDecks.map(d => (
                 <option key={d.id} value={d.id}>
-                  {d.name} {isDeckValid(d, worldPlayerInventory ?? {}) ? '' : '(invalid)'}
+                  {d.name} {isDeckValid(d, infiniteInventory) ? '' : '(invalid)'}
                 </option>
               ))}
             </select>

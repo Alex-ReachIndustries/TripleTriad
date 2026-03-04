@@ -4889,74 +4889,129 @@
   color: var(--text-muted);
 }
 
-.battle-deck-section {
+/* ── Hand Slots (inventory card picker) ── */
+
+.battle-hand-slots {
   width: 100%;
   max-width: 480px;
 }
 
-.battle-deck-row {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.battle-deck-label {
+.battle-hand-label {
+  font-family: var(--font);
   font-weight: 600;
-  font-family: var(--font);
+  font-size: 0.85rem;
   color: var(--text);
+  margin: 0 0 0.5rem;
 }
 
-.battle-deck-dropdown {
-  flex: 1;
-  min-width: 120px;
-  padding: 0.4rem 0.6rem;
-  background: var(--surface);
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  font-family: var(--font);
-}
-
-.battle-edit-decks-btn {
-  padding: 0.4rem 0.75rem;
-  background: var(--surface);
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  font-family: var(--font);
-  font-size: 0.8rem;
-  cursor: pointer;
-  transition: border-color var(--transition-fast);
-}
-
-.battle-edit-decks-btn:hover {
-  border-color: var(--accent-dim);
-}
-
-.battle-deck-preview {
+.battle-hand-row {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 6px;
-  margin-top: 0.75rem;
 }
 
-.battle-preview-card {
+.battle-hand-slot {
+  aspect-ratio: 3/4;
+  border: 2px dashed var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  overflow: hidden;
+  transition: border-color var(--transition-fast);
+}
+
+.battle-hand-slot.filled {
+  border-style: solid;
+  border-color: var(--accent-dim);
+}
+
+.battle-hand-slot.filled:hover {
+  border-color: var(--error);
+}
+
+.battle-hand-slot.empty {
+  cursor: default;
+}
+
+.battle-hand-slot-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.battle-hand-slot-empty {
+  font-size: 1.5rem;
+  color: var(--text-muted);
+  opacity: 0.4;
+}
+
+/* ── Inventory grid ── */
+
+.battle-inventory {
+  width: 100%;
+  max-width: 480px;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.battle-inventory-label {
+  font-family: var(--font);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0 0 0.4rem;
+}
+
+.battle-inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: 6px;
+  overflow-y: auto;
+  flex: 1;
+  padding-bottom: 0.5rem;
+}
+
+.battle-inv-card {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2px;
+  padding: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), opacity var(--transition-fast);
 }
 
-.battle-card-img {
+.battle-inv-card:hover:not(:disabled) {
+  border-color: var(--accent-dim);
+}
+
+.battle-inv-card.disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.battle-inv-card.in-use {
+  border-color: var(--accent-dim);
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+}
+
+.battle-inv-card-img {
   width: 100%;
   height: auto;
   border-radius: 4px;
-  border: 1px solid var(--border);
 }
 
-.battle-card-name {
-  font-size: 0.6rem;
+.battle-inv-card-name {
+  font-size: 0.55rem;
   color: var(--text-muted);
   text-align: center;
   overflow: hidden;
@@ -4965,10 +5020,10 @@
   max-width: 100%;
 }
 
-.battle-invalid {
-  color: var(--error);
-  font-size: 0.85rem;
-  margin-top: 0.5rem;
+.battle-inv-card-count {
+  font-size: 0.55rem;
+  color: var(--accent);
+  font-weight: 600;
 }
 
 .battle-start-btn {

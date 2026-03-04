@@ -37,6 +37,8 @@ export interface WorldPlayerState {
   mainQuestLog: string[]
   /** Per-location NPC interaction tracking for notification markers: locationId → npcId[]. */
   seenContent: Record<string, string[]>
+  /** Last 5 cards used in a 1P duel (card IDs). Used as default hand. */
+  lastHand: string[]
 }
 
 /** 5 starter cards – always protected (count can never drop below 1). */
@@ -65,6 +67,7 @@ function defaultState(): WorldPlayerState {
     storyChapter: 1,
     mainQuestLog: [],
     seenContent: {},
+    lastHand: [...STARTER_DECK_IDS],
   }
 }
 
@@ -164,7 +167,11 @@ export function loadWorldState(): WorldPlayerState {
       }
     }
 
-    return { unlockedOrder, inventory, discoveredCards, gil, npcWins, savedDecks, lastDeckId, activeQuests, completedQuests, clearedDungeons, storyChapter, mainQuestLog, seenContent }
+    const lastHand = Array.isArray(o.lastHand)
+      ? (o.lastHand as unknown[]).filter((v): v is string => typeof v === 'string')
+      : [...STARTER_DECK_IDS]
+
+    return { unlockedOrder, inventory, discoveredCards, gil, npcWins, savedDecks, lastDeckId, activeQuests, completedQuests, clearedDungeons, storyChapter, mainQuestLog, seenContent, lastHand }
   } catch {
     return defaultState()
   }
@@ -200,6 +207,34 @@ export function removeFromInventory(inventory: Record<string, number>, cardId: s
   const newCount = Math.max(minCount, current - count)
   if (newCount === current) return inventory // no change
   return { ...inventory, [cardId]: newCount }
+}
+
+/**
+ * Validate lastHand against current inventory.
+ * Removes any card IDs whose inventory count has been exhausted.
+ * Returns the cleaned hand (may have fewer than 5 cards).
+ */
+export function cleanLastHand(lastHand: string[], inventory: Record<string, number>): string[] {
+  const usage: Record<string, number> = {}
+  const result: string[] = []
+  for (const id of lastHand) {
+    const used = usage[id] ?? 0
+    const available = inventory[id] ?? 0
+    if (used < available) {
+      result.push(id)
+      usage[id] = used + 1
+    }
+  }
+  return result
+}
+
+/**
+ * Remove a card from inventory AND clean lastHand if needed.
+ */
+export function removeCardAndCleanHand(state: WorldPlayerState, cardId: string, count = 1): WorldPlayerState {
+  const newInventory = removeFromInventory(state.inventory, cardId, count)
+  const newLastHand = cleanLastHand(state.lastHand, newInventory)
+  return { ...state, inventory: newInventory, lastHand: newLastHand }
 }
 
 // ─── Story chapter helpers ───

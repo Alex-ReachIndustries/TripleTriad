@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react'
-import { loadWorldState, saveWorldState, addToInventory, removeFromInventory, markDiscovered, isStarterCard, acceptQuest, claimQuestReward } from './data/worldState'
+import { loadWorldState, saveWorldState, addToInventory, markDiscovered, isStarterCard, acceptQuest, claimQuestReward, removeCardAndCleanHand } from './data/worldState'
 import { getTournamentAtLocation } from './data/shops'
 import { getNpcById } from './data/world'
 import { DeckManager } from './components/DeckManager'
@@ -55,7 +55,8 @@ function App() {
       const count = prev.inventory[cardId] ?? 0
       const minCount = isStarterCard(cardId) ? 1 : 0
       if (count <= minCount) return prev
-      return { ...prev, gil: prev.gil + sellPrice, inventory: removeFromInventory(prev.inventory, cardId) }
+      const next = removeCardAndCleanHand(prev, cardId)
+      return { ...next, gil: next.gil + sellPrice }
     })
   }, [])
 
@@ -99,7 +100,7 @@ function App() {
           next = { ...next, inventory: addToInventory(next.inventory, cardId), discoveredCards: markDiscovered(next.discoveredCards, cardId) }
         }
         for (const cardId of result.cardsLost) {
-          next = { ...next, inventory: removeFromInventory(next.inventory, cardId) }
+          next = removeCardAndCleanHand(next, cardId)
         }
       }
 
@@ -275,6 +276,7 @@ function App() {
         {tab === 'duel' && (
           <PlayPage
             worldPlayerInventory={worldState.inventory}
+            discoveredCards={worldState.discoveredCards}
             savedDecks={worldState.savedDecks}
             lastDeckId={worldState.lastDeckId}
             onSetLastDeckId={(deckId) => setWorldState(prev => ({ ...prev, lastDeckId: deckId }))}
@@ -291,11 +293,8 @@ function App() {
             locationId={battleContext.locationId}
             tournamentPrize={battleContext.tournamentPrize}
             worldPlayerInventory={worldState.inventory}
-            discoveredCards={worldState.discoveredCards}
-            savedDecks={worldState.savedDecks}
-            lastDeckId={worldState.lastDeckId}
-            onSetLastDeckId={(deckId) => setWorldState(prev => ({ ...prev, lastDeckId: deckId }))}
-            onUpdateDecks={(decks) => setWorldState(prev => ({ ...prev, savedDecks: decks }))}
+            lastHand={worldState.lastHand}
+            onSetLastHand={(hand) => setWorldState(prev => ({ ...prev, lastHand: hand }))}
             onMatchComplete={handleBattleComplete}
             onCancel={handleBattleCancel}
           />

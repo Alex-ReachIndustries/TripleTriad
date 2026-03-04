@@ -2,15 +2,13 @@ import { useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import type { GameState } from '../game'
 import type { Card } from '../types/card'
 import type { NPC } from '../types/world'
-import type { SavedDeck } from '../data/deckManager'
 import type { Difficulty } from '../game'
 import type { TradeResult } from '../data/tradeRules'
 import { createGame, placeCard, continueSuddenDeath, getAiMove, getDifficultyForTier } from '../game'
 import { getLocationById, getRegionById, formatRules } from '../data/world'
-import { getDeckById, isDeckValid } from '../data/deckManager'
 import { computeTradeResult } from '../data/tradeRules'
+import { cleanLastHand } from '../data/worldState'
 import { GameBoard } from './GameBoard'
-import { DeckManager } from './DeckManager'
 import cardsData from '../data/cards.json'
 
 const allCards: Card[] = cardsData.cards as Card[]
@@ -42,11 +40,8 @@ export interface BattleScreenProps {
   locationId: string
   tournamentPrize: string | null
   worldPlayerInventory: Record<string, number>
-  discoveredCards?: string[]
-  savedDecks: SavedDeck[]
-  lastDeckId: string | null
-  onSetLastDeckId: (deckId: string) => void
-  onUpdateDecks: (decks: SavedDeck[]) => void
+  lastHand: string[]
+  onSetLastHand: (hand: string[]) => void
   onMatchComplete: (result: BattleResult) => void
   onCancel: () => void
 }
@@ -59,20 +54,15 @@ export function BattleScreen({
   locationId,
   tournamentPrize,
   worldPlayerInventory,
-  discoveredCards,
-  savedDecks,
-  lastDeckId,
-  onSetLastDeckId,
-  onUpdateDecks,
+  lastHand,
+  onSetLastHand,
   onMatchComplete,
   onCancel,
 }: BattleScreenProps) {
   const [phase, setPhase] = useState<BattlePhase>('pre-duel')
-  const [selectedDeckId, setSelectedDeckId] = useState<string>(lastDeckId ?? 'starter')
   const [localGameState, setLocalGameState] = useState<GameState | null>(null)
   const [difficulty, setDifficulty] = useState<Difficulty>('medium')
   const [battleResult, setBattleResult] = useState<BattleResult | null>(null)
-  const [showDeckManager, setShowDeckManager] = useState(false)
   const [tradeResult, setTradeResult] = useState<TradeResult | null>(null)
   const [selectedTradeIndices, setSelectedTradeIndices] = useState<Set<number>>(new Set())
   const aiScheduledRef = useRef(false)
@@ -80,25 +70,62 @@ export function BattleScreen({
   const aiDeckRef = useRef<Card[]>([])
   const playerDeckRef = useRef<Card[]>([])
 
-  // Resolve saved deck to Card[]
-  const resolvedDeck = useMemo(() => {
-    const sd = getDeckById(savedDecks, selectedDeckId)
-    if (!sd) return []
-    return sd.cardIds.map(id => getCard(id)).filter((c): c is Card => !!c)
-  }, [savedDecks, selectedDeckId])
+  // Card selection state for pre-duel inventory picker
+  const [selectedCardIds, setSelectedCardIds] = useState<string[]>(() =>
+    cleanLastHand(lastHand, worldPlayerInventory).slice(0, DECK_SIZE)
+  )
 
-  const selectedSavedDeck = useMemo(() => getDeckById(savedDecks, selectedDeckId), [savedDecks, selectedDeckId])
-  const deckIsValid = selectedSavedDeck ? isDeckValid(selectedSavedDeck, worldPlayerInventory) : false
+  // Build list of available cards from inventory for the picker
+  const availableCards = useMemo(() => {
+    const cards: { card: Card; count: number }[] = []
+    for (const [id, count] of Object.entries(worldPlayerInventory)) {
+      if (count <= 0) continue
+      const card = getCard(id)
+      if (card) cards.push({ card, count })
+    }
+    return cards.sort((a, b) => a.card.level - b.card.level || a.card.name.localeCompare(b.card.name))
+  }, [worldPlayerInventory])
+
+  // Count how many of each card are currently selected
+  const selectedUsage = useMemo(() => {
+    const usage: Record<string, number> = {}
+    for (const id of selectedCardIds) {
+      usage[id] = (usage[id] ?? 0) + 1
+    }
+    return usage
+  }, [selectedCardIds])
+
+  // Resolve selected cards to Card[]
+  const resolvedDeck = useMemo(() =>
+    selectedCardIds.map(id => getCard(id)).filter((c): c is Card => !!c),
+    [selectedCardIds]
+  )
+
+  const deckReady = resolvedDeck.length === DECK_SIZE
 
   // Resolve region + rules
   const location = useMemo(() => getLocationById(locationId), [locationId])
   const region = useMemo(() => location ? getRegionById(location.regionId) : null, [location])
   const activeRules = useMemo(() => region?.rules ?? [], [region])
 
+  // --- Add card to selection ---
+  const addCard = useCallback((cardId: string) => {
+    if (selectedCardIds.length >= DECK_SIZE) return
+    const used = selectedUsage[cardId] ?? 0
+    const available = worldPlayerInventory[cardId] ?? 0
+    if (used >= available) return
+    setSelectedCardIds(prev => [...prev, cardId])
+  }, [selectedCardIds.length, selectedUsage, worldPlayerInventory])
+
+  // --- Remove card from selection (by slot index) ---
+  const removeCard = useCallback((index: number) => {
+    setSelectedCardIds(prev => prev.filter((_, i) => i !== index))
+  }, [])
+
   // --- Start duel ---
   const handleStartDuel = useCallback(() => {
     if (resolvedDeck.length !== DECK_SIZE) return
-    onSetLastDeckId(selectedDeckId)
+    onSetLastHand(selectedCardIds)
 
     const npcDeckPool = npc?.deckPool?.length
       ? allCards.filter(c => npc.deckPool!.includes(c.id))
@@ -117,7 +144,7 @@ export function BattleScreen({
     setTradeResult(null)
     setSelectedTradeIndices(new Set())
     setPhase('game')
-  }, [resolvedDeck, npc, activeRules, selectedDeckId, onSetLastDeckId])
+  }, [resolvedDeck, selectedCardIds, npc, activeRules, onSetLastHand])
 
   // --- Player move ---
   const handleLocalPlace = useCallback(
@@ -142,7 +169,7 @@ export function BattleScreen({
         const move = getAiMove(localGameState, difficulty)
         setLocalGameState(placeCard(localGameState, 1, move.cardIndex, move.row, move.col))
       } catch {
-        // AI move failed — ignore
+        // AI move failed
       } finally {
         aiScheduledRef.current = false
       }
@@ -159,7 +186,7 @@ export function BattleScreen({
     return () => clearTimeout(id)
   }, [phase, localGameState])
 
-  // --- Game ended → compute trade result and transition to reward ---
+  // --- Game ended → compute trade result ---
   useEffect(() => {
     if (phase !== 'game' || !localGameState || localGameState.phase !== 'ended') return
     if (resultComputedRef.current) return
@@ -170,14 +197,12 @@ export function BattleScreen({
     const isTournament = !!tournamentPrize
     const tradeRule = region?.tradeRule ?? 'One'
 
-    // Compute trade based on captured cards
     let trade: TradeResult | null = null
     if (!isTournament) {
       trade = computeTradeResult(localGameState, tradeRule, winner, playerDeckRef.current, aiDeckRef.current)
       setTradeResult(trade)
     }
 
-    // If trade doesn't require selection, build final result now
     if (!trade || !trade.requiresSelection) {
       const result: BattleResult = {
         winner,
@@ -195,7 +220,7 @@ export function BattleScreen({
     return () => clearTimeout(timer)
   }, [phase, localGameState, npc, npcId, tournamentPrize, region])
 
-  // --- Handle trade card selection confirm ---
+  // --- Trade card selection confirm ---
   const handleConfirmTradeSelection = useCallback(() => {
     if (!tradeResult || !localGameState) return
     const winner = localGameState.winner ?? 'draw'
@@ -214,7 +239,6 @@ export function BattleScreen({
     setBattleResult(result)
   }, [tradeResult, selectedTradeIndices, localGameState, npc, npcId, tournamentPrize])
 
-  // --- Toggle trade card selection ---
   const toggleTradeCard = useCallback((index: number) => {
     if (!tradeResult) return
     setSelectedTradeIndices(prev => {
@@ -228,7 +252,6 @@ export function BattleScreen({
     })
   }, [tradeResult])
 
-  // --- Reward screen actions ---
   const handleDismissReward = useCallback(() => {
     if (battleResult) onMatchComplete(battleResult)
   }, [battleResult, onMatchComplete])
@@ -242,22 +265,7 @@ export function BattleScreen({
     setPhase('pre-duel')
   }, [])
 
-  // --- Deck manager sub-screen ---
-  if (showDeckManager) {
-    return (
-      <div className="battle-screen">
-        <DeckManager
-          savedDecks={savedDecks}
-          inventory={worldPlayerInventory}
-          discoveredCards={discoveredCards}
-          onUpdateDecks={onUpdateDecks}
-          onBack={() => setShowDeckManager(false)}
-        />
-      </div>
-    )
-  }
-
-  // ========== PRE-DUEL ==========
+  // ========== PRE-DUEL: Inventory Card Picker ==========
   if (phase === 'pre-duel') {
     return (
       <div className="battle-screen battle-pre-duel">
@@ -270,12 +278,9 @@ export function BattleScreen({
           </h2>
         </div>
 
-        {/* Opponent info */}
         {npc && (
           <div className="battle-opponent">
-            <div className="battle-opponent-name">
-              vs. {npc.name}
-            </div>
+            <div className="battle-opponent-name">vs. {npc.name}</div>
             {npc.difficultyTier && (
               <div className="battle-difficulty">
                 {'★'.repeat(npc.difficultyTier)}{'☆'.repeat(5 - npc.difficultyTier)}
@@ -293,7 +298,6 @@ export function BattleScreen({
           </div>
         )}
 
-        {/* Active rules */}
         {(activeRules.length > 0 || region?.tradeRule) && (
           <div className="battle-rules">
             {activeRules.length > 0 && (
@@ -303,52 +307,66 @@ export function BattleScreen({
           </div>
         )}
 
-        {/* Deck selector */}
-        <div className="battle-deck-section">
-          <div className="battle-deck-row">
-            <label htmlFor="battle-deck-select" className="battle-deck-label">Deck:</label>
-            <select
-              id="battle-deck-select"
-              className="battle-deck-dropdown"
-              value={selectedDeckId}
-              onChange={(e) => setSelectedDeckId(e.target.value)}
-            >
-              {savedDecks.map(d => (
-                <option key={d.id} value={d.id}>
-                  {d.name} {isDeckValid(d, worldPlayerInventory) ? '' : '(invalid)'}
-                </option>
-              ))}
-            </select>
-            <button type="button" className="battle-edit-decks-btn" onClick={() => setShowDeckManager(true)}>
-              Edit Decks
-            </button>
+        {/* Selected hand slots */}
+        <div className="battle-hand-slots">
+          <p className="battle-hand-label">Your Hand ({selectedCardIds.length}/{DECK_SIZE})</p>
+          <div className="battle-hand-row">
+            {Array.from({ length: DECK_SIZE }).map((_, i) => {
+              const cardId = selectedCardIds[i]
+              const card = cardId ? getCard(cardId) : undefined
+              return (
+                <button
+                  key={i}
+                  type="button"
+                  className={`battle-hand-slot ${card ? 'filled' : 'empty'}`}
+                  onClick={() => card && removeCard(i)}
+                  title={card ? `Remove ${card.name}` : 'Empty slot'}
+                >
+                  {card ? (
+                    <img src={`/cards/${card.id}.png`} alt={card.name} className="battle-hand-slot-img" />
+                  ) : (
+                    <span className="battle-hand-slot-empty">+</span>
+                  )}
+                </button>
+              )
+            })}
           </div>
+        </div>
 
-          {resolvedDeck.length > 0 && (
-            <div className="battle-deck-preview">
-              {resolvedDeck.map((card, i) => (
-                <div key={`${card.id}-${i}`} className="battle-preview-card">
-                  <img src={`/cards/${card.id}.png`} alt={card.name} className="battle-card-img" />
-                  <span className="battle-card-name">{card.name}</span>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {!deckIsValid && selectedSavedDeck && (
-            <p className="battle-invalid">
-              This deck is invalid — some cards may not be in your inventory.
-            </p>
-          )}
+        {/* Inventory grid */}
+        <div className="battle-inventory">
+          <p className="battle-inventory-label">Select cards from your collection:</p>
+          <div className="battle-inventory-grid">
+            {availableCards.map(({ card, count }) => {
+              const used = selectedUsage[card.id] ?? 0
+              const remaining = count - used
+              const disabled = remaining <= 0 || selectedCardIds.length >= DECK_SIZE
+              return (
+                <button
+                  key={card.id}
+                  type="button"
+                  className={`battle-inv-card ${disabled ? 'disabled' : ''} ${used > 0 ? 'in-use' : ''}`}
+                  onClick={() => !disabled && addCard(card.id)}
+                  disabled={disabled}
+                >
+                  <img src={`/cards/${card.id}.png`} alt={card.name} className="battle-inv-card-img" />
+                  <span className="battle-inv-card-name">{card.name}</span>
+                  {count > 1 && (
+                    <span className="battle-inv-card-count">x{remaining}/{count}</span>
+                  )}
+                </button>
+              )
+            })}
+          </div>
         </div>
 
         <button
           type="button"
           className="battle-start-btn"
-          disabled={!deckIsValid || resolvedDeck.length !== DECK_SIZE}
+          disabled={!deckReady}
           onClick={handleStartDuel}
         >
-          Start Duel
+          {deckReady ? 'Start Duel' : `Select ${DECK_SIZE - selectedCardIds.length} more card${DECK_SIZE - selectedCardIds.length !== 1 ? 's' : ''}`}
         </button>
       </div>
     )
