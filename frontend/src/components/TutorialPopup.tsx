@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import type { Tutorial } from '../data/tutorials'
 
 interface TutorialPopupProps {
@@ -8,10 +8,12 @@ interface TutorialPopupProps {
 
 export function TutorialPopup({ tutorial, onComplete }: TutorialPopupProps) {
   const [page, setPage] = useState(0)
+  const completingRef = useRef(false)
 
-  // Reset to page 0 whenever the tutorial changes
+  // Reset to page 0 and unlock completion whenever the tutorial changes
   useEffect(() => {
     setPage(0)
+    completingRef.current = false
   }, [tutorial.id])
 
   // Guard against stale page index during tutorial transitions
@@ -20,9 +22,16 @@ export function TutorialPopup({ tutorial, onComplete }: TutorialPopupProps) {
   const isLast = safePage === tutorial.pages.length - 1
   const isFirst = safePage === 0
 
+  // Guarded onComplete to prevent double-fires on mobile touch devices
+  const safeComplete = () => {
+    if (completingRef.current) return
+    completingRef.current = true
+    onComplete()
+  }
+
   return (
-    <div className="tutorial-overlay" onClick={onComplete} role="presentation">
-      <div className="tutorial-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-label={tutorial.title}>
+    <div className="tutorial-overlay" role="presentation">
+      <div className="tutorial-modal" role="dialog" aria-label={tutorial.title}>
         <div className="tutorial-header">
           <span className="tutorial-header-title">{tutorial.title}</span>
         </div>
@@ -40,7 +49,7 @@ export function TutorialPopup({ tutorial, onComplete }: TutorialPopupProps) {
             {tutorial.pages.map((_, i) => (
               <span
                 key={i}
-                className={`tutorial-dot ${i === page ? 'active' : ''}`}
+                className={`tutorial-dot ${i === safePage ? 'active' : ''}`}
               />
             ))}
           </div>
@@ -55,7 +64,7 @@ export function TutorialPopup({ tutorial, onComplete }: TutorialPopupProps) {
           <button
             type="button"
             className="tutorial-btn next"
-            onClick={() => isLast ? onComplete() : setPage(p => p + 1)}
+            onClick={() => isLast ? safeComplete() : setPage(p => p + 1)}
           >
             {isLast ? 'Got it!' : 'Next'}
           </button>

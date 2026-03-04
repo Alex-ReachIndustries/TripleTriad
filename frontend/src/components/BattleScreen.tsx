@@ -138,6 +138,7 @@ export function BattleScreen({
   // Tutorial queue — shown before duel starts
   const [tutorialQueue, setTutorialQueue] = useState<TutorialDef[]>([])
   const [pendingDuelStart, setPendingDuelStart] = useState(false)
+  const tutorialCompletingRef = useRef(false)
 
   // --- Add card to selection ---
   const addCard = useCallback((cardId: string) => {
@@ -200,12 +201,21 @@ export function BattleScreen({
     setPhase('game')
   }, [resolvedDeck, npc, activeRules, region, lastPlayedRegionId, regionRuleMods, storyChapter, onRuleSpread, seenTutorials, onMarkTutorialSeen])
 
-  // --- Handle tutorial completion ---
+  // --- Handle tutorial completion (guarded against double-fires) ---
   const handleTutorialComplete = useCallback(() => {
+    if (tutorialCompletingRef.current) return
     if (tutorialQueue.length > 0) {
+      tutorialCompletingRef.current = true
       const current = tutorialQueue[0]
       onMarkTutorialSeen(current.id)
-      setTutorialQueue(prev => prev.slice(1))
+      setTutorialQueue(prev => {
+        const next = prev.slice(1)
+        // Unlock for next tutorial (or for beginDuel)
+        if (next.length > 0) {
+          requestAnimationFrame(() => { tutorialCompletingRef.current = false })
+        }
+        return next
+      })
     }
   }, [tutorialQueue, onMarkTutorialSeen])
 
@@ -213,7 +223,13 @@ export function BattleScreen({
   useEffect(() => {
     if (pendingDuelStart && tutorialQueue.length === 0) {
       setPendingDuelStart(false)
-      beginDuel()
+      tutorialCompletingRef.current = false
+      try {
+        beginDuel()
+      } catch {
+        // If game creation fails, return to pre-duel
+        setPhase('pre-duel')
+      }
     }
   }, [pendingDuelStart, tutorialQueue.length, beginDuel])
 
@@ -611,5 +627,13 @@ export function BattleScreen({
     }
   }
 
-  return <div className="battle-screen">Loading...</div>
+  // Fallback: if stuck (e.g. game phase but no state), recover to pre-duel
+  return (
+    <div className="battle-screen">
+      <p>Loading...</p>
+      <button type="button" className="battle-start-btn" onClick={() => { setPhase('pre-duel'); setLocalGameState(null) }}>
+        Return to Card Selection
+      </button>
+    </div>
+  )
 }
