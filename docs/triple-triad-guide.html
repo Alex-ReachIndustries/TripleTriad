@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Triple Triad - Game Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap');
+
+  :root {
+    --bg: #0f1419;
+    --surface: #1a2332;
+    --surface-alt: #16213e;
+    --accent: #c9a227;
+    --accent-dim: #8b7355;
+    --text: #e8e6e3;
+    --text-muted: #9ca3af;
+    --border: #2d3a4d;
+    --blue: #6b9bd1;
+    --red: #d4786b;
+    --green: #6f9b6f;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Outfit', 'Segoe UI', Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 11pt;
+  }
+
+  .page {
+    page-break-after: always;
+    padding: 40px 50px;
+    min-height: 100vh;
+    position: relative;
+  }
+  .page:last-child { page-break-after: avoid; }
+
+  /* Decorative border */
+  .page::before {
+    content: '';
+    position: absolute;
+    top: 15px; right: 15px; bottom: 15px; left: 15px;
+    border: 2px solid var(--accent);
+    border-radius: 8px;
+    pointer-events: none;
+    opacity: 0.3;
+  }
+
+  /* Cover page */
+  .cover {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .cover-title {
+    font-size: 48pt;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    text-shadow: 0 0 40px rgba(201, 162, 39, 0.3);
+  }
+
+  .cover-subtitle {
+    font-size: 16pt;
+    color: var(--text-muted);
+    font-weight: 400;
+    margin-bottom: 40px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+  }
+
+  .cover-divider {
+    width: 200px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    margin: 20px auto;
+  }
+
+  .cover-tagline {
+    font-size: 13pt;
+    color: var(--text);
+    max-width: 500px;
+    margin-top: 30px;
+    line-height: 1.8;
+  }
+
+  .cover-version {
+    position: absolute;
+    bottom: 40px;
+    font-size: 10pt;
+    color: var(--text-muted);
+  }
+
+  /* Grid decoration on cover */
+  .grid-art {
+    display: grid;
+    grid-template-columns: repeat(3, 60px);
+    gap: 6px;
+    margin: 30px 0;
+  }
+  .grid-cell {
+    width: 60px;
+    height: 60px;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+  }
+  .grid-cell.accent { border-color: var(--accent); background: var(--surface-alt); }
+  .grid-cell.blue { border-color: var(--blue); }
+  .grid-cell.red { border-color: var(--red); }
+
+  /* Section headings */
+  h1 {
+    font-size: 24pt;
+    color: var(--accent);
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--accent);
+    font-weight: 700;
+  }
+
+  h2 {
+    font-size: 15pt;
+    color: var(--accent);
+    margin: 24px 0 10px;
+    font-weight: 700;
+  }
+
+  h3 {
+    font-size: 12pt;
+    color: var(--text);
+    margin: 16px 0 8px;
+    font-weight: 700;
+  }
+
+  p { margin-bottom: 10px; }
+
+  ul, ol {
+    margin: 8px 0 12px 24px;
+  }
+  li { margin-bottom: 4px; }
+
+  .highlight {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  .badge {
+    display: inline-block;
+    background: var(--surface-alt);
+    color: var(--accent);
+    padding: 2px 10px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 10pt;
+    border: 1px solid var(--border);
+  }
+
+  /* Feature grid */
+  .features {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+  .feature-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .feature-box h3 {
+    margin-top: 0;
+    color: var(--accent);
+  }
+  .feature-icon {
+    font-size: 20pt;
+    margin-bottom: 6px;
+  }
+
+  /* Code/command blocks */
+  .cmd {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 10pt;
+    color: var(--green);
+    margin: 10px 0;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  /* Step list */
+  .steps {
+    counter-reset: step;
+    list-style: none;
+    margin-left: 0;
+    padding-left: 0;
+  }
+  .steps li {
+    counter-increment: step;
+    position: relative;
+    padding-left: 40px;
+    margin-bottom: 14px;
+  }
+  .steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 28px;
+    height: 28px;
+    background: var(--accent);
+    color: var(--bg);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 12pt;
+    text-align: center;
+    line-height: 28px;
+  }
+
+  /* Warning/info box */
+  .info-box {
+    background: var(--surface);
+    border-left: 4px solid var(--accent);
+    border-radius: 0 6px 6px 0;
+    padding: 12px 16px;
+    margin: 14px 0;
+  }
+  .info-box.warning {
+    border-left-color: var(--red);
+  }
+
+  /* Rules table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 10pt;
+  }
+  th {
+    background: var(--surface-alt);
+    color: var(--accent);
+    padding: 8px 12px;
+    text-align: left;
+    font-weight: 700;
+    border-bottom: 2px solid var(--accent);
+  }
+  td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  tr:nth-child(even) td {
+    background: rgba(26, 35, 50, 0.5);
+  }
+
+  .footer-note {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 9pt;
+    margin-top: 30px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<!-- PAGE 1: COVER -->
+<div class="page cover">
+  <div class="cover-title">TRIPLE TRIAD</div>
+  <div class="cover-subtitle">Final Fantasy VIII</div>
+  <div class="cover-divider"></div>
+
+  <div class="grid-art">
+    <div class="grid-cell blue"></div>
+    <div class="grid-cell accent"></div>
+    <div class="grid-cell red"></div>
+    <div class="grid-cell red"></div>
+    <div class="grid-cell blue"></div>
+    <div class="grid-cell blue"></div>
+    <div class="grid-cell accent"></div>
+    <div class="grid-cell red"></div>
+    <div class="grid-cell blue"></div>
+  </div>
+
+  <div class="cover-tagline">
+    The legendary card game from Final Fantasy VIII, reimagined as a full single-player campaign.
+    110 unique cards with AI-generated artwork. 6 regions. 30+ locations. 100+ NPCs.
+    All 8 special rules and 4 trade rules. Story-driven progression across 13 chapters.
+    <br><br>
+    Play in your browser or install on Android.
+  </div>
+
+  <div class="cover-divider" style="margin-top: 30px;"></div>
+  <p style="color: var(--text-muted); margin-top: 10px;">Version 1.0.0 &mdash; Game Guide &amp; Installation</p>
+</div>
+
+<!-- PAGE 2: WHAT'S INSIDE -->
+<div class="page">
+  <h1>What's Inside</h1>
+
+  <p>Triple Triad v1.0 is the most faithful fan recreation of the FFVIII card game ever built. Whether you're a veteran card player or discovering Triple Triad for the first time, this is your definitive experience.</p>
+
+  <div class="features">
+    <div class="feature-box">
+      <div class="feature-icon">&#x1F30D;</div>
+      <h3>Full Campaign</h3>
+      <p>Travel across 6 regions and 30+ locations following the FF8 storyline. Challenge 100+ NPCs, each with unique dialogue and level-appropriate decks.</p>
+    </div>
+    <div class="feature-box">
+      <div class="feature-icon">&#x1F0CF;</div>
+      <h3>110 Unique Cards</h3>
+      <p>Every card features custom AI-generated artwork. Collect them all through duels, shops, tournaments, and quest rewards.</p>
+    </div>
+    <div class="feature-box">
+      <div class="feature-icon">&#x2694;&#xFE0F;</div>
+      <h3>All 8 Special Rules</h3>
+      <p>Open, Same, Same Wall, Plus, Combo, Elemental, Random, and Sudden Death &mdash; all implemented faithfully.</p>
+    </div>
+    <div class="feature-box">
+      <div class="feature-icon">&#x1F4DC;</div>
+      <h3>Quest System</h3>
+      <p>13 main story quests and 20+ side quests. Track your progress in the Quest Log with story recaps and objectives.</p>
+    </div>
+    <div class="feature-box">
+      <div class="feature-icon">&#x1F451;</div>
+      <h3>Queen of Cards</h3>
+      <p>Late-game NPC who can spread or abolish rules across any region &mdash; for a price. Master the rule system.</p>
+    </div>
+    <div class="feature-box">
+      <div class="feature-icon">&#x1F4F1;</div>
+      <h3>Android App</h3>
+      <p>Full-featured Android build with edge-to-edge display, system back button navigation, and offline play.</p>
+    </div>
+    <div class="feature-box">
+      <div class="feature-icon">&#x1F3AE;</div>
+      <h3>2-Player Online</h3>
+      <p>Challenge a friend with room codes. Pick your deck, apply special rules, and duel in real time via WebSocket.</p>
+    </div>
+    <div class="feature-box">
+      <div class="feature-icon">&#x1F9E0;</div>
+      <h3>Smart AI</h3>
+      <p>Alpha-beta pruning AI with difficulty levels. NPCs play intelligently &mdash; harder opponents in later regions.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3: GAMEPLAY -->
+<div class="page">
+  <h1>How to Play</h1>
+
+  <h2>The Basics</h2>
+  <p>Triple Triad is played on a <span class="highlight">3&times;3 grid</span>. Each player has <span class="highlight">5 cards</span>. Players take turns placing one card on an empty cell. The goal: own the <span class="highlight">majority of cards</span> (6 or more out of 10) when the board is full.</p>
+
+  <h2>Card Ranks</h2>
+  <p>Every card has 4 rank numbers &mdash; one per side: <span class="highlight">Top, Right, Bottom, Left</span>. Ranks range from 1 to 10 (10 is shown as <span class="highlight">A</span>). When you place a card adjacent to an opponent's card, compare the touching sides. If your rank is higher, you <span class="highlight">capture</span> their card (it flips to your colour).</p>
+
+  <h2>Special Rules</h2>
+  <p>Different regions play with different rules. These change how captures work:</p>
+
+  <table>
+    <tr><th>Rule</th><th>Effect</th></tr>
+    <tr><td><span class="highlight">Open</span></td><td>You can see the opponent's hand before playing.</td></tr>
+    <tr><td><span class="highlight">Same</span></td><td>If your card's touching ranks equal the adjacent cards' ranks on 2+ sides, capture those cards. Triggers Combo.</td></tr>
+    <tr><td><span class="highlight">Same Wall</span></td><td>Board edges count as rank A (10) for Same checks.</td></tr>
+    <tr><td><span class="highlight">Plus</span></td><td>If the sums (your rank + their rank) are equal on 2+ sides, capture those cards. Triggers Combo.</td></tr>
+    <tr><td><span class="highlight">Combo</span></td><td>Cards captured by Same/Plus cascade &mdash; any adjacent weaker card is also captured.</td></tr>
+    <tr><td><span class="highlight">Elemental</span></td><td>Board cells have elements. Matching element: +1 to all ranks. Mismatched: &minus;1.</td></tr>
+    <tr><td><span class="highlight">Random</span></td><td>Your 5 cards are randomly chosen from your deck.</td></tr>
+    <tr><td><span class="highlight">Sudden Death</span></td><td>On a draw, the game replays with the board as-is until someone wins.</td></tr>
+  </table>
+
+  <h2>Trade Rules</h2>
+  <p>What happens to cards after a match:</p>
+  <table>
+    <tr><th>Rule</th><th>Stakes</th></tr>
+    <tr><td><span class="highlight">One</span></td><td>Winner takes 1 card from the loser.</td></tr>
+    <tr><td><span class="highlight">Diff</span></td><td>Winner takes 1 card per point of score difference.</td></tr>
+    <tr><td><span class="highlight">Direct</span></td><td>Each player keeps the cards in their colour at game end.</td></tr>
+    <tr><td><span class="highlight">All</span></td><td>Winner takes ALL of the loser's played cards.</td></tr>
+  </table>
+
+  <div class="info-box">
+    <strong>Tip:</strong> In-game tutorial popups explain each rule the first time you encounter it. You can revisit all tutorials from the <span class="highlight">Guide</span> tab at any time.
+  </div>
+</div>
+
+<!-- PAGE 4: REGIONS -->
+<div class="page">
+  <h1>The World of Triple Triad</h1>
+
+  <p>Your journey follows the FF8 storyline across 6 regions, each with unique rules and increasing difficulty.</p>
+
+  <table>
+    <tr><th>Region</th><th>Special Rules</th><th>Trade Rule</th><th>Chapter</th></tr>
+    <tr><td><span class="highlight">Balamb</span></td><td>Open</td><td>One</td><td>1&ndash;3</td></tr>
+    <tr><td><span class="highlight">Galbadia</span></td><td>Same</td><td>One</td><td>2&ndash;5</td></tr>
+    <tr><td><span class="highlight">FH</span></td><td>Elemental, Sudden Death</td><td>Diff</td><td>4&ndash;7</td></tr>
+    <tr><td><span class="highlight">Trabia</span></td><td>Random, Plus</td><td>Diff</td><td>6&ndash;9</td></tr>
+    <tr><td><span class="highlight">Centra</span></td><td>Same, Plus, Combo</td><td>Direct</td><td>8&ndash;11</td></tr>
+    <tr><td><span class="highlight">Esthar</span></td><td>Elemental, Same Wall, Random</td><td>All</td><td>9&ndash;13</td></tr>
+  </table>
+
+  <h2>Rule Spreading</h2>
+  <p>After Chapter 5, dueling in a new region can carry rules from your last-played region. Rules can spread to or be abolished from regions over time. The <span class="highlight">Queen of Cards</span> in Esthar City lets you deliberately manipulate rules across any region for a gil fee.</p>
+
+  <h2>Progression</h2>
+  <ul>
+    <li><span class="highlight">Win duels</span> to earn gil and capture opponent cards</li>
+    <li><span class="highlight">Buy cards</span> from shops in each town</li>
+    <li><span class="highlight">Enter tournaments</span> for rare card prizes</li>
+    <li><span class="highlight">Complete quests</span> to unlock new regions and earn rewards</li>
+    <li><span class="highlight">Build your deck</span> &mdash; save multiple deck loadouts for different strategies</li>
+  </ul>
+
+  <h2>Settings</h2>
+  <p>Accessible from the title screen. Customise your experience:</p>
+  <ul>
+    <li><span class="highlight">Text Scale</span> (70%&ndash;150%) &mdash; adjust all game text with a live preview</li>
+    <li><span class="highlight">Card Overlay</span> (0&ndash;150%) &mdash; control the size of rank numbers on cards, or turn them off entirely for a clean art-only look</li>
+  </ul>
+</div>
+
+<!-- PAGE 5: WEB INSTALLATION -->
+<div class="page">
+  <h1>Running on Web (Docker)</h1>
+
+  <p>The web version runs entirely via Docker &mdash; no Node.js, no local dependencies needed.</p>
+
+  <h2>Prerequisites</h2>
+  <ul>
+    <li><span class="highlight">Docker Desktop</span> (Windows/Mac) or Docker Engine (Linux)</li>
+    <li><span class="highlight">Git</span> to clone the repository</li>
+  </ul>
+
+  <h2>Quick Start</h2>
+  <ol class="steps">
+    <li>
+      <strong>Clone the repository</strong>
+      <div class="cmd">git clone https://github.com/Alex-ReachIndustries/TripleTriad.git
+cd TripleTriad</div>
+    </li>
+    <li>
+      <strong>Start with Docker Compose</strong>
+      <div class="cmd">docker compose up -d --build</div>
+      <p>This builds and starts both the frontend dev server and the WebSocket backend for 2P duels.</p>
+    </li>
+    <li>
+      <strong>Open in your browser</strong>
+      <div class="cmd">http://localhost:5173</div>
+      <p>The game loads immediately. Your save data is stored in your browser's localStorage.</p>
+    </li>
+    <li>
+      <strong>To stop</strong>
+      <div class="cmd">docker compose down</div>
+    </li>
+  </ol>
+
+  <div class="info-box">
+    <strong>Note:</strong> The 2P Duel mode requires the backend WebSocket server (included in docker-compose). Single-player World Mode works entirely in the browser with no backend needed.
+  </div>
+
+  <h2>Production Build</h2>
+  <p>To create an optimised static build:</p>
+  <div class="cmd">docker run --rm -v "$(pwd)/frontend:/app" -w /app node:22-slim sh -c "npm ci && npm run build"</div>
+  <p>The output in <code>frontend/dist/</code> can be served by any static file server (Nginx, Caddy, GitHub Pages, etc.).</p>
+</div>
+
+<!-- PAGE 6: ANDROID INSTALLATION -->
+<div class="page">
+  <h1>Installing on Android</h1>
+
+  <p>The Android APK is available on the <span class="highlight">GitHub Releases</span> page. Since it's not from the Play Store, you'll need to allow installation from unknown sources.</p>
+
+  <h2>Download</h2>
+  <ol class="steps">
+    <li>
+      <strong>Get the APK</strong>
+      <p>Go to the GitHub Releases page and download <span class="highlight">TripleTriad.apk</span> from the latest release (v1.0.0).</p>
+      <div class="cmd">https://github.com/Alex-ReachIndustries/TripleTriad/releases</div>
+    </li>
+    <li>
+      <strong>Transfer to your device</strong>
+      <p>If you downloaded on a PC, transfer the APK to your phone via USB cable, cloud storage, or email it to yourself.</p>
+    </li>
+  </ol>
+
+  <h2>Enable Unknown Sources</h2>
+
+  <div class="info-box warning">
+    <strong>Important:</strong> Android blocks apps from outside the Play Store by default. You need to temporarily allow installation from the source you're using (browser, file manager, etc.).
+  </div>
+
+  <h3>Android 8.0+ (Oreo and newer)</h3>
+  <ol class="steps">
+    <li>
+      <strong>Open the APK file</strong> on your phone (tap the download notification or find it in your file manager).
+    </li>
+    <li>
+      <strong>Android will prompt:</strong> "For your security, your phone is not allowed to install unknown apps from this source."
+    </li>
+    <li>
+      Tap <span class="highlight">Settings</span> on the prompt. This opens the per-app install permission screen.
+    </li>
+    <li>
+      Toggle <span class="highlight">"Allow from this source"</span> (or "Install unknown apps") to ON.
+    </li>
+    <li>
+      Go back and tap <span class="highlight">Install</span>.
+    </li>
+    <li>
+      <em>Optional but recommended:</em> After installing, go back to <strong>Settings &gt; Apps &gt; Special access &gt; Install unknown apps</strong> and toggle the permission back OFF for security.
+    </li>
+  </ol>
+
+  <h3>Android 7.0 and older</h3>
+  <ol class="steps">
+    <li>Go to <strong>Settings &gt; Security</strong>.</li>
+    <li>Enable <span class="highlight">"Unknown sources"</span> (this is a global toggle on older Android).</li>
+    <li>Open the APK and tap <span class="highlight">Install</span>.</li>
+    <li>Disable "Unknown sources" again after installation.</li>
+  </ol>
+
+  <h2>After Installation</h2>
+  <ul>
+    <li>Find <span class="highlight">Triple Triad</span> in your app drawer and tap to launch.</li>
+    <li>The game runs entirely offline &mdash; no internet connection needed for single-player.</li>
+    <li>Use the Android <span class="highlight">back button</span> to navigate (tabs &rarr; world &rarr; title screen).</li>
+    <li>Your save data persists between sessions automatically.</li>
+  </ul>
+
+  <div class="footer-note">
+    Triple Triad is a fan tribute to the classic card game from Final Fantasy VIII by Square Enix.<br>
+    This project is not affiliated with or endorsed by Square Enix. All card artwork is AI-generated.
+  </div>
+</div>
+
+</body>
+</html>
