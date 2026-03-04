@@ -10,12 +10,11 @@ import { TitleScreen } from './components/TitleScreen'
 import { HowToPlay } from './components/HowToPlay'
 import { HomePage } from './components/HomePage'
 import { StoryCutscene, OPENING_PANELS } from './components/StoryCutscene'
-import { MapEditor } from './components/admin/MapEditor'
 import { TutorialsMenu } from './components/TutorialsMenu'
 import './App.css'
 
 type AppView = 'title' | 'howto' | 'home' | 'game' | 'cutscene'
-type GameTab = 'world' | 'deck' | 'duel' | 'battle' | 'admin' | 'guide'
+type GameTab = 'world' | 'deck' | 'duel' | 'battle' | 'guide'
 
 const STORAGE_KEY = 'tripletriad-world'
 
@@ -267,14 +266,6 @@ function App() {
           >
             Guide
           </button>
-          <button
-            type="button"
-            className={tab === 'admin' ? 'active' : ''}
-            onClick={() => setTab('admin')}
-            aria-current={tab === 'admin' ? 'page' : undefined}
-          >
-            Admin
-          </button>
         </nav>
       <main id="main-content">
         <div style={{ display: tab === 'world' ? undefined : 'none' }}>
@@ -314,9 +305,6 @@ function App() {
             seenTutorials={worldState.seenTutorials}
             onBack={() => setTab('world')}
           />
-        )}
-        {tab === 'admin' && (
-          <MapEditor />
         )}
         {tab === 'battle' && battleContext && (
           <BattleScreen
