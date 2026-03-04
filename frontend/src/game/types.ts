@@ -6,6 +6,8 @@ export type PlayerId = 0 | 1
 export interface BoardCell {
   card: Card
   owner: PlayerId
+  /** Who originally placed this card (does not change on capture). */
+  placedBy: PlayerId
 }
 
 export type MaybeBoardCell = BoardCell | null

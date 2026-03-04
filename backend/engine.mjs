@@ -222,7 +222,7 @@ export function placeCard(state, player, cardIndex, row, col) {
   const newHands = player === 0 ? [newHand, state.hands[1]] : [state.hands[0], newHand]
 
   const board = deepCopyBoard(state.board)
-  board[row][col] = { card, owner: player }
+  board[row][col] = { card, owner: player, placedBy: player }
 
   const { activeRules, boardElements } = state
   const allCaptures = []
@@ -327,5 +327,19 @@ export function getValidMoves(state) {
 
 export function getWinner(state) { return state.winner }
 export function isGameOver(state) { return state.phase === 'ended' }
+
+export function getCapturedCards(state) {
+  const capturedByPlayer0 = []
+  const capturedByPlayer1 = []
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      const cell = state.board[r][c]
+      if (!cell) continue
+      if (cell.owner === 0 && cell.placedBy === 1) capturedByPlayer0.push(cell.card)
+      else if (cell.owner === 1 && cell.placedBy === 0) capturedByPlayer1.push(cell.card)
+    }
+  }
+  return { capturedByPlayer0, capturedByPlayer1 }
+}
 
 export { ROWS, COLS, HAND_SIZE }
