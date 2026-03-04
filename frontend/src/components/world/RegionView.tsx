@@ -25,8 +25,8 @@ export function RegionView({ region, worldState, onSelectLocation, onBack }: Reg
   const regionH = bbox.y2 - bbox.y1
 
   // Scale marker sizes relative to viewBox dimensions
-  const markerR = Math.max(1, vw * 0.04)
-  const fontSize = Math.max(0.8, vw * 0.04)
+  const markerR = Math.max(0.7, vw * 0.025)
+  const fontSize = Math.max(0.6, vw * 0.028)
   const labelOffset = markerR + fontSize * 1.2
 
   const unlockedCount = locations.filter(l => isLocationUnlocked(l, worldState)).length
