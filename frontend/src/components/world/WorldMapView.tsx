@@ -3,6 +3,7 @@ import type { Region } from '../../types/world'
 import type { WorldPlayerState } from '../../data/worldState'
 import { getRegions, formatRules } from '../../data/world'
 import { isRegionUnlocked } from '../../data/unlock'
+import { getRegionMarkers } from '../../data/markers'
 
 interface WorldMapViewProps {
   worldState: WorldPlayerState
@@ -95,6 +96,16 @@ export function WorldMapView({ worldState, onSelectRegion }: WorldMapViewProps) 
               aria-hidden
             >
               {unlocked ? region.name : '???'}
+              {unlocked && (() => {
+                const markers = getRegionMarkers(region.id, worldState)
+                if (markers.length === 0) return null
+                return (
+                  <span className="wm-region-markers">
+                    {markers.includes('main_quest') && <span className="wm-marker main-quest" title="Main quest available">!</span>}
+                    {markers.includes('side_quest') && <span className="wm-marker side-quest" title="Side quest available">?</span>}
+                  </span>
+                )
+              })()}
             </div>
           )
         })}

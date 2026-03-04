@@ -107,7 +107,7 @@ Todos:
 ---
 
 ### Phase 3: NPCs, Shops, Tournaments & Quest Chain
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 Goal: Populate all ~30 locations with NPCs (~100+), create the 13-chapter main quest storyline, design shops and tournaments, and write ~15-20 side quests.
 

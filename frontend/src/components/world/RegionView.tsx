@@ -2,6 +2,7 @@ import type { Region, Location } from '../../types/world'
 import type { WorldPlayerState } from '../../data/worldState'
 import { getLocationsByRegion, formatRules, getNpcsByLocation } from '../../data/world'
 import { isLocationUnlocked } from '../../data/unlock'
+import { getLocationMarkers } from '../../data/markers'
 
 interface RegionViewProps {
   region: Region
@@ -196,6 +197,31 @@ export function RegionView({ region, worldState, onSelectLocation, onBack }: Reg
                     ? `${npcCount} NPC${npcCount !== 1 ? 's' : ''}`
                     : '\uD83D\uDD12 Locked'}
                 </text>
+
+                {/* Notification markers (top-right of marker) */}
+                {unlocked && (() => {
+                  const markers = getLocationMarkers(loc.id, worldState)
+                  if (markers.length === 0) return null
+                  const badgeR = markerR * 0.35
+                  const bx = absX + markerR * 0.7
+                  const by = absY - markerR * 0.7
+                  return (
+                    <>
+                      {markers.includes('main_quest') && (
+                        <>
+                          <circle cx={bx} cy={by} r={badgeR} fill="#d4a017" stroke="#1a1a2e" strokeWidth={vw * 0.002} />
+                          <text x={bx} y={by + badgeR * 0.4} textAnchor="middle" fontSize={badgeR * 1.4} fill="#1a1a2e" fontWeight="bold" fontFamily="sans-serif" pointerEvents="none">!</text>
+                        </>
+                      )}
+                      {markers.includes('side_quest') && (
+                        <>
+                          <circle cx={markers.includes('main_quest') ? bx + badgeR * 2.2 : bx} cy={by} r={badgeR} fill="#3b82f6" stroke="#1a1a2e" strokeWidth={vw * 0.002} />
+                          <text x={markers.includes('main_quest') ? bx + badgeR * 2.2 : bx} y={by + badgeR * 0.4} textAnchor="middle" fontSize={badgeR * 1.4} fill="white" fontWeight="bold" fontFamily="sans-serif" pointerEvents="none">?</text>
+                        </>
+                      )}
+                    </>
+                  )
+                })()}
               </g>
             )
           })}
@@ -219,6 +245,16 @@ export function RegionView({ region, worldState, onSelectLocation, onBack }: Reg
               <span className="wm-loc-card-name">{unlocked ? loc.name : '???'}</span>
               {unlocked && <span className="wm-loc-card-count">{npcCount} NPCs</span>}
               {!unlocked && <span className="wm-loc-card-lock">{'\u{1F512}'}</span>}
+              {unlocked && (() => {
+                const markers = getLocationMarkers(loc.id, worldState)
+                if (markers.length === 0) return null
+                return (
+                  <span className="wm-loc-card-markers">
+                    {markers.includes('main_quest') && <span className="wm-marker main-quest" title="Main quest">!</span>}
+                    {markers.includes('side_quest') && <span className="wm-marker side-quest" title="Side quest">?</span>}
+                  </span>
+                )
+              })()}
             </button>
           )
         })}
