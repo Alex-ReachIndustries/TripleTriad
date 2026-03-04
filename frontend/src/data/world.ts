@@ -1114,6 +1114,40 @@ export const NPCS: NPC[] = ([
     isBoss: false,
   },
   {
+    id: 'cell_block_boss',
+    name: 'Cell Block Boss',
+    locationId: 'd_district_prison',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'A notorious prisoner runs the cell block. "New fish wants to climb higher? Cards first."',
+      floorDefeated: '"You\'re tougher than you look. The upper levels won\'t be so easy."',
+    },
+    difficultyTier: 3,
+    deckPool: [
+      'armadodo', 'tri_face', 'fastitocalon', 'snow_lion', 'ochu', 'sam08g', 'death_claw', 'cactuar',
+    ],
+    gilReward: 175,
+    floorOrder: 2,
+    isBoss: false,
+  },
+  {
+    id: 'solitary_guard',
+    name: 'Solitary Guard',
+    locationId: 'd_district_prison',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'The guard outside solitary confinement grins. "Entertainment\'s rare down here. Play me."',
+      floorDefeated: '"Bah. Go on then. The Warden\'s office is just above."',
+    },
+    difficultyTier: 3,
+    deckPool: [
+      'tri_face', 'snow_lion', 'ochu', 'sam08g', 'death_claw', 'cactuar', 'tonberry', 'abyss_worm',
+    ],
+    gilReward: 225,
+    floorOrder: 3,
+    isBoss: false,
+  },
+  {
     id: 'warden',
     name: 'Warden',
     locationId: 'd_district_prison',
@@ -1138,7 +1172,7 @@ export const NPCS: NPC[] = ([
       't_rexaur',
     ],
     gilReward: 300,
-    floorOrder: 2,
+    floorOrder: 4,
     isBoss: true,
   },
 
@@ -1604,6 +1638,40 @@ export const NPCS: NPC[] = ([
     isBoss: false,
   },
   {
+    id: 'ruin_revenant',
+    name: 'Ruin Revenant',
+    locationId: 'centra_ruins',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'An ancient warrior rises from a stone sarcophagus, ghostly cards floating around it.',
+      floorDefeated: 'The revenant bows and returns to its eternal rest...',
+    },
+    difficultyTier: 4,
+    deckPool: [
+      'adamantoise', 'hexadragon', 'iron_giant', 'behemoth', 'chimera', 'malboro', 'ruby_dragon', 'elnoyle',
+    ],
+    gilReward: 400,
+    floorOrder: 2,
+    isBoss: false,
+  },
+  {
+    id: 'centra_obelisk',
+    name: 'Centra Obelisk',
+    locationId: 'centra_ruins',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'A massive obsidian obelisk hums with power. Cards materialise in the air around it.',
+      floorDefeated: 'The obelisk dims. The inner sanctum opens...',
+    },
+    difficultyTier: 4,
+    deckPool: [
+      'iron_giant', 'behemoth', 'chimera', 'malboro', 'ruby_dragon', 'elnoyle', 'tonberry_king', 'wedge_biggs',
+    ],
+    gilReward: 500,
+    floorOrder: 3,
+    isBoss: false,
+  },
+  {
     id: 'centra_guardian',
     name: 'Centra Guardian',
     locationId: 'centra_ruins',
@@ -1630,7 +1698,7 @@ export const NPCS: NPC[] = ([
       'ruby_dragon',
     ],
     gilReward: 600,
-    floorOrder: 2,
+    floorOrder: 4,
     isBoss: true,
   },
 
@@ -1803,6 +1871,23 @@ export const NPCS: NPC[] = ([
     isBoss: false,
   },
   {
+    id: 'zero_g_phantom',
+    name: 'Zero-G Phantom',
+    locationId: 'lunar_base',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'Cards float in zero gravity. A spectral figure materialises among them, beckoning.',
+      floorDefeated: 'The phantom dissipates into the vacuum. The command centre is just ahead...',
+    },
+    difficultyTier: 5,
+    deckPool: [
+      'granaldo', 'gerogero', 'iguion', 'abadon', 'propagator', 'jumbo_cactuar', 'tri_point', 'gargantua', 'mobile_type_8',
+    ],
+    gilReward: 700,
+    floorOrder: 2,
+    isBoss: false,
+  },
+  {
     id: 'lunar_officer',
     name: 'Lunar Officer',
     locationId: 'lunar_base',
@@ -1829,7 +1914,7 @@ export const NPCS: NPC[] = ([
       'mobile_type_8',
     ],
     gilReward: 1000,
-    floorOrder: 2,
+    floorOrder: 3,
     isBoss: true,
   },
 
@@ -1913,6 +1998,40 @@ export const NPCS: NPC[] = ([
     isBoss: false,
   },
   {
+    id: 'pressure_phantom',
+    name: 'Pressure Phantom',
+    locationId: 'deep_sea_research_center',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'A spectral figure materialises from the crushing pressure. It extends a hand of cards.',
+      floorDefeated: 'The phantom dissolves into the blackness. The water grows colder...',
+    },
+    difficultyTier: 5,
+    deckPool: [
+      'tri_point', 'gargantua', 'mobile_type_8', 'sphinxara', 'tiamat', 'bgh251f2', 'red_giant', 'catoblepas',
+    ],
+    gilReward: 600,
+    floorOrder: 3,
+    isBoss: false,
+  },
+  {
+    id: 'ultima_sentinel',
+    name: 'Ultima Sentinel',
+    locationId: 'deep_sea_research_center',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'A massive mechanical guardian blocks the final corridor. "AUTHORIZATION: DEFEAT ME."',
+      floorDefeated: 'AUTHORIZATION GRANTED. The sentinel powers down. Only one challenge remains...',
+    },
+    difficultyTier: 5,
+    deckPool: [
+      'tiamat', 'bgh251f2', 'red_giant', 'catoblepas', 'ultima_weapon', 'propagator', 'jumbo_cactuar', 'tri_point',
+    ],
+    gilReward: 800,
+    floorOrder: 4,
+    isBoss: false,
+  },
+  {
     id: 'deep_sea_researcher',
     name: 'Deep Sea Researcher',
     locationId: 'deep_sea_research_center',
@@ -1940,7 +2059,7 @@ export const NPCS: NPC[] = ([
       'ultima_weapon',
     ],
     gilReward: 1500,
-    floorOrder: 3,
+    floorOrder: 5,
     isBoss: true,
   },
 
@@ -2150,6 +2269,23 @@ export const NPCS: NPC[] = ([
     isBoss: false,
   },
   {
+    id: 'comm_officer',
+    name: 'Comm Officer',
+    locationId: 'radio_tower',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'A communications officer intercepts you at the relay room. "Unauthorised frequency detected — engage!"',
+      floorDefeated: '"Signal lost... you\'re clear to the antenna."',
+    },
+    difficultyTier: 2,
+    deckPool: [
+      'cockatrice', 'grat', 'buel', 'mesmerize', 'glacial_eye', 'belhelmel', 'thrustaevis', 'anacondaur',
+    ],
+    gilReward: 150,
+    floorOrder: 2,
+    isBoss: false,
+  },
+  {
     id: 'biggs_wedge',
     name: 'Biggs & Wedge',
     locationId: 'radio_tower',
@@ -2164,7 +2300,7 @@ export const NPCS: NPC[] = ([
       'gayla', 'cockatrice', 'grat', 'buel', 'mesmerize', 'glacial_eye', 'belhelmel', 'thrustaevis',
     ],
     gilReward: 200,
-    floorOrder: 2,
+    floorOrder: 3,
     isBoss: true,
   },
 
@@ -2207,6 +2343,23 @@ export const NPCS: NPC[] = ([
     isBoss: false,
   },
   {
+    id: 'tomb_phantom',
+    name: 'Tomb Phantom',
+    locationId: 'tomb_of_unknown_king',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'A phantom drifts through the labyrinth walls. It holds cards that glow with spectral light.',
+      floorDefeated: 'The phantom wails and dissipates. The brothers\' chamber lies ahead...',
+    },
+    difficultyTier: 2,
+    deckPool: [
+      'belhelmel', 'thrustaevis', 'anacondaur', 'creeps', 'grendel', 'jelleye', 'grand_mantis', 'forbidden',
+    ],
+    gilReward: 200,
+    floorOrder: 2,
+    isBoss: false,
+  },
+  {
     id: 'sacred_minotaur',
     name: 'Sacred & Minotaur',
     locationId: 'tomb_of_unknown_king',
@@ -2221,7 +2374,7 @@ export const NPCS: NPC[] = ([
       'glacial_eye', 'belhelmel', 'thrustaevis', 'anacondaur', 'creeps', 'grendel', 'jelleye', 'grand_mantis', 'forbidden',
     ],
     gilReward: 300,
-    floorOrder: 2,
+    floorOrder: 3,
     isBoss: true,
   },
 
@@ -2321,6 +2474,40 @@ export const NPCS: NPC[] = ([
     isBoss: false,
   },
   {
+    id: 'launch_engineer',
+    name: 'Launch Engineer',
+    locationId: 'galbadia_missile_base',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'An engineer stands at the missile silo controls. "The countdown has begun. Beat me to stop it!"',
+      floorDefeated: '"Abort sequence initiated... You\'re mad, but you\'re good."',
+    },
+    difficultyTier: 3,
+    deckPool: [
+      'creeps', 'grendel', 'jelleye', 'grand_mantis', 'forbidden', 'armadodo', 'tri_face', 'sam08g',
+    ],
+    gilReward: 225,
+    floorOrder: 2,
+    isBoss: false,
+  },
+  {
+    id: 'silo_guardian',
+    name: 'Silo Guardian',
+    locationId: 'galbadia_missile_base',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'A heavily armoured robot activates in the missile silo. "INTRUDER. ENGAGE PROTOCOL."',
+      floorDefeated: 'PROTOCOL FAILED. POWERING DOWN. The commander\'s office is just ahead...',
+    },
+    difficultyTier: 3,
+    deckPool: [
+      'grand_mantis', 'forbidden', 'armadodo', 'tri_face', 'sam08g', 'death_claw', 'cactuar', 'tonberry',
+    ],
+    gilReward: 275,
+    floorOrder: 3,
+    isBoss: false,
+  },
+  {
     id: 'base_commander',
     name: 'Base Commander',
     locationId: 'galbadia_missile_base',
@@ -2335,7 +2522,7 @@ export const NPCS: NPC[] = ([
       'anacondaur', 'creeps', 'grendel', 'jelleye', 'grand_mantis', 'forbidden', 'armadodo', 'tri_face', 'sam08g',
     ],
     gilReward: 350,
-    floorOrder: 2,
+    floorOrder: 4,
     isBoss: true,
   },
 
@@ -2435,6 +2622,23 @@ export const NPCS: NPC[] = ([
     isBoss: false,
   },
   {
+    id: 'occupation_captain',
+    name: 'Occupation Captain',
+    locationId: 'balamb_under_siege',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'The captain of the occupation force stands at the town square. "You SeeDs just don\'t quit!"',
+      floorDefeated: '"Pull back to the harbour! These card players are insane!"',
+    },
+    difficultyTier: 3,
+    deckPool: [
+      'armadodo', 'tri_face', 'sam08g', 'death_claw', 'cactuar', 'tonberry', 'abyss_worm', 'turtapod',
+    ],
+    gilReward: 300,
+    floorOrder: 2,
+    isBoss: false,
+  },
+  {
     id: 'fujin_boss',
     name: 'Fujin',
     locationId: 'balamb_under_siege',
@@ -2449,7 +2653,7 @@ export const NPCS: NPC[] = ([
       'forbidden', 'armadodo', 'tri_face', 'sam08g', 'death_claw', 'cactuar', 'tonberry', 'abyss_worm', 'turtapod',
     ],
     gilReward: 400,
-    floorOrder: 2,
+    floorOrder: 3,
     isBoss: true,
   },
 
@@ -2549,6 +2753,40 @@ export const NPCS: NPC[] = ([
     isBoss: false,
   },
   {
+    id: 'gg_berserker',
+    name: 'GG Berserker',
+    locationId: 'galbadia_garden_revolution',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'A crazed student charges through the wreckage. "The Sorceress demands victory! FIGHT ME!"',
+      floorDefeated: '"The Sorceress... she lied to us..." He collapses against the wall.',
+    },
+    difficultyTier: 3,
+    deckPool: [
+      'turtapod', 'vysage', 't_rexaur', 'bomb', 'blitz', 'wendigo', 'torama', 'imp', 'blue_dragon',
+    ],
+    gilReward: 400,
+    floorOrder: 2,
+    isBoss: false,
+  },
+  {
+    id: 'gg_commander',
+    name: 'GG Commander',
+    locationId: 'galbadia_garden_revolution',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'The Garden\'s military commander blocks the bridge. "Seifer will hear about this!"',
+      floorDefeated: '"Fine... Seifer can deal with you himself."',
+    },
+    difficultyTier: 4,
+    deckPool: [
+      'bomb', 'blitz', 'wendigo', 'torama', 'imp', 'blue_dragon', 'adamantoise', 'hexadragon', 'iron_giant',
+    ],
+    gilReward: 500,
+    floorOrder: 3,
+    isBoss: false,
+  },
+  {
     id: 'seifer',
     name: 'Seifer',
     locationId: 'galbadia_garden_revolution',
@@ -2563,7 +2801,7 @@ export const NPCS: NPC[] = ([
       'torama', 'imp', 'blue_dragon', 'adamantoise', 'hexadragon', 'iron_giant', 'behemoth', 'chimera',
     ],
     gilReward: 600,
-    floorOrder: 2,
+    floorOrder: 4,
     isBoss: true,
   },
 
@@ -2624,6 +2862,23 @@ export const NPCS: NPC[] = ([
     isBoss: false,
   },
   {
+    id: 'salt_golem',
+    name: 'Salt Golem',
+    locationId: 'great_salt_lake',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'A massive crystalline golem blocks the path to Esthar. Its body hums with energy.',
+      floorDefeated: 'The golem fractures and the salt wind carries its dust away...',
+    },
+    difficultyTier: 4,
+    deckPool: [
+      'adamantoise', 'hexadragon', 'iron_giant', 'behemoth', 'chimera', 'malboro', 'ruby_dragon', 'elnoyle',
+    ],
+    gilReward: 475,
+    floorOrder: 2,
+    isBoss: false,
+  },
+  {
     id: 'abadon_boss',
     name: 'Abadon',
     locationId: 'great_salt_lake',
@@ -2638,7 +2893,7 @@ export const NPCS: NPC[] = ([
       'hexadragon', 'iron_giant', 'behemoth', 'chimera', 'malboro', 'ruby_dragon', 'elnoyle', 'tonberry_king',
     ],
     gilReward: 600,
-    floorOrder: 2,
+    floorOrder: 3,
     isBoss: true,
   },
 
@@ -2730,6 +2985,40 @@ export const NPCS: NPC[] = ([
     isBoss: false,
   },
   {
+    id: 'pandora_shade',
+    name: 'Pandora Shade',
+    locationId: 'lunatic_pandora',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'A shadow detaches from the crystal walls. It speaks in the Sorceress\'s voice: "You will go no further."',
+      floorDefeated: 'The shade dissolves, the Sorceress\'s laughter fading...',
+    },
+    difficultyTier: 5,
+    deckPool: [
+      'iguion', 'abadon', 'propagator', 'jumbo_cactuar', 'tri_point', 'gargantua', 'mobile_type_8', 'sphinxara',
+    ],
+    gilReward: 700,
+    floorOrder: 2,
+    isBoss: false,
+  },
+  {
+    id: 'pandora_core',
+    name: 'Pandora Core',
+    locationId: 'lunatic_pandora',
+    type: 'duel',
+    dialogue: {
+      floorIntro: 'The Pandora\'s crystalline core pulsates violently. Energy coalesces into cards.',
+      floorDefeated: 'The core cracks. Beyond it stands Seifer, waiting...',
+    },
+    difficultyTier: 5,
+    deckPool: [
+      'propagator', 'jumbo_cactuar', 'tri_point', 'gargantua', 'mobile_type_8', 'sphinxara', 'tiamat', 'bgh251f2',
+    ],
+    gilReward: 850,
+    floorOrder: 3,
+    isBoss: false,
+  },
+  {
     id: 'seifer_final',
     name: 'Seifer',
     locationId: 'lunatic_pandora',
@@ -2744,7 +3033,7 @@ export const NPCS: NPC[] = ([
       'propagator', 'jumbo_cactuar', 'tri_point', 'gargantua', 'mobile_type_8', 'sphinxara', 'tiamat', 'bgh251f2',
     ],
     gilReward: 1000,
-    floorOrder: 2,
+    floorOrder: 4,
     isBoss: true,
   },
 

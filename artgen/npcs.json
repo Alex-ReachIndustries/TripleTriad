@@ -117,5 +117,22 @@
   { "id": "seifer_final", "name": "Seifer", "locationId": "lunatic_pandora", "type": "duel" },
   { "id": "excavation_drone", "name": "Excavation Drone", "locationId": "centra_excavation_site", "type": "duel" },
   { "id": "excavation_golem", "name": "Excavation Golem", "locationId": "centra_excavation_site", "type": "duel" },
-  { "id": "omega_weapon", "name": "Omega Weapon", "locationId": "centra_excavation_site", "type": "duel" }
+  { "id": "omega_weapon", "name": "Omega Weapon", "locationId": "centra_excavation_site", "type": "duel" },
+  { "id": "cell_block_boss", "name": "Cell Block Boss", "locationId": "d_district_prison", "type": "duel" },
+  { "id": "solitary_guard", "name": "Solitary Guard", "locationId": "d_district_prison", "type": "duel" },
+  { "id": "ruin_revenant", "name": "Ruin Revenant", "locationId": "centra_ruins", "type": "duel" },
+  { "id": "centra_obelisk", "name": "Centra Obelisk", "locationId": "centra_ruins", "type": "duel" },
+  { "id": "zero_g_phantom", "name": "Zero-G Phantom", "locationId": "lunar_base", "type": "duel" },
+  { "id": "pressure_phantom", "name": "Pressure Phantom", "locationId": "deep_sea_research_center", "type": "duel" },
+  { "id": "ultima_sentinel", "name": "Ultima Sentinel", "locationId": "deep_sea_research_center", "type": "duel" },
+  { "id": "comm_officer", "name": "Comm Officer", "locationId": "radio_tower", "type": "duel" },
+  { "id": "tomb_phantom", "name": "Tomb Phantom", "locationId": "tomb_of_unknown_king", "type": "duel" },
+  { "id": "launch_engineer", "name": "Launch Engineer", "locationId": "galbadia_missile_base", "type": "duel" },
+  { "id": "silo_guardian", "name": "Silo Guardian", "locationId": "galbadia_missile_base", "type": "duel" },
+  { "id": "occupation_captain", "name": "Occupation Captain", "locationId": "balamb_under_siege", "type": "duel" },
+  { "id": "gg_berserker", "name": "GG Berserker", "locationId": "galbadia_garden_revolution", "type": "duel" },
+  { "id": "gg_commander", "name": "GG Commander", "locationId": "galbadia_garden_revolution", "type": "duel" },
+  { "id": "salt_golem", "name": "Salt Golem", "locationId": "great_salt_lake", "type": "duel" },
+  { "id": "pandora_shade", "name": "Pandora Shade", "locationId": "lunatic_pandora", "type": "duel" },
+  { "id": "pandora_core", "name": "Pandora Core", "locationId": "lunatic_pandora", "type": "duel" }
 ]

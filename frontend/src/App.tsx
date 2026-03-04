@@ -13,7 +13,7 @@ import { HomePage } from './components/HomePage'
 import { StoryCutscene, OPENING_PANELS } from './components/StoryCutscene'
 import { TutorialsMenu } from './components/TutorialsMenu'
 import { SettingsScreen, loadSettings, applySettingsToDOM } from './components/SettingsScreen'
-import { App as CapApp } from '@capacitor/app'
+// @capacitor/app is imported dynamically — only available in Capacitor builds
 import './App.css'
 
 type AppView = 'title' | 'howto' | 'home' | 'game' | 'cutscene' | 'settings'
@@ -53,31 +53,34 @@ function App() {
   useEffect(() => { viewRef.current = view }, [view])
   useEffect(() => { tabRef.current = tab }, [tab])
 
-  // Android system back button navigation
+  // Android system back button navigation (Capacitor only)
   useEffect(() => {
-    const listener = CapApp.addListener('backButton', () => {
-      const v = viewRef.current
-      const t = tabRef.current
-      if (v === 'settings' || v === 'howto' || v === 'home') {
-        setView('title')
-      } else if (v === 'game') {
-        if (t === 'battle') {
-          // During battle, cancel returns to world
-          setBattleContext(null)
-          setTab('world')
-        } else if (t === 'duel') {
+    let cleanup: (() => void) | undefined
+    const capModule = '@capaci' + 'tor/app'
+    import(/* @vite-ignore */ capModule).then(({ App: CapApp }: any) => {
+      const listener = CapApp.addListener('backButton', () => {
+        const v = viewRef.current
+        const t = tabRef.current
+        if (v === 'settings' || v === 'howto' || v === 'home') {
           setView('title')
-        } else if (t !== 'world') {
-          setTab('world')
-        } else {
-          setView('title')
+        } else if (v === 'game') {
+          if (t === 'battle') {
+            setBattleContext(null)
+            setTab('world')
+          } else if (t === 'duel') {
+            setView('title')
+          } else if (t !== 'world') {
+            setTab('world')
+          } else {
+            setView('title')
+          }
+        } else if (v === 'title') {
+          CapApp.minimizeApp()
         }
-      } else if (v === 'title') {
-        CapApp.minimizeApp()
-      }
-      // Cutscene: ignore back button
-    })
-    return () => { listener.then(l => l.remove()) }
+      })
+      cleanup = () => { listener.then((l: any) => l.remove()) }
+    }).catch(() => { /* not in Capacitor environment */ })
+    return () => { cleanup?.() }
   }, [])
 
   useEffect(() => {

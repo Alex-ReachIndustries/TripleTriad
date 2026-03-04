@@ -156,6 +156,23 @@ def get_npc_prompt(npc_id, npc_name, npc_type, location_id, region_id):
         "base_guard": "missile base security guard in hazmat suit, military facility, warning lights",
         "base_technician": "military technician at console, missile base, nervous expression, countdown screens",
         "base_commander": "missile base commander in officer uniform, stern expression, war room",
+        "cell_block_boss": "prison cell block boss, scarred tough inmate leader, dim prison corridor, menacing",
+        "solitary_guard": "solitary confinement guard, heavy armor, cruel grin, dark prison basement",
+        "ruin_revenant": "ancient warrior revenant rising from stone sarcophagus, ghostly armor, glowing cards",
+        "centra_obelisk": "massive obsidian obelisk humming with energy, ancient Centra artifact, glowing runes",
+        "zero_g_phantom": "spectral phantom floating in zero gravity, space station corridor, ethereal glow",
+        "pressure_phantom": "deep sea phantom formed from crushing pressure, translucent deep water form, eerie",
+        "ultima_sentinel": "massive mechanical guardian, glowing red core, armored plating, deep sea facility",
+        "comm_officer": "communications officer at radio tower, military headset, stern, relay equipment",
+        "tomb_phantom": "ghostly phantom drifting through labyrinth walls, spectral light, ancient tomb",
+        "launch_engineer": "missile launch engineer at control panel, countdown screens, nervous, military base",
+        "silo_guardian": "heavily armored robot in missile silo, red warning lights, mechanical menace",
+        "occupation_captain": "Galbadian occupation captain, decorated military uniform, town square, authoritative",
+        "gg_berserker": "crazed Galbadia Garden student, wild eyes, torn red uniform, battle damage",
+        "gg_commander": "Galbadia Garden military commander, formal red officer uniform, strategic pose",
+        "salt_golem": "massive crystalline salt golem, translucent body with salt formations, glowing core",
+        "pandora_shade": "shadowy entity born from crystal walls, Sorceress energy, dark purple form",
+        "pandora_core": "pulsating crystalline core entity, geometric energy patterns, Lunatic Pandora interior",
     }
 
     if npc_id in creature_npcs:

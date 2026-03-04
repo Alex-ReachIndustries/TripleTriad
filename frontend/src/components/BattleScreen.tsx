@@ -124,6 +124,8 @@ export function BattleScreen({
   // Resolve region + rules (dynamic: base + mods)
   const location = useMemo(() => getLocationById(locationId), [locationId])
   const region = useMemo(() => location ? getRegionById(location.regionId) : null, [location])
+  const locationBg = useMemo(() => `/locations/${locationId}.png`, [locationId])
+  const bgStyle = useMemo(() => ({ backgroundImage: `url(${locationBg})` }), [locationBg])
   const activeRules = useMemo(
     () => region ? getActiveRegionRules(region.rules, region.id, regionRuleMods) : [],
     [region, regionRuleMods]
@@ -375,7 +377,7 @@ export function BattleScreen({
   // ========== PRE-DUEL: Inventory Card Picker ==========
   if (phase === 'pre-duel') {
     return (
-      <div className="battle-screen battle-pre-duel">
+      <div className="battle-screen battle-pre-duel" style={bgStyle}>
         <div className="battle-header">
           <button type="button" className="back" onClick={onCancel}>
             &larr; Back
@@ -387,6 +389,11 @@ export function BattleScreen({
 
         {npc && (
           <div className="battle-opponent">
+            {npc.portrait && (
+              <div className="battle-opponent-portrait">
+                <img src={npc.portrait} alt={npc.name} />
+              </div>
+            )}
             <div className="battle-opponent-name">vs. {npc.name}</div>
             {npc.difficultyTier && (
               <div className="battle-difficulty">
@@ -501,7 +508,7 @@ export function BattleScreen({
   // ========== GAME ==========
   if (phase === 'game' && localGameState) {
     return (
-      <div className="battle-screen battle-game">
+      <div className="battle-screen battle-game" style={bgStyle}>
         <GameBoard
           state={localGameState}
           myPlayer={0}
@@ -524,7 +531,7 @@ export function BattleScreen({
     // Trade selection phase (One/Diff — player picks cards)
     if (tradeResult?.requiresSelection && !battleResult) {
       return (
-        <div className="battle-screen battle-reward-screen">
+        <div className="battle-screen battle-reward-screen" style={bgStyle}>
           <div className={`battle-reward-result ${resultClass}`}>{resultText}</div>
 
           {gilReward > 0 && (
@@ -567,7 +574,7 @@ export function BattleScreen({
       const lostCards = battleResult.cardsLost.map(id => getCard(id)).filter((c): c is Card => !!c)
 
       return (
-        <div className="battle-screen battle-reward-screen">
+        <div className="battle-screen battle-reward-screen" style={bgStyle}>
           <div className={`battle-reward-result ${resultClass}`}>{resultText}</div>
 
           {battleResult.gilReward > 0 && (
