@@ -18,9 +18,9 @@
   --transition-fast: 150ms ease;
   --transition-normal: 220ms ease;
   --font: 'Outfit', system-ui, sans-serif;
-  /* Safe area insets for mobile (status bar, gesture nav, notch) */
-  --sat: env(safe-area-inset-top, 0px);
-  --sab: env(safe-area-inset-bottom, 0px);
+  /* Safe area insets — overridden by Android JS injection, fallback to env() then fixed minimum */
+  --sat: env(safe-area-inset-top, 24px);
+  --sab: env(safe-area-inset-bottom, 16px);
   --sal: env(safe-area-inset-left, 0px);
   --sar: env(safe-area-inset-right, 0px);
   /* App padding = max(1rem, safe-area) on each side */
