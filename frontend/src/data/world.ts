@@ -2794,7 +2794,7 @@ export const NPCS: NPC[] = [
     floorOrder: 2,
     isBoss: true,
   },
-]
+].map(npc => ({ ...npc, portrait: npc.portrait ?? `/portraits/${npc.id}.png` }))
 
 // ─── Map Override Persistence ────────────────────────────────────────────────
 
