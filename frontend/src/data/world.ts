@@ -132,7 +132,7 @@ export const LOCATIONS: Location[] = [
     order: 3,
     mapX: 10.6,
     mapY: 29.3,
-    unlockCondition: { type: 'clear_dungeon', targetId: 'fire_cavern' },
+    unlockCondition: { type: 'unique_wins_in_location', targetId: 'fire_cavern', count: 1 },
   },
   {
     id: 'radio_tower',
@@ -198,7 +198,7 @@ export const LOCATIONS: Location[] = [
     order: 5,
     mapX: 48.3,
     mapY: 31,
-    unlockCondition: { type: 'clear_dungeon', targetId: 'tomb_of_unknown_king' },
+    unlockCondition: { type: 'unique_wins_in_location', targetId: 'tomb_of_unknown_king', count: 1 },
     parentTownId: 'deling_city',
     flavour: 'The sewers beneath Deling City. Dark, damp, and full of desperate card players...',
   },
@@ -210,7 +210,7 @@ export const LOCATIONS: Location[] = [
     order: 6,
     mapX: 49.5,
     mapY: 75.2,
-    unlockCondition: { type: 'clear_dungeon', targetId: 'deling_sewers' },
+    unlockCondition: { type: 'unique_wins_in_location', targetId: 'deling_sewers', count: 1 },
   },
   {
     id: 'd_district_prison',
@@ -231,7 +231,7 @@ export const LOCATIONS: Location[] = [
     order: 8,
     mapX: 27.7,
     mapY: 53.3,
-    unlockCondition: { type: 'clear_dungeon', targetId: 'd_district_prison' },
+    unlockCondition: { type: 'unique_wins_in_location', targetId: 'd_district_prison', count: 1 },
     flavour: 'A top-secret military installation. The self-destruct countdown has begun...',
   },
 
@@ -246,7 +246,7 @@ export const LOCATIONS: Location[] = [
     order: 10,
     mapX: 73.4,
     mapY: 69,
-    unlockCondition: { type: 'story_chapter', count: 3 },
+    unlockCondition: { type: 'quest_completed', targetId: 'mq_galbadian_offensive' },
     parentTownId: 'balamb_garden',
     flavour: 'Hidden passages beneath the Garden. The MD Level holds secrets the faculty tried to bury...',
   },
@@ -276,7 +276,7 @@ export const LOCATIONS: Location[] = [
     order: 11,
     mapX: 60.4,
     mapY: 81.9,
-    unlockCondition: { type: 'story_chapter', count: 5 },
+    unlockCondition: { type: 'quest_completed', targetId: 'mq_the_bridge' },
     parentTownId: 'balamb_town',
     flavour: 'Galbadian soldiers have occupied Balamb! Card battles are the only way to reclaim the town...',
   },
@@ -303,7 +303,7 @@ export const LOCATIONS: Location[] = [
     order: 1,
     mapX: 62.8,
     mapY: 66,
-    unlockCondition: { type: 'clear_dungeon', targetId: 'roaming_forest' },
+    unlockCondition: { type: 'unique_wins_in_location', targetId: 'roaming_forest', count: 1 },
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -317,7 +317,7 @@ export const LOCATIONS: Location[] = [
     order: 9,
     mapX: 61.4,
     mapY: 42.2,
-    unlockCondition: { type: 'story_chapter', count: 7 },
+    unlockCondition: { type: 'quest_completed', targetId: 'mq_memories' },
     parentTownId: 'galbadia_garden',
     flavour: 'The Gardens clash! Fight through Galbadia Garden\'s defenders in a hostile takeover...',
   },
@@ -368,7 +368,7 @@ export const LOCATIONS: Location[] = [
     order: 1,
     mapX: 23,
     mapY: 36.4,
-    unlockCondition: { type: 'clear_dungeon', targetId: 'great_salt_lake' },
+    unlockCondition: { type: 'unique_wins_in_location', targetId: 'great_salt_lake', count: 1 },
   },
   {
     id: 'lunar_base',
@@ -389,7 +389,7 @@ export const LOCATIONS: Location[] = [
     order: 3,
     mapX: 48.7,
     mapY: 47,
-    unlockCondition: { type: 'clear_dungeon', targetId: 'lunar_base' },
+    unlockCondition: { type: 'unique_wins_in_location', targetId: 'lunar_base', count: 1 },
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -403,7 +403,7 @@ export const LOCATIONS: Location[] = [
     order: 2,
     mapX: 7.4,
     mapY: 85,
-    unlockCondition: { type: 'story_chapter', count: 10 },
+    unlockCondition: { type: 'quest_completed', targetId: 'mq_contact' },
     flavour: 'The deepest facility in the world. Four levels of increasingly dangerous opponents guard the ultimate prize...',
   },
 
@@ -418,7 +418,7 @@ export const LOCATIONS: Location[] = [
     order: 2,
     mapX: 24.1,
     mapY: 34,
-    unlockCondition: { type: 'story_chapter', count: 11 },
+    unlockCondition: { type: 'quest_completed', targetId: 'mq_into_the_deep' },
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -432,7 +432,7 @@ export const LOCATIONS: Location[] = [
     order: 4,
     mapX: 33,
     mapY: 56,
-    unlockCondition: { type: 'story_chapter', count: 12 },
+    unlockCondition: { type: 'quest_completed', targetId: 'mq_shumis_wisdom' },
     flavour: 'A massive crystalline structure floating above Esthar. The final Galbadian weapon...',
   },
 
@@ -447,7 +447,7 @@ export const LOCATIONS: Location[] = [
     order: 3,
     mapX: 45.4,
     mapY: 24,
-    unlockCondition: { type: 'story_chapter', count: 13 },
+    unlockCondition: { type: 'quest_completed', targetId: 'mq_pandoras_box' },
     flavour: 'Ancient ruins deep beneath the Centra continent. Archaeologists discovered something terrible here...',
   },
   {
@@ -458,7 +458,7 @@ export const LOCATIONS: Location[] = [
     order: 4,
     mapX: 53.4,
     mapY: 55.3,
-    unlockCondition: { type: 'clear_dungeon', targetId: 'centra_excavation_site' },
+    unlockCondition: { type: 'unique_wins_in_location', targetId: 'centra_excavation_site', count: 1 },
     flavour: 'The final dungeon. Ancient ruins of a lost civilisation. Strange energies pulse through crumbling corridors...',
   },
 ]
@@ -1351,6 +1351,7 @@ export const NPCS: NPC[] = ([
       text: "Triple Triad? I suppose it's a peaceful pursuit... But prove yourself against our best player first.",
     },
     questId: 'mq_the_bridge',
+    storyLogText: "Mayor Dobe of Fisherman's Horizon reluctantly acknowledges your presence. He challenges you to prove your skills are more than just warfare.",
   },
   {
     id: 'fh_master',
@@ -2087,6 +2088,7 @@ export const NPCS: NPC[] = ([
       text: 'Your SeeD field exam awaits. Clear the Radio Tower in Dollet and return to me. Good luck, cadet.',
     },
     questId: 'mq_seed_exam',
+    storyLogText: 'Headmaster Cid briefs you on your SeeD field exam. Your mission: infiltrate the Dollet Radio Tower and prove yourself worthy of becoming a SeeD.',
   },
   {
     id: 'rinoa_timber',
@@ -2097,6 +2099,7 @@ export const NPCS: NPC[] = ([
       text: "The Galbadian Missile Base threatens everything we've fought for. We need someone to infiltrate it. Will you go?",
     },
     questId: 'mq_galbadian_offensive',
+    storyLogText: 'Rinoa reveals the Galbadian Missile Base threatens the Gardens. She asks you to infiltrate it before it launches.',
   },
   {
     id: 'xu',
@@ -2107,6 +2110,7 @@ export const NPCS: NPC[] = ([
       text: "There's something beneath the Garden — an ancient mechanism. The Headmaster wants you to investigate the basement.",
     },
     questId: 'mq_gardens_secret',
+    storyLogText: 'Xu confides that something ancient lies beneath Balamb Garden. The Headmaster wants you to investigate the mysterious basement.',
     minChapter: 3,
   },
   {
@@ -2118,6 +2122,7 @@ export const NPCS: NPC[] = ([
       text: "Dude! Galbadian soldiers took over Balamb! We gotta drive 'em out! Are you with me?!",
     },
     questId: 'mq_reclaiming_balamb',
+    storyLogText: "Zell is furious — Galbadian soldiers have occupied his hometown. He's determined to drive them out and needs your help.",
     minChapter: 5,
   },
   {
@@ -2129,6 +2134,7 @@ export const NPCS: NPC[] = ([
       text: "Our Garden was hit... but we're not giving up! Beat our champion and show everyone we can still fight!",
     },
     questId: 'mq_memories',
+    storyLogText: "Selphie stands amid the ruins of Trabia Garden, hit by Galbadian missiles. Despite everything, she refuses to give up — and asks you to help restore hope.",
   },
   {
     id: 'trabia_champion',
@@ -2155,6 +2161,7 @@ export const NPCS: NPC[] = ([
       text: "Galbadia Garden has been taken over. We need to storm it and end this. Are you ready for the Battle of the Gardens?",
     },
     questId: 'mq_garden_clash',
+    storyLogText: 'Quistis reports that Galbadia Garden has been seized by the Sorceress. A full assault is the only option — the Battle of the Gardens begins.',
     minChapter: 7,
   },
   {
@@ -2166,6 +2173,7 @@ export const NPCS: NPC[] = ([
       text: 'Children... seek the White SeeD Ship. Their captain holds the key to reaching Esthar.',
     },
     questId: 'mq_the_orphanage',
+    storyLogText: 'Edea, now freed from the Sorceress, speaks gently of the White SeeD Ship. Its captain holds the key to reaching the distant nation of Esthar.',
   },
   {
     id: 'esthar_official',
@@ -2176,6 +2184,7 @@ export const NPCS: NPC[] = ([
       text: 'The Sorceress has been taken to the Lunar Base. You must go to space and stop her before the Lunar Cry is triggered.',
     },
     questId: 'mq_contact',
+    storyLogText: 'An Esthar Official delivers urgent news: the Sorceress has been taken to the Lunar Base. You must reach space before the Lunar Cry is triggered.',
   },
   {
     id: 'dr_odine',
@@ -2186,6 +2195,7 @@ export const NPCS: NPC[] = ([
       text: "Ze Deep Sea Research Centre! Zere iz ancient Centra technology hidden below. You must retrieve it — for science, of course!",
     },
     questId: 'mq_into_the_deep',
+    storyLogText: 'Dr. Odine rambles excitedly about ancient Centra technology hidden in the Deep Sea Research Centre. He insists you retrieve it — for science, of course.',
     minChapter: 10,
   },
   {
@@ -2197,6 +2207,7 @@ export const NPCS: NPC[] = ([
       text: 'The Elder has been expecting you. He holds wisdom about time and space. Seek him out.',
     },
     questId: 'mq_shumis_wisdom',
+    storyLogText: 'The Shumi Attendant welcomes you — the Elder has been expecting your arrival. He holds ancient wisdom about time and space that may prove vital.',
   },
   {
     id: 'laguna_esthar',
@@ -2207,6 +2218,7 @@ export const NPCS: NPC[] = ([
       text: "Lunatic Pandora has appeared above Esthar. I'm too old for this... but you're not. Go stop it!",
     },
     questId: 'mq_pandoras_box',
+    storyLogText: "Laguna greets you with weary eyes. Lunatic Pandora looms above Esthar, and he's counting on you to stop it before it's too late.",
     minChapter: 12,
   },
   {
@@ -2228,6 +2240,7 @@ export const NPCS: NPC[] = ([
       text: 'The Sorceress has fled to the deepest ruins of Centra. This is the final battle. End this once and for all.',
     },
     questId: 'mq_time_compression',
+    storyLogText: 'Edea warns you gravely — the Sorceress has fled to the deepest ruins of Centra. This is the final battle. The fate of the world rests on your cards.',
   },
 
   // ═══════════════════════════════════════════════════════════════════════════

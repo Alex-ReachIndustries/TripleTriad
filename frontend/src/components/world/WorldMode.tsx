@@ -25,6 +25,7 @@ export interface WorldModeCallbacks {
   onClaimQuest?: (questId: string) => void
   onSpreadRule?: (rule: SpecialRule, regionId: string) => void
   onAbolishRule?: (rule: SpecialRule, regionId: string) => void
+  onNpcInteract?: (npc: NPC) => void
 }
 
 interface WorldModeProps extends WorldModeCallbacks {
@@ -41,6 +42,7 @@ export function WorldMode({
   onClaimQuest,
   onSpreadRule,
   onAbolishRule,
+  onNpcInteract,
 }: WorldModeProps) {
   const [screen, setScreen] = useState<WorldScreen>({ type: 'map' })
   const [selectedNpc, setSelectedNpc] = useState<NPC | null>(null)
@@ -64,7 +66,8 @@ export function WorldMode({
 
   const handleSelectNpc = useCallback((npc: NPC) => {
     setSelectedNpc(npc)
-  }, [])
+    onNpcInteract?.(npc)
+  }, [onNpcInteract])
 
   const handleCloseNpc = useCallback(() => {
     setSelectedNpc(null)

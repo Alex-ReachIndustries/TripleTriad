@@ -4,9 +4,10 @@
  */
 
 import type { SavedDeck } from './deckManager'
-import type { SpecialRule } from '../types/world'
+import type { SpecialRule, StoryLogEntry } from '../types/world'
 import { createStarterDeck, parseSavedDecks } from './deckManager'
 import { getQuestById, isQuestComplete } from './quests'
+import { LOCATIONS, getDungeonFloors } from './world'
 
 const STORAGE_KEY = 'tripletriad-world'
 
@@ -46,6 +47,8 @@ export interface WorldPlayerState {
   regionRuleMods: Record<string, { added: SpecialRule[]; removed: SpecialRule[] }>
   /** Tutorial IDs the player has already seen. */
   seenTutorials: string[]
+  /** Chronological story log entries from various sources. */
+  storyLog: StoryLogEntry[]
 }
 
 /** 5 starter cards – always protected (count can never drop below 1). */
@@ -78,6 +81,12 @@ function defaultState(): WorldPlayerState {
     lastPlayedRegionId: null,
     regionRuleMods: {},
     seenTutorials: [],
+    storyLog: [{
+      id: 'prologue',
+      text: 'Your journey begins at Balamb Garden. Armed with five basic cards and a dream, you set out to become the greatest Triple Triad player in the world.',
+      source: 'prologue',
+      order: 0,
+    }],
   }
 }
 
@@ -201,7 +210,24 @@ export function loadWorldState(): WorldPlayerState {
       ? (o.seenTutorials as unknown[]).filter((v): v is string => typeof v === 'string')
       : []
 
-    return { unlockedOrder, inventory, discoveredCards, gil, npcWins, savedDecks, lastDeckId, activeQuests, completedQuests, clearedDungeons, storyChapter, mainQuestLog, seenContent, lastHand, lastPlayedRegionId, regionRuleMods, seenTutorials }
+    // Parse storyLog with backward-compat default
+    const storyLog: StoryLogEntry[] = Array.isArray(o.storyLog)
+      ? (o.storyLog as unknown[]).filter(
+          (v): v is StoryLogEntry => typeof v === 'object' && v !== null && 'id' in v && 'text' in v
+        )
+      : []
+
+    // Backfill: if player has beaten dungeon bosses but clearedDungeons is empty (v1.1.0 bug)
+    if (clearedDungeons.length === 0 && Object.keys(npcWins).length > 0) {
+      for (const loc of LOCATIONS.filter(l => l.type === 'dungeon')) {
+        const floors = getDungeonFloors(loc.id)
+        if (floors.length > 0 && floors.every(f => (npcWins[f.id] ?? 0) > 0)) {
+          clearedDungeons.push(loc.id)
+        }
+      }
+    }
+
+    return { unlockedOrder, inventory, discoveredCards, gil, npcWins, savedDecks, lastDeckId, activeQuests, completedQuests, clearedDungeons, storyChapter, mainQuestLog, seenContent, lastHand, lastPlayedRegionId, regionRuleMods, seenTutorials, storyLog }
   } catch {
     return defaultState()
   }
@@ -291,13 +317,40 @@ export function advanceStoryChapter(state: WorldPlayerState, mainQuestId: string
   }
 }
 
+// ─── Story log helpers ───
+
+/** Add a story log entry (deduplicates by id). */
+export function addStoryLogEntry(
+  state: WorldPlayerState,
+  entry: Omit<StoryLogEntry, 'order'>
+): WorldPlayerState {
+  if (state.storyLog.some(e => e.id === entry.id)) return state
+  const order = state.storyLog.length > 0
+    ? Math.max(...state.storyLog.map(e => e.order)) + 1
+    : 0
+  return {
+    ...state,
+    storyLog: [...state.storyLog, { ...entry, order }],
+  }
+}
+
 // ─── Quest helpers ───
 
 /** Accept a quest: add its ID to activeQuests if not already active or completed. */
 export function acceptQuest(state: WorldPlayerState, questId: string): WorldPlayerState {
   if (state.activeQuests.includes(questId) || state.completedQuests.includes(questId)) return state
-  if (!getQuestById(questId)) return state
-  return { ...state, activeQuests: [...state.activeQuests, questId] }
+  const quest = getQuestById(questId)
+  if (!quest) return state
+  let next: WorldPlayerState = { ...state, activeQuests: [...state.activeQuests, questId] }
+  // Story log entry for main quest acceptance
+  if (quest.isMainQuest) {
+    next = addStoryLogEntry(next, {
+      id: `accept_${questId}`,
+      text: `Accepted mission: ${quest.name}. ${quest.description}`,
+      source: 'quest_accept',
+    })
+  }
+  return next
 }
 
 /**
@@ -335,6 +388,21 @@ export function claimQuestReward(state: WorldPlayerState, questId: string): Worl
     gil,
     activeQuests: state.activeQuests.filter((id) => id !== questId),
     completedQuests: [...state.completedQuests, questId],
+  }
+
+  // Story log entry for quest completion
+  if (quest.isMainQuest && quest.storyText) {
+    next = addStoryLogEntry(next, {
+      id: `complete_${questId}`,
+      text: quest.storyText,
+      source: 'quest_complete',
+    })
+  } else if (!quest.isMainQuest) {
+    next = addStoryLogEntry(next, {
+      id: `complete_${questId}`,
+      text: `Completed: ${quest.name}.`,
+      source: 'quest_complete',
+    })
   }
 
   // Main quests advance the story chapter

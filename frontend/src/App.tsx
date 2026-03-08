@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
-import { loadWorldState, saveWorldState, addToInventory, markDiscovered, isStarterCard, acceptQuest, claimQuestReward, removeCardAndCleanHand, spreadRuleToRegion, abolishRuleFromRegion } from './data/worldState'
+import { loadWorldState, saveWorldState, addToInventory, markDiscovered, isStarterCard, acceptQuest, claimQuestReward, removeCardAndCleanHand, spreadRuleToRegion, abolishRuleFromRegion, markDungeonCleared, markNpcSeen, addStoryLogEntry } from './data/worldState'
 import { getTournamentAtLocation } from './data/shops'
-import { getNpcById } from './data/world'
+import { getNpcById, getLocationById } from './data/world'
 import { DeckManager } from './components/DeckManager'
 import { PlayPage } from './components/PlayPage'
 import { BattleScreen, type BattleResult } from './components/BattleScreen'
@@ -154,6 +154,19 @@ function App() {
         next = { ...next, npcWins: { ...next.npcWins, [key]: (next.npcWins[key] ?? 0) + 1 } }
       }
 
+      // Mark dungeon cleared when boss is defeated
+      if (result.isDungeonBoss && result.dungeonLocationId) {
+        next = markDungeonCleared(next, result.dungeonLocationId)
+        const loc = getLocationById(result.dungeonLocationId)
+        if (loc) {
+          next = addStoryLogEntry(next, {
+            id: `dungeon_${result.dungeonLocationId}`,
+            text: `Conquered ${loc.name}. All opponents have been defeated.`,
+            source: 'dungeon_clear',
+          })
+        }
+      }
+
       // Unlock progression
       if (!result.isTournament && result.winner === 0) {
         next = { ...next, unlockedOrder: Math.min(next.unlockedOrder + 1, 9) }
@@ -177,6 +190,21 @@ function App() {
 
   const handleClaimQuest = useCallback((questId: string) => {
     setWorldState((prev) => claimQuestReward(prev, questId))
+  }, [])
+
+  // NPC interaction: mark seen + add story log entry if NPC has storyLogText
+  const handleNpcInteract = useCallback((npc: { id: string; locationId: string; storyLogText?: string }) => {
+    setWorldState((prev) => {
+      let next = markNpcSeen(prev, npc.locationId, npc.id)
+      if (npc.storyLogText) {
+        next = addStoryLogEntry(next, {
+          id: `npc_${npc.id}`,
+          text: npc.storyLogText,
+          source: 'npc_talk',
+        })
+      }
+      return next
+    })
   }, [])
 
   // Queen of Cards: spread/abolish rules for a gil cost
@@ -335,6 +363,7 @@ function App() {
             onClaimQuest={handleClaimQuest}
             onSpreadRule={handleSpreadRule}
             onAbolishRule={handleAbolishRule}
+            onNpcInteract={handleNpcInteract}
           />
         </div>
         {tab === 'deck' && (

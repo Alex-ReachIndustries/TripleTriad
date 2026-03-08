@@ -40,11 +40,20 @@ export interface Region {
 
 export interface UnlockCondition {
   /** Type of condition. */
-  type: 'default' | 'beat_npc' | 'clear_dungeon' | 'unique_wins_in_location' | 'unique_wins_in_region' | 'quest_count' | 'story_chapter'
-  /** For beat_npc: NPC id. For clear_dungeon: location id. For unique_wins: location/region id. */
+  type: 'default' | 'beat_npc' | 'clear_dungeon' | 'unique_wins_in_location' | 'unique_wins_in_region' | 'quest_count' | 'story_chapter' | 'quest_accepted' | 'quest_completed' | 'npc_spoken'
+  /** For beat_npc/npc_spoken: NPC id. For clear_dungeon: location id. For unique_wins: location/region id. For quest_accepted/quest_completed: quest id. */
   targetId?: string
   /** For unique_wins: how many unique NPC wins needed. For quest_count: how many quests. For story_chapter: chapter number required. */
   count?: number
+}
+
+export type StoryLogSource = 'prologue' | 'npc_talk' | 'quest_accept' | 'quest_complete' | 'dungeon_clear'
+
+export interface StoryLogEntry {
+  id: string
+  text: string
+  source: StoryLogSource
+  order: number
 }
 
 export interface Location {
@@ -117,6 +126,8 @@ export interface NPC {
   minChapter?: number
   /** Story chapter maximum — NPC only visible when storyChapter <= this value. */
   maxChapter?: number
+  /** Story log text added when player first talks to this NPC. */
+  storyLogText?: string
 }
 
 // ─── Legacy type aliases (backward compat until UI migration) ───

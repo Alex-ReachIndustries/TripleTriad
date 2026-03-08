@@ -1,7 +1,18 @@
 import type { WorldPlayerState } from '../../data/worldState'
 import { QUESTS } from '../../data/quests'
-import { getQuestById, getQuestStatus, isQuestAccessible } from '../../data/quests'
+import { getQuestStatus, isQuestAccessible } from '../../data/quests'
 import type { Quest, QuestStatus } from '../../types/quest'
+import type { StoryLogSource } from '../../types/world'
+
+function sourceLabel(source: StoryLogSource): string {
+  switch (source) {
+    case 'prologue': return 'Prologue'
+    case 'npc_talk': return 'Encounter'
+    case 'quest_accept': return 'Quest'
+    case 'quest_complete': return 'Milestone'
+    case 'dungeon_clear': return 'Victory'
+  }
+}
 
 interface QuestLogProps {
   worldState: WorldPlayerState
@@ -14,10 +25,8 @@ export function QuestLog({ worldState, onBack }: QuestLogProps) {
   const mainQuests = accessible.filter(q => q.isMainQuest)
   const sideQuests = accessible.filter(q => !q.isMainQuest)
 
-  // Story log: completed main quests in chapter order
-  const completedMainQuests = worldState.mainQuestLog
-    .map(id => getQuestById(id))
-    .filter((q): q is Quest => q != null)
+  // Story log: sorted by order
+  const storyEntries = [...(worldState.storyLog ?? [])].sort((a, b) => a.order - b.order)
 
   // Active quests — already accepted, giver still accessible
   const activeMain = mainQuests.filter(q =>
@@ -54,20 +63,20 @@ export function QuestLog({ worldState, onBack }: QuestLogProps) {
         </div>
       </div>
 
-      {/* Story Log — completed main quest entries */}
+      {/* Story Log — granular entries from NPCs, quests, dungeons */}
       <section className="ql-section">
         <h3 className="ql-section-title">
           <span className="ql-section-icon">&#x1F4D6;</span>
           Story Log
         </h3>
-        {completedMainQuests.length === 0 ? (
-          <p className="ql-empty">Your story has just begun. Complete main quests to fill your story log.</p>
+        {storyEntries.length === 0 ? (
+          <p className="ql-empty">Your story has just begun...</p>
         ) : (
           <div className="ql-story-entries">
-            {completedMainQuests.map(quest => (
-              <div key={quest.id} className="ql-story-entry">
-                <div className="ql-story-chapter">{quest.chapterTitle}</div>
-                <p className="ql-story-text">{quest.storyText}</p>
+            {storyEntries.map(entry => (
+              <div key={entry.id} className="ql-story-entry">
+                <span className={`ql-story-source ${entry.source}`}>{sourceLabel(entry.source)}</span>
+                <p className="ql-story-text">{entry.text}</p>
               </div>
             ))}
           </div>

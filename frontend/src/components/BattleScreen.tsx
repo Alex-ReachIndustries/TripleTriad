@@ -36,6 +36,8 @@ export interface BattleResult {
   gilReward: number
   cardsGained: string[]
   cardsLost: string[]
+  isDungeonBoss: boolean
+  dungeonLocationId: string | null
 }
 
 export interface BattleScreenProps {
@@ -318,6 +320,8 @@ export function BattleScreen({
         gilReward,
         cardsGained: (trade?.cardsGained ?? []).map(c => c.id),
         cardsLost: (trade?.cardsLost ?? []).map(c => c.id),
+        isDungeonBoss: !!(npc?.isBoss && winner === 0),
+        dungeonLocationId: npc?.isBoss && winner === 0 ? locationId : null,
       }
       setBattleResult(result)
     }
@@ -341,6 +345,8 @@ export function BattleScreen({
       gilReward,
       cardsGained: selectedCards.map(c => c.id),
       cardsLost: tradeResult.cardsLost.map(c => c.id),
+      isDungeonBoss: !!(npc?.isBoss && winner === 0),
+      dungeonLocationId: npc?.isBoss && winner === 0 ? locationId : null,
     }
     setBattleResult(result)
   }, [tradeResult, selectedTradeIndices, localGameState, npc, npcId, tournamentPrize])

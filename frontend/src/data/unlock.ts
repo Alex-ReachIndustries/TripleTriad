@@ -51,6 +51,15 @@ export function isUnlockConditionMet(
       return state.completedQuests.length >= (condition.count ?? 1)
     case 'story_chapter':
       return state.storyChapter >= (condition.count ?? 0)
+    case 'quest_accepted':
+      return state.activeQuests.includes(condition.targetId!)
+        || state.completedQuests.includes(condition.targetId!)
+    case 'quest_completed':
+      return state.completedQuests.includes(condition.targetId!)
+    case 'npc_spoken':
+      return Object.values(state.seenContent).some(
+        npcs => npcs.includes(condition.targetId!)
+      )
     default:
       return false
   }

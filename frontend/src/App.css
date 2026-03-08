@@ -2939,12 +2939,23 @@
   border-radius: 0 var(--radius) var(--radius) 0;
 }
 
-.ql-story-chapter {
-  font-size: 0.85rem;
+.ql-story-source {
+  display: inline-block;
+  font-size: 0.7rem;
   font-weight: 700;
-  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.15rem 0.5rem;
+  border-radius: 0.75rem;
   margin-bottom: 0.35rem;
+  color: #fff;
+  background: var(--accent);
 }
+.ql-story-source.prologue { background: #7c5cbf; }
+.ql-story-source.npc_talk { background: #2d8cf0; }
+.ql-story-source.quest_accept { background: #e6a817; }
+.ql-story-source.quest_complete { background: #19a974; }
+.ql-story-source.dungeon_clear { background: #e74c3c; }
 
 .ql-story-text {
   font-size: 0.85rem;
