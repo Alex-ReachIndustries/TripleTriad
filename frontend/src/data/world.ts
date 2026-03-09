@@ -1,6 +1,6 @@
 /**
  * V3 Campaign world data: 6 regions, ~30 locations, ~100+ NPCs.
- * 13-chapter FF8 storyline with backtracking and TD (Town-Dungeon) locations.
+ * 18-chapter FF8 storyline with backtracking and TD (Town-Dungeon) locations.
  * Source of truth: .cursor/projects/triple-triad-v3-campaign.md
  */
 
@@ -39,7 +39,7 @@ export const REGIONS: Region[] = [
     description:
       'The militaristic Galbadian continent. The Same rule makes positioning crucial — one wrong move and your cards get chain-captured.',
     mapBounds: '16.3,29.8 38.6,32.5 48.4,61.4 28,70.1 16.3,29.8',
-    unlockCondition: { type: 'story_chapter', count: 2 },
+    unlockCondition: { type: 'story_chapter', count: 4 },
   },
   {
     id: 'fh',
@@ -50,7 +50,7 @@ export const REGIONS: Region[] = [
     description:
       'A pacifist settlement on the transcontinental bridge. Sudden Death means draws never end, and the Diff trade rule means you win or lose cards proportional to your score.',
     mapBounds: '52.9,53.3 60.8,54 60.9,61.5 53.5,60.9 52.9,53.3',
-    unlockCondition: { type: 'story_chapter', count: 4 },
+    unlockCondition: { type: 'story_chapter', count: 8 },
   },
   {
     id: 'trabia',
@@ -61,7 +61,7 @@ export const REGIONS: Region[] = [
     description:
       'The frozen northern continent. The Plus rule rewards mathematical thinking, but Random hands make it a gamble. Diff trading means bigger wins — and bigger losses.',
     mapBounds: '45.6,12.7 78.4,26.4 76.4,41.5 46.5,39 45.6,12.7',
-    unlockCondition: { type: 'story_chapter', count: 6 },
+    unlockCondition: { type: 'story_chapter', count: 10 },
   },
   {
     id: 'centra',
@@ -72,7 +72,7 @@ export const REGIONS: Region[] = [
     description:
       'The ruined southern continent, devastated by the Lunar Cry. Combo chains captures from Same and Plus, and Direct trade means you swap every card you captured.',
     mapBounds: '40.9,64.9 61.1,65.4 66.1,94.9 32.2,93.2 40.9,64.9',
-    unlockCondition: { type: 'story_chapter', count: 8 },
+    unlockCondition: { type: 'story_chapter', count: 12 },
   },
   {
     id: 'esthar',
@@ -83,7 +83,7 @@ export const REGIONS: Region[] = [
     description:
       'The technologically advanced Esthar continent. Same Wall makes edges deadly, Random shuffles your hand, and the All trade rule means the winner takes everything.',
     mapBounds: '65.7,44.6 89.3,46.5 81.6,84.4 63.2,75 65.7,44.6',
-    unlockCondition: { type: 'story_chapter', count: 9 },
+    unlockCondition: { type: 'story_chapter', count: 13 },
   },
 ]
 
@@ -91,7 +91,7 @@ export const REGIONS: Region[] = [
 
 export const LOCATIONS: Location[] = [
   // ═══════════════════════════════════════════════════════════════════════════
-  // CHAPTER 1 — BALAMB REGION
+  // CHAPTERS 1-3 — BALAMB REGION (Garden Intro → Fire Cavern → SeeD Exam)
   // ═══════════════════════════════════════════════════════════════════════════
   {
     id: 'balamb_garden',
@@ -147,7 +147,7 @@ export const LOCATIONS: Location[] = [
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // CHAPTER 2 — GALBADIA REGION
+  // CHAPTERS 4-6 — GALBADIA REGION (Timber → Assassination → Prison)
   // ═══════════════════════════════════════════════════════════════════════════
   {
     id: 'timber',
@@ -236,7 +236,7 @@ export const LOCATIONS: Location[] = [
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // CHAPTER 3 — BALAMB REGION (backtrack)
+  // CHAPTER 7 — BALAMB REGION (Missile Base & Garden Crisis)
   // ═══════════════════════════════════════════════════════════════════════════
   {
     id: 'balamb_garden_basement',
@@ -246,13 +246,13 @@ export const LOCATIONS: Location[] = [
     order: 10,
     mapX: 73.4,
     mapY: 69,
-    unlockCondition: { type: 'quest_completed', targetId: 'mq_galbadian_offensive' },
+    unlockCondition: { type: 'quest_completed', targetId: 'mq_missile_base' },
     parentTownId: 'balamb_garden',
     flavour: 'Hidden passages beneath the Garden. The MD Level holds secrets the faculty tried to bury...',
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // CHAPTER 4 — FISHERMAN'S HORIZON REGION
+  // CHAPTER 8 — FISHERMAN'S HORIZON REGION
   // ═══════════════════════════════════════════════════════════════════════════
   {
     id: 'fishermans_horizon',
@@ -266,7 +266,7 @@ export const LOCATIONS: Location[] = [
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // CHAPTER 5 — BALAMB REGION (backtrack)
+  // CHAPTER 9 — BALAMB REGION (Balamb Liberation)
   // ═══════════════════════════════════════════════════════════════════════════
   {
     id: 'balamb_under_siege',
@@ -282,7 +282,7 @@ export const LOCATIONS: Location[] = [
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // CHAPTER 6 — TRABIA REGION
+  // CHAPTER 10 — TRABIA REGION (Trabia & Memories)
   // ═══════════════════════════════════════════════════════════════════════════
   {
     id: 'roaming_forest',
@@ -307,7 +307,7 @@ export const LOCATIONS: Location[] = [
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // CHAPTER 7 — GALBADIA REGION (backtrack)
+  // CHAPTER 11 — GALBADIA REGION (Battle of the Gardens)
   // ═══════════════════════════════════════════════════════════════════════════
   {
     id: 'galbadia_garden_revolution',
@@ -323,7 +323,7 @@ export const LOCATIONS: Location[] = [
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // CHAPTER 8 — CENTRA REGION
+  // CHAPTER 12 — CENTRA REGION (The Orphanage)
   // ═══════════════════════════════════════════════════════════════════════════
   {
     id: 'edeas_house',
@@ -347,7 +347,7 @@ export const LOCATIONS: Location[] = [
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // CHAPTER 9 — ESTHAR REGION
+  // CHAPTERS 13-14 — ESTHAR REGION (Esthar → Space & Lunar Cry)
   // ═══════════════════════════════════════════════════════════════════════════
   {
     id: 'great_salt_lake',
@@ -393,7 +393,7 @@ export const LOCATIONS: Location[] = [
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // CHAPTER 10 — CENTRA REGION (backtrack)
+  // CHAPTER 15 — CENTRA REGION (Deep Sea & Shumi)
   // ═══════════════════════════════════════════════════════════════════════════
   {
     id: 'deep_sea_research_center',
@@ -403,12 +403,12 @@ export const LOCATIONS: Location[] = [
     order: 2,
     mapX: 7.4,
     mapY: 85,
-    unlockCondition: { type: 'quest_completed', targetId: 'mq_contact' },
+    unlockCondition: { type: 'quest_completed', targetId: 'mq_lunar_cry' },
     flavour: 'The deepest facility in the world. Four levels of increasingly dangerous opponents guard the ultimate prize...',
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // CHAPTER 11 — TRABIA REGION (backtrack)
+  // CHAPTER 15 — TRABIA REGION (Shumi Village)
   // ═══════════════════════════════════════════════════════════════════════════
   {
     id: 'shumi_village',
@@ -418,11 +418,11 @@ export const LOCATIONS: Location[] = [
     order: 2,
     mapX: 24.1,
     mapY: 34,
-    unlockCondition: { type: 'quest_completed', targetId: 'mq_into_the_deep' },
+    unlockCondition: { type: 'quest_completed', targetId: 'mq_deep_sea' },
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // CHAPTER 12 — ESTHAR REGION (backtrack)
+  // CHAPTER 16 — ESTHAR REGION (Lunatic Pandora)
   // ═══════════════════════════════════════════════════════════════════════════
   {
     id: 'lunatic_pandora',
@@ -432,12 +432,12 @@ export const LOCATIONS: Location[] = [
     order: 4,
     mapX: 33,
     mapY: 56,
-    unlockCondition: { type: 'quest_completed', targetId: 'mq_shumis_wisdom' },
+    unlockCondition: { type: 'quest_completed', targetId: 'mq_deep_sea' },
     flavour: 'A massive crystalline structure floating above Esthar. The final Galbadian weapon...',
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // CHAPTER 13 — CENTRA REGION (backtrack)
+  // CHAPTERS 17-18 — CENTRA REGION (Time Compression → Ultimecia's Castle)
   // ═══════════════════════════════════════════════════════════════════════════
   {
     id: 'centra_excavation_site',
@@ -447,7 +447,7 @@ export const LOCATIONS: Location[] = [
     order: 3,
     mapX: 45.4,
     mapY: 24,
-    unlockCondition: { type: 'quest_completed', targetId: 'mq_pandoras_box' },
+    unlockCondition: { type: 'quest_completed', targetId: 'mq_lunatic_pandora' },
     flavour: 'Ancient ruins deep beneath the Centra continent. Archaeologists discovered something terrible here...',
   },
   {
@@ -536,17 +536,6 @@ export const NPCS: NPC[] = ([
       { cardId: 'buel' },
     ],
   },
-  {
-    id: 'zell',
-    name: 'Zell',
-    locationId: 'balamb_town',
-    type: 'dialogue',
-    dialogue: {
-      text: "Yo! Triple Triad is the best game ever! You should check out the Garden — lots of players there.",
-    },
-    questId: 'zells_request',
-  },
-
   // ── Balamb Garden ────────────────────────────────────────────────────────
   {
     id: 'garden_student',
@@ -599,16 +588,6 @@ export const NPCS: NPC[] = ([
       'creeps',
     ],
     gilReward: 150,
-  },
-  {
-    id: 'quistis',
-    name: 'Quistis',
-    locationId: 'balamb_garden',
-    type: 'dialogue',
-    dialogue: {
-      text: "Triple Triad teaches you to think strategically. That's a SeeD quality.",
-    },
-    questId: 'quistis_test',
   },
   {
     id: 'library_girl',
@@ -798,16 +777,6 @@ export const NPCS: NPC[] = ([
     ],
   },
   {
-    id: 'queen_of_cards',
-    name: 'Queen of Cards',
-    locationId: 'dollet',
-    type: 'dialogue',
-    dialogue: {
-      text: "I travel the world playing Triple Triad. Perhaps we'll meet again in your travels.",
-    },
-    questId: 'queens_favour',
-  },
-  {
     id: 'dollet_tournament',
     name: 'Dollet Tournament',
     locationId: 'dollet',
@@ -884,16 +853,6 @@ export const NPCS: NPC[] = ([
     gilReward: 150,
   },
   {
-    id: 'resistance_member',
-    name: 'Resistance Member',
-    locationId: 'timber',
-    type: 'dialogue',
-    dialogue: {
-      text: "We fight for Timber's independence. A card game would lighten the mood.",
-    },
-    questId: 'resistance_supplies',
-  },
-  {
     id: 'timber_card_dealer',
     name: 'Timber Card Dealer',
     locationId: 'timber',
@@ -962,17 +921,6 @@ export const NPCS: NPC[] = ([
     ],
     gilReward: 250,
   },
-  {
-    id: 'irvine',
-    name: 'Irvine',
-    locationId: 'galbadia_garden',
-    type: 'dialogue',
-    dialogue: {
-      text: "Hey there! I'm quite the card player myself. Beat the instructor here and I might have something for you.",
-    },
-    questId: 'irvines_challenge',
-  },
-
   // ── Deling City ──────────────────────────────────────────────────────────
   {
     id: 'deling_city_guard',
@@ -1229,17 +1177,6 @@ export const NPCS: NPC[] = ([
     ],
     gilReward: 275,
   },
-  {
-    id: 'laguna',
-    name: 'Laguna',
-    locationId: 'winhill',
-    type: 'dialogue',
-    dialogue: {
-      text: "Winhill... brings back memories. Beat the flower girl here and I'll share something special with you.",
-    },
-    questId: 'lagunas_memento',
-  },
-
   // ═══════════════════════════════════════════════════════════════════════════
   // REGION 3: FISHERMAN'S HORIZON
   // ═══════════════════════════════════════════════════════════════════════════
@@ -1298,16 +1235,6 @@ export const NPCS: NPC[] = ([
     gilReward: 300,
   },
   {
-    id: 'fh_fisherman',
-    name: 'FH Fisherman',
-    locationId: 'fishermans_horizon',
-    type: 'dialogue',
-    dialogue: {
-      text: 'I once caught a card in my net. No, really!',
-    },
-    questId: 'fishers_catch',
-  },
-  {
     id: 'fh_card_trader',
     name: 'FH Card Trader',
     locationId: 'fishermans_horizon',
@@ -1341,17 +1268,6 @@ export const NPCS: NPC[] = ([
       'vysage',
       't_rexaur',
     ],
-  },
-  {
-    id: 'mayor_dobe',
-    name: 'Mayor Dobe',
-    locationId: 'fishermans_horizon',
-    type: 'dialogue',
-    dialogue: {
-      text: "Triple Triad? I suppose it's a peaceful pursuit... But prove yourself against our best player first.",
-    },
-    questId: 'mq_the_bridge',
-    storyLogText: "Mayor Dobe of Fisherman's Horizon reluctantly acknowledges your presence. He challenges you to prove your skills are more than just warfare.",
   },
   {
     id: 'fh_master',
@@ -1427,17 +1343,6 @@ export const NPCS: NPC[] = ([
     ],
     gilReward: 350,
   },
-  {
-    id: 'selphie',
-    name: 'Selphie',
-    locationId: 'trabia_garden',
-    type: 'dialogue',
-    dialogue: {
-      text: "Booyaka! Let's play cards! It'll cheer everyone up! Beat the scout here and I'll give you something special!",
-    },
-    questId: 'selphies_morale_boost',
-  },
-
   // ── Shumi Village ────────────────────────────────────────────────────────
   {
     id: 'shumi_elder',
@@ -1481,17 +1386,6 @@ export const NPCS: NPC[] = ([
       { cardId: 'imp' },
     ],
   },
-  {
-    id: 'shumi_sculptor',
-    name: 'Shumi Sculptor',
-    locationId: 'shumi_village',
-    type: 'dialogue',
-    dialogue: {
-      text: 'I carve statues... but I also know card secrets.',
-    },
-    questId: 'sculptors_muse',
-  },
-
   // ═══════════════════════════════════════════════════════════════════════════
   // REGION 5: CENTRA
   // ═══════════════════════════════════════════════════════════════════════════
@@ -1550,16 +1444,6 @@ export const NPCS: NPC[] = ([
     gilReward: 500,
   },
   {
-    id: 'edea',
-    name: 'Edea',
-    locationId: 'edeas_house',
-    type: 'dialogue',
-    dialogue: {
-      text: 'Children... this is where your journey began. And where it continues.',
-    },
-    questId: 'matrons_request',
-  },
-  {
     id: 'ruin_explorer',
     name: 'Ruin Explorer',
     locationId: 'edeas_house',
@@ -1574,17 +1458,6 @@ export const NPCS: NPC[] = ([
       { cardId: 'iron_giant' },
     ],
   },
-  {
-    id: 'tonberry_king_npc',
-    name: 'Tonberry King',
-    locationId: 'edeas_house',
-    type: 'dialogue',
-    dialogue: {
-      text: '...',
-    },
-    questId: 'tonberrys_treasure',
-  },
-
   // ── Centra Ruins (Dungeon) ───────────────────────────────────────────────
   {
     id: 'ruin_spirit',
@@ -1775,26 +1648,6 @@ export const NPCS: NPC[] = ([
       { cardId: 'elnoyle' },
       { cardId: 'iron_giant' },
     ],
-  },
-  {
-    id: 'rinoa',
-    name: 'Rinoa',
-    locationId: 'esthar_city',
-    type: 'dialogue',
-    dialogue: {
-      text: "Squall never wants to play cards with me... Will you? Beat the soldier here and I'll give you something special.",
-    },
-    questId: 'rinoas_wish',
-  },
-  {
-    id: 'space_engineer',
-    name: 'Space Engineer',
-    locationId: 'esthar_city',
-    type: 'dialogue',
-    dialogue: {
-      text: "The view from up here changes your perspective on everything... even card games. Clear Lunar Gate and I'll have something for you.",
-    },
-    questId: 'final_frontier',
   },
   {
     id: 'esthar_tournament',
@@ -2076,66 +1929,511 @@ export const NPCS: NPC[] = ([
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // MAIN QUEST GIVER NPCs (dialogue type with questId)
+  // STORY CHARACTER NPCs — Main FFVIII cast across 18 chapters
   // ═══════════════════════════════════════════════════════════════════════════
 
+  // --- QUISTIS TREPE ---
+  {
+    id: 'quistis_garden_ch1',
+    name: 'Instructor Quistis',
+    locationId: 'balamb_garden',
+    type: 'dialogue',
+    dialogue: { text: "Welcome to Balamb Garden. I'm Instructor Trepe — I'll be guiding you through your training. Before the SeeD exam, you must pass the Fire Cavern prerequisite." },
+    storyLogText: 'Instructor Quistis Trepe welcomes you to Balamb Garden. She explains that before attempting the SeeD field exam, you must first clear the Fire Cavern.',
+    questId: 'mq_fire_cavern',
+    minChapter: 1,
+    maxChapter: 3,
+  },
+  {
+    id: 'quistis_garden_ch5',
+    name: 'Quistis',
+    locationId: 'balamb_garden',
+    type: 'dialogue',
+    dialogue: { text: "I've been demoted from instructor... but I'm still a SeeD. The assassination mission in Deling City needs all hands. I'll lead the gateway team." },
+    storyLogText: 'Quistis reveals she has been demoted from instructor. She volunteers to lead the gateway team for the assassination mission in Deling City.',
+    minChapter: 5,
+    maxChapter: 5,
+  },
+  {
+    id: 'quistis_gg',
+    name: 'Quistis',
+    locationId: 'galbadia_garden',
+    type: 'dialogue',
+    dialogue: { text: "Galbadia Garden has been taken over by the Sorceress. We need to storm it and end this. Are you ready for the Battle of the Gardens?" },
+    storyLogText: 'Quistis reports that Galbadia Garden has been seized by the Sorceress. The Battle of the Gardens is about to begin.',
+    questId: 'mq_garden_clash',
+    minChapter: 11,
+    maxChapter: 11,
+  },
+
+  // --- HEADMASTER CID ---
   {
     id: 'cid',
     name: 'Headmaster Cid',
     locationId: 'balamb_garden',
     type: 'dialogue',
-    dialogue: {
-      text: 'Your SeeD field exam awaits. Clear the Radio Tower in Dollet and return to me. Good luck, cadet.',
-    },
+    dialogue: { text: 'Your SeeD field exam awaits. Clear the Radio Tower in Dollet and return to me. Good luck, cadet.' },
+    storyLogText: 'Headmaster Cid assigns you the SeeD field exam — infiltrate the Dollet Radio Tower and prove yourself worthy of becoming a SeeD.',
     questId: 'mq_seed_exam',
-    storyLogText: 'Headmaster Cid briefs you on your SeeD field exam. Your mission: infiltrate the Dollet Radio Tower and prove yourself worthy of becoming a SeeD.',
+    minChapter: 3,
+    maxChapter: 3,
   },
   {
-    id: 'rinoa_timber',
-    name: 'Rinoa',
-    locationId: 'timber',
-    type: 'dialogue',
-    dialogue: {
-      text: "The Galbadian Missile Base threatens everything we've fought for. We need someone to infiltrate it. Will you go?",
-    },
-    questId: 'mq_galbadian_offensive',
-    storyLogText: 'Rinoa reveals the Galbadian Missile Base threatens the Gardens. She asks you to infiltrate it before it launches.',
-  },
-  {
-    id: 'xu',
-    name: 'Xu',
+    id: 'cid_commander',
+    name: 'Headmaster Cid',
     locationId: 'balamb_garden',
     type: 'dialogue',
-    dialogue: {
-      text: "There's something beneath the Garden — an ancient mechanism. The Headmaster wants you to investigate the basement.",
-    },
-    questId: 'mq_gardens_secret',
-    storyLogText: 'Xu confides that something ancient lies beneath Balamb Garden. The Headmaster wants you to investigate the mysterious basement.',
-    minChapter: 3,
+    dialogue: { text: "You've grown so much since that first day at the Garden. I'm naming you commander of Balamb Garden. Lead us well." },
+    storyLogText: "Headmaster Cid names you commander of Balamb Garden. 'Lead us well,' he says, placing the fate of Garden in your hands.",
+    minChapter: 8,
+    maxChapter: 8,
+  },
+  {
+    id: 'cid_orphanage',
+    name: 'Cid',
+    locationId: 'edeas_house',
+    type: 'dialogue',
+    dialogue: { text: "This is where it all began... Edea and I started SeeD here, at this orphanage. Everything was to protect you children." },
+    storyLogText: 'Cid stands at the orphanage where he and Edea founded SeeD. He reveals it was all to protect the children they raised — including you.',
+    minChapter: 12,
+    maxChapter: 18,
+  },
+
+  // --- ZELL DINCHT ---
+  {
+    id: 'zell_garden',
+    name: 'Zell',
+    locationId: 'balamb_garden',
+    type: 'dialogue',
+    dialogue: { text: "Yo! I'm Zell. Just transferred here. I punch things mostly, but I'm pretty good at Triple Triad too. Let's get through the SeeD exam together!" },
+    storyLogText: 'You meet Zell Dincht, an energetic martial artist and fellow SeeD candidate. He is eager to prove himself at the field exam.',
+    minChapter: 1,
+    maxChapter: 3,
   },
   {
     id: 'zell_balamb',
     name: 'Zell',
     locationId: 'balamb_town',
     type: 'dialogue',
-    dialogue: {
-      text: "Dude! Galbadian soldiers took over Balamb! We gotta drive 'em out! Are you with me?!",
-    },
-    questId: 'mq_reclaiming_balamb',
-    storyLogText: "Zell is furious — Galbadian soldiers have occupied his hometown. He's determined to drive them out and needs your help.",
-    minChapter: 5,
+    dialogue: { text: "Dude! Galbadian soldiers took over my hometown! We gotta drive 'em out! Fujin and Raijin are running the show here. Are you with me?!" },
+    storyLogText: "Zell is furious — Galbadian soldiers have occupied his hometown of Balamb. Fujin and Raijin are leading the occupation.",
+    questId: 'mq_reclaim_balamb',
+    minChapter: 9,
+    maxChapter: 9,
+  },
+  {
+    id: 'zell_trabia',
+    name: 'Zell',
+    locationId: 'trabia_garden',
+    type: 'dialogue',
+    dialogue: { text: "This is crazy... We all grew up at the same orphanage? GFs made us forget everything? I don't even know what's real anymore." },
+    storyLogText: "Zell struggles to process the orphanage revelation. 'I don't even know what's real anymore,' he says quietly.",
+    minChapter: 10,
+    maxChapter: 10,
+  },
+
+  // --- SELPHIE TILMITT ---
+  {
+    id: 'selphie_dollet',
+    name: 'Selphie',
+    locationId: 'dollet',
+    type: 'dialogue',
+    dialogue: { text: "Hi! I just transferred from Trabia Garden. I'm here for the SeeD exam too! Let's do our best!" },
+    storyLogText: 'You meet Selphie Tilmitt, a cheerful transfer student from Trabia Garden who has joined the SeeD exam squad.',
+    minChapter: 3,
+    maxChapter: 3,
+  },
+  {
+    id: 'selphie_missile',
+    name: 'Selphie',
+    locationId: 'galbadia_missile_base',
+    type: 'dialogue',
+    dialogue: { text: "They've already launched missiles at Trabia Garden... We can't let them hit Balamb too! I'll lead the infiltration team. Let's blow this place sky-high!" },
+    storyLogText: 'Selphie learns missiles have already struck Trabia Garden. Burning with determination, she leads the team to sabotage the missile base before Balamb Garden is next.',
+    questId: 'mq_missile_base',
+    minChapter: 7,
+    maxChapter: 7,
   },
   {
     id: 'selphie_trabia',
     name: 'Selphie',
     locationId: 'trabia_garden',
     type: 'dialogue',
-    dialogue: {
-      text: "Our Garden was hit... but we're not giving up! Beat our champion and show everyone we can still fight!",
-    },
+    dialogue: { text: "Our Garden was hit... but we're not giving up! My friends, my home... Beat our champion and show everyone we can still fight!" },
+    storyLogText: "Selphie stands amid the ruins of Trabia Garden, destroyed by Galbadian missiles. Despite the devastation, she refuses to give up.",
     questId: 'mq_memories',
-    storyLogText: "Selphie stands amid the ruins of Trabia Garden, hit by Galbadian missiles. Despite everything, she refuses to give up — and asks you to help restore hope.",
+    minChapter: 10,
+    maxChapter: 10,
   },
+  {
+    id: 'selphie_fh',
+    name: 'Selphie',
+    locationId: 'fishermans_horizon',
+    type: 'dialogue',
+    dialogue: { text: "Hey! I'm organizing a concert in the Garden quad to cheer everyone up. We could all use some music right about now, don't you think?" },
+    storyLogText: "Selphie organizes a concert at Fisherman's Horizon to boost morale after the Garden's crash landing.",
+    minChapter: 8,
+    maxChapter: 8,
+  },
+
+  // --- RINOA HEARTILLY ---
+  {
+    id: 'rinoa_ball',
+    name: 'Rinoa',
+    locationId: 'balamb_garden',
+    type: 'dialogue',
+    dialogue: { text: "You're the best-looking guy here. Dance with me? ...I'm just kidding. But seriously, come on! One dance won't kill you." },
+    storyLogText: 'At the SeeD graduation ball, a mysterious girl named Rinoa drags you onto the dance floor. Something about her is unforgettable.',
+    minChapter: 3,
+    maxChapter: 3,
+  },
+  {
+    id: 'rinoa_timber',
+    name: 'Rinoa',
+    locationId: 'timber',
+    type: 'dialogue',
+    dialogue: { text: "Welcome to Timber! I'm the leader of the Forest Owls resistance. We're going to kidnap President Deling from his private train. Are you in?" },
+    storyLogText: "Rinoa leads the Forest Owls, a resistance faction in occupied Timber. She has a bold plan: kidnap President Deling from his private train.",
+    questId: 'mq_timber_mission',
+    minChapter: 4,
+    maxChapter: 5,
+  },
+  {
+    id: 'rinoa_deling',
+    name: 'Rinoa',
+    locationId: 'deling_city',
+    type: 'dialogue',
+    dialogue: { text: "That woman — the Sorceress — she's terrifying. But I have this Odine Bangle that might suppress her powers. I have to try, even if it's dangerous." },
+    storyLogText: "Rinoa reveals she has an Odine Bangle that could suppress the Sorceress's powers. She's determined to confront Edea herself.",
+    minChapter: 5,
+    maxChapter: 5,
+  },
+  {
+    id: 'rinoa_esthar',
+    name: 'Rinoa',
+    locationId: 'esthar_city',
+    type: 'dialogue',
+    dialogue: { text: "I'm a sorceress now... I can feel the power inside me. What if they seal me away like they did Adel? ...Would you let them?" },
+    storyLogText: "Rinoa confides her fear — as a sorceress, she may be sealed away like Adel. Her eyes search yours for an answer.",
+    minChapter: 14,
+    maxChapter: 15,
+  },
+  {
+    id: 'rinoa_final',
+    name: 'Rinoa',
+    locationId: 'centra_excavation_site',
+    type: 'dialogue',
+    dialogue: { text: "Whatever happens in time compression... just think of me. Think of where you want to be. We'll find each other. I promise." },
+    storyLogText: "Rinoa makes you promise: no matter what happens during time compression, you'll find your way back to each other.",
+    minChapter: 17,
+    maxChapter: 18,
+  },
+
+  // --- IRVINE KINNEAS ---
+  {
+    id: 'irvine_gg',
+    name: 'Irvine',
+    locationId: 'galbadia_garden',
+    type: 'dialogue',
+    dialogue: { text: "Name's Irvine Kinneas, sharpshooter extraordinaire. They've assigned me to your team for the assassination mission. Don't worry — I never miss." },
+    storyLogText: "Irvine Kinneas, a sharpshooter from Galbadia Garden, joins the team for the Deling City assassination mission. He seems confident — perhaps too confident.",
+    minChapter: 5,
+    maxChapter: 5,
+  },
+  {
+    id: 'irvine_trabia',
+    name: 'Irvine',
+    locationId: 'trabia_garden',
+    type: 'dialogue',
+    dialogue: { text: "I have to tell you all something. I remember. We all grew up together at the same orphanage. Edea — the Sorceress — she was our Matron. She raised us." },
+    storyLogText: "Irvine reveals the devastating truth: all of you grew up together at Edea's orphanage. GF junctioning erased your memories. The Sorceress you've been fighting is your Matron.",
+    minChapter: 10,
+    maxChapter: 10,
+  },
+
+  // --- SEIFER ALMASY ---
+  {
+    id: 'seifer_garden',
+    name: 'Seifer',
+    locationId: 'balamb_garden',
+    type: 'dialogue',
+    dialogue: { text: "Well, well. Another cadet trying to become SeeD. Don't get in my way at Dollet. I don't need dead weight on my squad." },
+    storyLogText: 'Seifer Almasy, your arrogant rival, makes it clear he considers you dead weight. He leads Squad B for the Dollet exam.',
+    minChapter: 1,
+    maxChapter: 3,
+  },
+  {
+    id: 'seifer_deling',
+    name: 'Seifer',
+    locationId: 'deling_city',
+    type: 'dialogue',
+    dialogue: { text: "I've found my purpose. The Sorceress chose me as her knight. You SeeDs are nothing but tools — I'm the one with a romantic dream!" },
+    storyLogText: "Seifer has become Edea's knight. He stands at the Sorceress's side in Deling City, having abandoned everything for his 'romantic dream.'",
+    minChapter: 5,
+    maxChapter: 6,
+  },
+  {
+    id: 'seifer_prison',
+    name: 'Seifer',
+    locationId: 'd_district_prison',
+    type: 'dialogue',
+    dialogue: { text: "Tell me, SeeD. Why do you fight the Sorceress? She's going to bring a new order to this world. And I'll be at her side." },
+    storyLogText: 'Seifer interrogates you in D-District Prison. As the Sorceress\'s knight, he demands to know why SeeD opposes her.',
+    minChapter: 6,
+    maxChapter: 6,
+  },
+
+  // --- EDEA KRAMER ---
+  {
+    id: 'edea_sorceress',
+    name: 'Sorceress Edea',
+    locationId: 'deling_city',
+    type: 'dialogue',
+    dialogue: { text: "Foolish SeeDs... You dare challenge a Sorceress? Your precious Gardens will burn, and your pathetic resistance will crumble." },
+    storyLogText: 'Sorceress Edea addresses the crowd during the Deling City parade. Her words are chilling — she promises to destroy SeeD and the Gardens.',
+    minChapter: 5,
+    maxChapter: 5,
+  },
+  {
+    id: 'edea_centra',
+    name: 'Edea',
+    locationId: 'edeas_house',
+    type: 'dialogue',
+    dialogue: { text: "Children... I'm so sorry for what Ultimecia made me do. The real enemy is a sorceress from the future. Seek the White SeeD Ship — they can help you reach Esthar." },
+    storyLogText: "Edea, freed from Ultimecia's possession, apologizes for everything. She reveals the true enemy is a sorceress from the far future.",
+    questId: 'mq_orphanage',
+    minChapter: 12,
+    maxChapter: 15,
+  },
+  {
+    id: 'edea_final',
+    name: 'Edea',
+    locationId: 'centra_excavation_site',
+    type: 'dialogue',
+    dialogue: { text: "Ultimecia has fled into time compression. You must follow her — through the distortion of time itself — and end this once and for all." },
+    storyLogText: 'Edea reveals that Ultimecia has fled into time compression. To stop her, you must ride the compression itself into the far future.',
+    questId: 'mq_time_compression',
+    minChapter: 17,
+    maxChapter: 18,
+  },
+
+  // --- LAGUNA LOIRE ---
+  {
+    id: 'laguna_dream_1',
+    name: 'Laguna (Dream)',
+    locationId: 'deling_city',
+    type: 'dialogue',
+    dialogue: { text: "Man, I get so nervous around Julia... She's a pianist at the hotel here. Every time I try to talk to her, my leg cramps up!" },
+    storyLogText: "In a strange dream, you inhabit the body of Laguna Loire, a Galbadian soldier. He's hopelessly smitten with Julia, a pianist at the Deling City hotel.",
+    minChapter: 4,
+    maxChapter: 4,
+  },
+  {
+    id: 'laguna_dream_2',
+    name: 'Laguna (Dream)',
+    locationId: 'winhill',
+    type: 'dialogue',
+    dialogue: { text: "Raine's been taking care of me since I washed up here. And little Ellone... she's like a daughter to me. Winhill is peaceful. I wish it could last." },
+    storyLogText: 'Another dream of Laguna — he has settled in Winhill, nursed back to health by Raine. He patrols the village and watches over young Ellone.',
+    minChapter: 6,
+    maxChapter: 6,
+  },
+  {
+    id: 'laguna_esthar',
+    name: 'President Laguna',
+    locationId: 'esthar_city',
+    type: 'dialogue',
+    dialogue: { text: "So you're the one from the dreams, huh? I'm Laguna — President of Esthar. Long story. Lunatic Pandora has appeared. I'm too old for this... but you're not." },
+    storyLogText: "You finally meet Laguna Loire in person — he's the President of Esthar. He explains his past and the threat of Lunatic Pandora.",
+    questId: 'mq_lunatic_pandora',
+    minChapter: 13,
+    maxChapter: 16,
+  },
+
+  // --- ELLONE ---
+  {
+    id: 'ellone_ship',
+    name: 'Ellone',
+    locationId: 'white_seed_ship',
+    type: 'dialogue',
+    dialogue: { text: "I'm sorry for the dreams... that was me, sending your consciousness into the past. I was trying to change things, to save Raine. But you can't change the past." },
+    storyLogText: "Ellone apologizes for the dream sequences — she has the power to send consciousness into the past. She was trying to change history, but learned it's impossible.",
+    minChapter: 12,
+    maxChapter: 12,
+  },
+  {
+    id: 'ellone_lunar',
+    name: 'Ellone',
+    locationId: 'lunar_base',
+    type: 'dialogue',
+    dialogue: { text: "The Sorceress — Ultimecia — she wants to compress all of time. If she succeeds, past, present, and future will merge into one. We have to stop her." },
+    storyLogText: "Ellone explains Ultimecia's ultimate goal from the Lunar Base: to compress all of time into a single moment where she can rule everything.",
+    minChapter: 14,
+    maxChapter: 14,
+  },
+
+  // --- FUJIN & RAIJIN ---
+  {
+    id: 'fujin_garden',
+    name: 'Fujin',
+    locationId: 'balamb_garden',
+    type: 'dialogue',
+    dialogue: { text: "SEIFER. DISCIPLINARY COMMITTEE. STAY OUT OF TROUBLE." },
+    storyLogText: "You encounter Fujin, a member of Seifer's disciplinary committee. She speaks exclusively in single-word shouts.",
+    minChapter: 1,
+    maxChapter: 3,
+  },
+  {
+    id: 'raijin_garden',
+    name: 'Raijin',
+    locationId: 'balamb_garden',
+    type: 'dialogue',
+    dialogue: { text: "Hey, ya know? Seifer's our leader, ya know? We're the disciplinary committee, ya know?" },
+    storyLogText: "Raijin, another member of Seifer's posse, nervously explains the disciplinary committee's role.",
+    minChapter: 1,
+    maxChapter: 3,
+  },
+  {
+    id: 'fujin_balamb',
+    name: 'Fujin',
+    locationId: 'balamb_town',
+    type: 'dialogue',
+    dialogue: { text: "OCCUPATION. ORDERS. SEARCHING FOR ELLONE." },
+    storyLogText: "Fujin and Raijin have occupied Balamb Town under Seifer's orders, searching for someone named Ellone.",
+    minChapter: 9,
+    maxChapter: 9,
+  },
+  {
+    id: 'raijin_balamb',
+    name: 'Raijin',
+    locationId: 'balamb_town',
+    type: 'dialogue',
+    dialogue: { text: "Look, we're just following orders, ya know? Seifer told us to lock down Balamb, ya know? Nothing personal, ya know?" },
+    storyLogText: 'Raijin apologetically explains that the occupation is just orders from Seifer.',
+    minChapter: 9,
+    maxChapter: 9,
+  },
+  {
+    id: 'fujin_pandora',
+    name: 'Fujin',
+    locationId: 'lunatic_pandora',
+    type: 'dialogue',
+    dialogue: { text: "...Seifer. We've been with you through everything. But this has gone too far. Please... just stop. Come back to us." },
+    storyLogText: "In a shocking moment, Fujin drops her usual shouting and speaks softly, begging Seifer to stop. 'Come back to us,' she pleads.",
+    minChapter: 16,
+    maxChapter: 16,
+  },
+
+  // --- MAYOR DOBE ---
+  {
+    id: 'mayor_dobe',
+    name: 'Mayor Dobe',
+    locationId: 'fishermans_horizon',
+    type: 'dialogue',
+    dialogue: { text: "We don't want soldiers here. FH is a pacifist settlement. But... if you must stay while your Garden is repaired, at least prove your skills are more than warfare." },
+    storyLogText: "Mayor Dobe reluctantly allows you to stay at Fisherman's Horizon while the Garden is repaired. He challenges you to prove card skills aren't just about fighting.",
+    questId: 'mq_the_bridge',
+    minChapter: 8,
+    maxChapter: 9,
+  },
+
+  // --- XU ---
+  {
+    id: 'xu',
+    name: 'Xu',
+    locationId: 'balamb_garden',
+    type: 'dialogue',
+    dialogue: { text: "Garden Master NORG has turned against Cid. There's civil war in the basement — NORG wants to hand us over to the Sorceress. You need to stop him." },
+    storyLogText: "Xu warns that Garden Master NORG has betrayed Headmaster Cid. A civil war rages in the Garden basement.",
+    questId: 'mq_garden_crisis',
+    minChapter: 7,
+    maxChapter: 7,
+  },
+
+  // --- DR. ODINE ---
+  {
+    id: 'dr_odine',
+    name: 'Dr. Odine',
+    locationId: 'esthar_city',
+    type: 'dialogue',
+    dialogue: { text: "Ze Deep Sea Research Centre! Zere iz ancient Centra technology hidden below. You must retrieve it — for science, of course!" },
+    storyLogText: 'Dr. Odine rambles excitedly about ancient Centra technology hidden in the Deep Sea Research Centre.',
+    questId: 'mq_deep_sea',
+    minChapter: 15,
+    maxChapter: 16,
+  },
+
+  // --- ESTHAR OFFICIAL ---
+  {
+    id: 'esthar_official',
+    name: 'Esthar Official',
+    locationId: 'esthar_city',
+    type: 'dialogue',
+    dialogue: { text: "The Sorceress has been taken to the Lunar Base. You must go to space and stop her before the Lunar Cry is triggered." },
+    storyLogText: 'An Esthar Official delivers urgent news — the Sorceress has been taken to the Lunar Base. You must reach space before the Lunar Cry is triggered.',
+    questId: 'mq_lunar_cry',
+    minChapter: 13,
+    maxChapter: 14,
+  },
+
+  // --- SHUMI ATTENDANT ---
+  {
+    id: 'shumi_attendant',
+    name: 'Shumi Attendant',
+    locationId: 'shumi_village',
+    type: 'dialogue',
+    dialogue: { text: "The Elder has been expecting you. He holds wisdom about time and space that may prove vital for your journey ahead." },
+    storyLogText: 'The Shumi Attendant welcomes you — the Elder has been expecting your arrival with ancient wisdom about time and space.',
+    minChapter: 15,
+    maxChapter: 18,
+  },
+
+  // --- ZONE & WATTS ---
+  {
+    id: 'zone_timber',
+    name: 'Zone',
+    locationId: 'timber',
+    type: 'dialogue',
+    dialogue: { text: "I'm Zone, second-in-command of the Forest Owls! We've been waiting for SeeD reinforcements. The princess — er, Rinoa — has a plan." },
+    storyLogText: 'Zone, second-in-command of the Forest Owls resistance, eagerly awaits your arrival in Timber.',
+    minChapter: 4,
+    maxChapter: 5,
+  },
+  {
+    id: 'watts_timber',
+    name: 'Watts',
+    locationId: 'timber',
+    type: 'dialogue',
+    dialogue: { text: "Sir! I've been gathering intelligence on President Deling's train schedule, sir! Everything is ready for the operation, sir!" },
+    storyLogText: "Watts, the Forest Owls' intelligence officer, has detailed information on President Deling's movements.",
+    minChapter: 4,
+    maxChapter: 5,
+  },
+
+  // --- GENERAL CARAWAY ---
+  {
+    id: 'general_caraway',
+    name: 'General Caraway',
+    locationId: 'deling_city',
+    type: 'dialogue',
+    dialogue: { text: "I am General Caraway. The assassination plan is mine. During the parade, we'll trap the Sorceress's float at the city gate. Your sniper will have one shot." },
+    storyLogText: "General Caraway — Rinoa's estranged father — briefs you on the assassination plan. One shot during the parade is all you'll get.",
+    questId: 'mq_assassination',
+    minChapter: 5,
+    maxChapter: 5,
+  },
+
+  // --- QUEEN OF CARDS ---
+  {
+    id: 'queen_of_cards_esthar',
+    name: 'Queen of Cards',
+    locationId: 'esthar_city',
+    type: 'dialogue',
+    dialogue: { text: "I am the Queen of Cards. I travel the world, shaping the rules of card games in every region. For a price, I can spread a rule... or abolish one." },
+    minChapter: 13,
+  },
+
+  // --- TRABIA CHAMPION (duel NPC linked to Selphie's quest) ---
   {
     id: 'trabia_champion',
     name: 'Trabia Champion',
@@ -2151,96 +2449,6 @@ export const NPCS: NPC[] = ([
       'sam08g', 'death_claw', 'cactuar', 'tonberry', 'abyss_worm', 'turtapod', 'vysage', 't_rexaur', 'bomb', 'blitz',
     ],
     gilReward: 500,
-  },
-  {
-    id: 'quistis_gg',
-    name: 'Quistis',
-    locationId: 'galbadia_garden',
-    type: 'dialogue',
-    dialogue: {
-      text: "Galbadia Garden has been taken over. We need to storm it and end this. Are you ready for the Battle of the Gardens?",
-    },
-    questId: 'mq_garden_clash',
-    storyLogText: 'Quistis reports that Galbadia Garden has been seized by the Sorceress. A full assault is the only option — the Battle of the Gardens begins.',
-    minChapter: 7,
-  },
-  {
-    id: 'edea_centra',
-    name: 'Edea',
-    locationId: 'edeas_house',
-    type: 'dialogue',
-    dialogue: {
-      text: 'Children... seek the White SeeD Ship. Their captain holds the key to reaching Esthar.',
-    },
-    questId: 'mq_the_orphanage',
-    storyLogText: 'Edea, now freed from the Sorceress, speaks gently of the White SeeD Ship. Its captain holds the key to reaching the distant nation of Esthar.',
-  },
-  {
-    id: 'esthar_official',
-    name: 'Esthar Official',
-    locationId: 'esthar_city',
-    type: 'dialogue',
-    dialogue: {
-      text: 'The Sorceress has been taken to the Lunar Base. You must go to space and stop her before the Lunar Cry is triggered.',
-    },
-    questId: 'mq_contact',
-    storyLogText: 'An Esthar Official delivers urgent news: the Sorceress has been taken to the Lunar Base. You must reach space before the Lunar Cry is triggered.',
-  },
-  {
-    id: 'dr_odine',
-    name: 'Dr. Odine',
-    locationId: 'esthar_city',
-    type: 'dialogue',
-    dialogue: {
-      text: "Ze Deep Sea Research Centre! Zere iz ancient Centra technology hidden below. You must retrieve it — for science, of course!",
-    },
-    questId: 'mq_into_the_deep',
-    storyLogText: 'Dr. Odine rambles excitedly about ancient Centra technology hidden in the Deep Sea Research Centre. He insists you retrieve it — for science, of course.',
-    minChapter: 10,
-  },
-  {
-    id: 'shumi_attendant',
-    name: 'Shumi Attendant',
-    locationId: 'shumi_village',
-    type: 'dialogue',
-    dialogue: {
-      text: 'The Elder has been expecting you. He holds wisdom about time and space. Seek him out.',
-    },
-    questId: 'mq_shumis_wisdom',
-    storyLogText: 'The Shumi Attendant welcomes you — the Elder has been expecting your arrival. He holds ancient wisdom about time and space that may prove vital.',
-  },
-  {
-    id: 'laguna_esthar',
-    name: 'Laguna',
-    locationId: 'esthar_city',
-    type: 'dialogue',
-    dialogue: {
-      text: "Lunatic Pandora has appeared above Esthar. I'm too old for this... but you're not. Go stop it!",
-    },
-    questId: 'mq_pandoras_box',
-    storyLogText: "Laguna greets you with weary eyes. Lunatic Pandora looms above Esthar, and he's counting on you to stop it before it's too late.",
-    minChapter: 12,
-  },
-  {
-    id: 'queen_of_cards',
-    name: 'Queen of Cards',
-    locationId: 'esthar_city',
-    type: 'dialogue',
-    dialogue: {
-      text: "I am the Queen of Cards. I travel the world, shaping the rules of card games in every region. For a price, I can spread a rule to a region... or abolish one that annoys you. What would you like?",
-    },
-    minChapter: 10,
-  },
-  {
-    id: 'edea_final',
-    name: 'Edea',
-    locationId: 'centra_excavation_site',
-    type: 'dialogue',
-    dialogue: {
-      text: 'The Sorceress has fled to the deepest ruins of Centra. This is the final battle. End this once and for all.',
-    },
-    questId: 'mq_time_compression',
-    storyLogText: 'Edea warns you gravely — the Sorceress has fled to the deepest ruins of Centra. This is the final battle. The fate of the world rests on your cards.',
   },
 
   // ═══════════════════════════════════════════════════════════════════════════

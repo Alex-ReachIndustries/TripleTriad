@@ -10,7 +10,7 @@ import { QuestLog } from './components/world/QuestLog'
 import { TitleScreen } from './components/TitleScreen'
 import { HowToPlay } from './components/HowToPlay'
 import { HomePage } from './components/HomePage'
-import { StoryCutscene, OPENING_PANELS } from './components/StoryCutscene'
+import { StoryCutscene, OPENING_PANELS, CUTSCENE_MAP, QUEST_CUTSCENE_MAP } from './components/StoryCutscene'
 import { TutorialsMenu } from './components/TutorialsMenu'
 import { SettingsScreen, loadSettings, applySettingsToDOM } from './components/SettingsScreen'
 // @capacitor/app is imported dynamically — only available in Capacitor builds
@@ -41,6 +41,7 @@ function App() {
   const [worldState, setWorldState] = useState(loadWorldState)
   const [battleContext, setBattleContext] = useState<BattleContext | null>(null)
   const [saveExists, setSaveExists] = useState(hasSaveData)
+  const [pendingCutscene, setPendingCutscene] = useState<string | null>(null)
 
   // Apply saved settings on mount
   useEffect(() => {
@@ -189,7 +190,18 @@ function App() {
   }, [])
 
   const handleClaimQuest = useCallback((questId: string) => {
-    setWorldState((prev) => claimQuestReward(prev, questId))
+    setWorldState((prev) => {
+      const next = claimQuestReward(prev, questId)
+      // If quest was actually claimed (state changed) and has a cutscene, trigger it
+      if (next !== prev) {
+        const cutsceneId = QUEST_CUTSCENE_MAP[questId]
+        if (cutsceneId && !prev.seenCutscenes.includes(cutsceneId)) {
+          // Use setTimeout to avoid setState-inside-setState
+          setTimeout(() => setPendingCutscene(cutsceneId), 0)
+        }
+      }
+      return next
+    })
   }, [])
 
   // NPC interaction: mark seen + add story log entry if NPC has storyLogText
@@ -243,6 +255,18 @@ function App() {
     setTab('world')
     setView('game')
   }, [])
+
+  const handlePendingCutsceneComplete = useCallback(() => {
+    if (pendingCutscene) {
+      setWorldState((prev) => ({
+        ...prev,
+        seenCutscenes: prev.seenCutscenes.includes(pendingCutscene)
+          ? prev.seenCutscenes
+          : [...prev.seenCutscenes, pendingCutscene],
+      }))
+    }
+    setPendingCutscene(null)
+  }, [pendingCutscene])
 
   const handle2PDuel = useCallback(() => {
     setTab('duel')
@@ -303,6 +327,16 @@ function App() {
           <SettingsScreen onBack={() => setView('title')} />
         </main>
       </div>
+    )
+  }
+
+  // Show in-game cutscene overlay when a quest triggers one
+  if (pendingCutscene && CUTSCENE_MAP[pendingCutscene]) {
+    return (
+      <StoryCutscene
+        panels={CUTSCENE_MAP[pendingCutscene]}
+        onComplete={handlePendingCutsceneComplete}
+      />
     )
   }
 

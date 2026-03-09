@@ -327,6 +327,116 @@
   opacity: 0.6;
 }
 
+/* Swipe Confirm Dialog */
+.swipe-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  animation: swipe-fade-in 0.2s ease;
+}
+@keyframes swipe-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.swipe-dialog {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem 1.5rem 1.5rem;
+  max-width: 320px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+.swipe-dialog-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+  margin-bottom: 0.75rem;
+}
+.swipe-dialog-text {
+  font-size: 0.95rem;
+  color: var(--text);
+  margin: 0 0 1.5rem;
+  line-height: 1.5;
+}
+.swipe-track {
+  position: relative;
+  height: 52px;
+  background: var(--surface-alt);
+  border-radius: 26px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  user-select: none;
+  touch-action: none;
+}
+.swipe-track-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(201, 162, 39, 0.15), rgba(201, 162, 39, 0.3));
+  border-radius: 26px;
+  pointer-events: none;
+}
+.swipe-track-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  pointer-events: none;
+}
+.swipe-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent) 0%, #a88520 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--bg);
+  cursor: grab;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+.swipe-thumb.dragging {
+  cursor: grabbing;
+  box-shadow: 0 4px 16px rgba(201, 162, 39, 0.4);
+}
+.swipe-thumb.confirmed {
+  background: #19a974;
+}
+.swipe-dialog-cancel {
+  margin-top: 1rem;
+  padding: 0.5rem 1.5rem;
+  font-family: var(--font);
+  font-weight: 600;
+  font-size: 0.9rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.swipe-dialog-cancel:hover {
+  border-color: var(--text-muted);
+  color: var(--text);
+}
+
 /* Legacy compat — keep old class for any leftover references */
 .title-screen { display: none; }
 .title-screen-button {

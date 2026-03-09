@@ -58,7 +58,7 @@ export function QuestLog({ worldState, onBack }: QuestLogProps) {
         <div className="ql-title-area">
           <h2 className="ql-title">Quest Log</h2>
           <div className="ql-chapter-badge">
-            Chapter {worldState.storyChapter} of 13
+            Chapter {worldState.storyChapter} of 18
           </div>
         </div>
       </div>

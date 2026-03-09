@@ -49,6 +49,8 @@ export interface WorldPlayerState {
   seenTutorials: string[]
   /** Chronological story log entries from various sources. */
   storyLog: StoryLogEntry[]
+  /** Cutscene IDs the player has already seen. */
+  seenCutscenes: string[]
 }
 
 /** 5 starter cards – always protected (count can never drop below 1). */
@@ -56,6 +58,7 @@ export const STARTER_DECK_IDS: string[] = [
   'geezard', 'funguar', 'bite_bug', 'red_bat', 'blobra',
 ]
 
+const SAVE_VERSION = 2  // v2.0.0 — incompatible with v1.x saves
 const DEFAULT_GIL = 500
 
 function defaultState(): WorldPlayerState {
@@ -83,10 +86,11 @@ function defaultState(): WorldPlayerState {
     seenTutorials: [],
     storyLog: [{
       id: 'prologue',
-      text: 'Your journey begins at Balamb Garden. Armed with five basic cards and a dream, you set out to become the greatest Triple Triad player in the world.',
+      text: 'You arrive at Balamb Garden as a cadet, armed with five basic cards and 500 gil. Instructor Quistis awaits — the Fire Cavern prerequisite must be passed before the SeeD exam.',
       source: 'prologue',
       order: 0,
     }],
+    seenCutscenes: [],
   }
 }
 
@@ -104,6 +108,9 @@ export function loadWorldState(): WorldPlayerState {
     const parsed = JSON.parse(raw) as unknown
     if (typeof parsed !== 'object' || parsed === null) return defaultState()
     const o = parsed as Record<string, unknown>
+
+    // Discard saves from older versions (v1.x has no saveVersion field)
+    if (o.saveVersion !== SAVE_VERSION) return defaultState()
     const unlockedOrder = typeof o.unlockedOrder === 'number' ? o.unlockedOrder : 0
 
     // Parse inventory — support both new Record format and legacy string[] migration
@@ -210,6 +217,10 @@ export function loadWorldState(): WorldPlayerState {
       ? (o.seenTutorials as unknown[]).filter((v): v is string => typeof v === 'string')
       : []
 
+    const seenCutscenes = Array.isArray(o.seenCutscenes)
+      ? (o.seenCutscenes as unknown[]).filter((v): v is string => typeof v === 'string')
+      : []
+
     // Parse storyLog with backward-compat default
     const storyLog: StoryLogEntry[] = Array.isArray(o.storyLog)
       ? (o.storyLog as unknown[]).filter(
@@ -227,7 +238,7 @@ export function loadWorldState(): WorldPlayerState {
       }
     }
 
-    return { unlockedOrder, inventory, discoveredCards, gil, npcWins, savedDecks, lastDeckId, activeQuests, completedQuests, clearedDungeons, storyChapter, mainQuestLog, seenContent, lastHand, lastPlayedRegionId, regionRuleMods, seenTutorials, storyLog }
+    return { unlockedOrder, inventory, discoveredCards, gil, npcWins, savedDecks, lastDeckId, activeQuests, completedQuests, clearedDungeons, storyChapter, mainQuestLog, seenContent, lastHand, lastPlayedRegionId, regionRuleMods, seenTutorials, storyLog, seenCutscenes }
   } catch {
     return defaultState()
   }
@@ -235,7 +246,7 @@ export function loadWorldState(): WorldPlayerState {
 
 export function saveWorldState(state: WorldPlayerState): void {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...state, saveVersion: SAVE_VERSION }))
   } catch (_) {
     // ignore quota or other errors
   }
@@ -308,11 +319,23 @@ export function markNpcSeen(state: WorldPlayerState, locationId: string, npcId: 
   }
 }
 
-/** Advance the story chapter and log the completed main quest. */
+/**
+ * Advance the story chapter and log the completed main quest.
+ * Most main quests advance to the next chapter. Exceptions:
+ * - mq_missile_base: stays at ch7 (garden_crisis also in ch7)
+ * - mq_ultimecia: stays at ch18 (final chapter)
+ */
 export function advanceStoryChapter(state: WorldPlayerState, mainQuestId: string): WorldPlayerState {
+  // Quests that do NOT advance the chapter
+  const noAdvanceQuests = new Set(['mq_missile_base', 'mq_ultimecia'])
+
+  const nextChapter = noAdvanceQuests.has(mainQuestId)
+    ? state.storyChapter
+    : state.storyChapter + 1
+
   return {
     ...state,
-    storyChapter: state.storyChapter + 1,
+    storyChapter: nextChapter,
     mainQuestLog: [...state.mainQuestLog, mainQuestId],
   }
 }
