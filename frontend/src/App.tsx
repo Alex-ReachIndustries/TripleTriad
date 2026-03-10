@@ -10,7 +10,7 @@ import { QuestLog } from './components/world/QuestLog'
 import { TitleScreen } from './components/TitleScreen'
 import { HowToPlay } from './components/HowToPlay'
 import { HomePage } from './components/HomePage'
-import { StoryCutscene, OPENING_PANELS, CUTSCENE_MAP, QUEST_CUTSCENE_MAP } from './components/StoryCutscene'
+import { StoryCutscene, OPENING_PANELS, CUTSCENE_MAP, QUEST_CUTSCENE_MAP, CUTSCENE_STORY_LOG } from './components/StoryCutscene'
 import { TutorialsMenu } from './components/TutorialsMenu'
 import { SettingsScreen, loadSettings, applySettingsToDOM } from './components/SettingsScreen'
 // @capacitor/app is imported dynamically — only available in Capacitor builds
@@ -258,12 +258,23 @@ function App() {
 
   const handlePendingCutsceneComplete = useCallback(() => {
     if (pendingCutscene) {
-      setWorldState((prev) => ({
-        ...prev,
-        seenCutscenes: prev.seenCutscenes.includes(pendingCutscene)
-          ? prev.seenCutscenes
-          : [...prev.seenCutscenes, pendingCutscene],
-      }))
+      setWorldState((prev) => {
+        let next = {
+          ...prev,
+          seenCutscenes: prev.seenCutscenes.includes(pendingCutscene)
+            ? prev.seenCutscenes
+            : [...prev.seenCutscenes, pendingCutscene],
+        }
+        const logText = CUTSCENE_STORY_LOG[pendingCutscene]
+        if (logText) {
+          next = addStoryLogEntry(next, {
+            id: `cutscene_${pendingCutscene}`,
+            text: logText,
+            source: 'cutscene',
+          })
+        }
+        return next
+      })
     }
     setPendingCutscene(null)
   }, [pendingCutscene])
@@ -398,6 +409,23 @@ function App() {
             onSpreadRule={handleSpreadRule}
             onAbolishRule={handleAbolishRule}
             onNpcInteract={handleNpcInteract}
+            onMarkCutsceneSeen={(cutsceneId) => setWorldState(prev => {
+              let next = {
+                ...prev,
+                seenCutscenes: prev.seenCutscenes.includes(cutsceneId)
+                  ? prev.seenCutscenes
+                  : [...prev.seenCutscenes, cutsceneId],
+              }
+              const logText = CUTSCENE_STORY_LOG[cutsceneId]
+              if (logText) {
+                next = addStoryLogEntry(next, {
+                  id: `cutscene_${cutsceneId}`,
+                  text: logText,
+                  source: 'cutscene',
+                })
+              }
+              return next
+            })}
           />
         </div>
         {tab === 'deck' && (

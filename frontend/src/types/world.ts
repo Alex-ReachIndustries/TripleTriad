@@ -47,7 +47,7 @@ export interface UnlockCondition {
   count?: number
 }
 
-export type StoryLogSource = 'prologue' | 'npc_talk' | 'quest_accept' | 'quest_complete' | 'dungeon_clear'
+export type StoryLogSource = 'prologue' | 'npc_talk' | 'quest_accept' | 'quest_complete' | 'dungeon_clear' | 'cutscene'
 
 export interface StoryLogEntry {
   id: string

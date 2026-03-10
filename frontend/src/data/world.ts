@@ -39,7 +39,7 @@ export const REGIONS: Region[] = [
     description:
       'The militaristic Galbadian continent. The Same rule makes positioning crucial — one wrong move and your cards get chain-captured.',
     mapBounds: '16.3,29.8 38.6,32.5 48.4,61.4 28,70.1 16.3,29.8',
-    unlockCondition: { type: 'story_chapter', count: 4 },
+    unlockCondition: { type: 'story_chapter', count: 3 },
   },
   {
     id: 'fh',
@@ -50,7 +50,7 @@ export const REGIONS: Region[] = [
     description:
       'A pacifist settlement on the transcontinental bridge. Sudden Death means draws never end, and the Diff trade rule means you win or lose cards proportional to your score.',
     mapBounds: '52.9,53.3 60.8,54 60.9,61.5 53.5,60.9 52.9,53.3',
-    unlockCondition: { type: 'story_chapter', count: 8 },
+    unlockCondition: { type: 'story_chapter', count: 7 },
   },
   {
     id: 'trabia',
@@ -61,7 +61,7 @@ export const REGIONS: Region[] = [
     description:
       'The frozen northern continent. The Plus rule rewards mathematical thinking, but Random hands make it a gamble. Diff trading means bigger wins — and bigger losses.',
     mapBounds: '45.6,12.7 78.4,26.4 76.4,41.5 46.5,39 45.6,12.7',
-    unlockCondition: { type: 'story_chapter', count: 10 },
+    unlockCondition: { type: 'story_chapter', count: 9 },
   },
   {
     id: 'centra',
@@ -72,7 +72,7 @@ export const REGIONS: Region[] = [
     description:
       'The ruined southern continent, devastated by the Lunar Cry. Combo chains captures from Same and Plus, and Direct trade means you swap every card you captured.',
     mapBounds: '40.9,64.9 61.1,65.4 66.1,94.9 32.2,93.2 40.9,64.9',
-    unlockCondition: { type: 'story_chapter', count: 12 },
+    unlockCondition: { type: 'story_chapter', count: 11 },
   },
   {
     id: 'esthar',
@@ -83,7 +83,7 @@ export const REGIONS: Region[] = [
     description:
       'The technologically advanced Esthar continent. Same Wall makes edges deadly, Random shuffles your hand, and the All trade rule means the winner takes everything.',
     mapBounds: '65.7,44.6 89.3,46.5 81.6,84.4 63.2,75 65.7,44.6',
-    unlockCondition: { type: 'story_chapter', count: 13 },
+    unlockCondition: { type: 'story_chapter', count: 12 },
   },
 ]
 
@@ -132,7 +132,7 @@ export const LOCATIONS: Location[] = [
     order: 3,
     mapX: 10.6,
     mapY: 29.3,
-    unlockCondition: { type: 'unique_wins_in_location', targetId: 'fire_cavern', count: 1 },
+    unlockCondition: { type: 'clear_dungeon', targetId: 'fire_cavern' },
   },
   {
     id: 'radio_tower',
@@ -1962,7 +1962,7 @@ export const NPCS: NPC[] = ([
     dialogue: { text: "Galbadia Garden has been taken over by the Sorceress. We need to storm it and end this. Are you ready for the Battle of the Gardens?" },
     storyLogText: 'Quistis reports that Galbadia Garden has been seized by the Sorceress. The Battle of the Gardens is about to begin.',
     questId: 'mq_garden_clash',
-    minChapter: 11,
+    minChapter: 10,
     maxChapter: 11,
   },
 
@@ -1975,7 +1975,7 @@ export const NPCS: NPC[] = ([
     dialogue: { text: 'Your SeeD field exam awaits. Clear the Radio Tower in Dollet and return to me. Good luck, cadet.' },
     storyLogText: 'Headmaster Cid assigns you the SeeD field exam — infiltrate the Dollet Radio Tower and prove yourself worthy of becoming a SeeD.',
     questId: 'mq_seed_exam',
-    minChapter: 3,
+    minChapter: 2,
     maxChapter: 3,
   },
   {
@@ -2018,7 +2018,7 @@ export const NPCS: NPC[] = ([
     dialogue: { text: "Dude! Galbadian soldiers took over my hometown! We gotta drive 'em out! Fujin and Raijin are running the show here. Are you with me?!" },
     storyLogText: "Zell is furious — Galbadian soldiers have occupied his hometown of Balamb. Fujin and Raijin are leading the occupation.",
     questId: 'mq_reclaim_balamb',
-    minChapter: 9,
+    minChapter: 8,
     maxChapter: 9,
   },
   {
@@ -2051,7 +2051,7 @@ export const NPCS: NPC[] = ([
     dialogue: { text: "They've already launched missiles at Trabia Garden... We can't let them hit Balamb too! I'll lead the infiltration team. Let's blow this place sky-high!" },
     storyLogText: 'Selphie learns missiles have already struck Trabia Garden. Burning with determination, she leads the team to sabotage the missile base before Balamb Garden is next.',
     questId: 'mq_missile_base',
-    minChapter: 7,
+    minChapter: 6,
     maxChapter: 7,
   },
   {
@@ -2062,7 +2062,7 @@ export const NPCS: NPC[] = ([
     dialogue: { text: "Our Garden was hit... but we're not giving up! My friends, my home... Beat our champion and show everyone we can still fight!" },
     storyLogText: "Selphie stands amid the ruins of Trabia Garden, destroyed by Galbadian missiles. Despite the devastation, she refuses to give up.",
     questId: 'mq_memories',
-    minChapter: 10,
+    minChapter: 9,
     maxChapter: 10,
   },
   {
@@ -2095,7 +2095,7 @@ export const NPCS: NPC[] = ([
     dialogue: { text: "Welcome to Timber! I'm the leader of the Forest Owls resistance. We're going to kidnap President Deling from his private train. Are you in?" },
     storyLogText: "Rinoa leads the Forest Owls, a resistance faction in occupied Timber. She has a bold plan: kidnap President Deling from his private train.",
     questId: 'mq_timber_mission',
-    minChapter: 4,
+    minChapter: 3,
     maxChapter: 5,
   },
   {
@@ -2179,7 +2179,7 @@ export const NPCS: NPC[] = ([
     type: 'dialogue',
     dialogue: { text: "Tell me, SeeD. Why do you fight the Sorceress? She's going to bring a new order to this world. And I'll be at her side." },
     storyLogText: 'Seifer interrogates you in D-District Prison. As the Sorceress\'s knight, he demands to know why SeeD opposes her.',
-    minChapter: 6,
+    minChapter: 5,
     maxChapter: 6,
   },
 
@@ -2202,7 +2202,7 @@ export const NPCS: NPC[] = ([
     dialogue: { text: "Children... I'm so sorry for what Ultimecia made me do. The real enemy is a sorceress from the future. Seek the White SeeD Ship — they can help you reach Esthar." },
     storyLogText: "Edea, freed from Ultimecia's possession, apologizes for everything. She reveals the true enemy is a sorceress from the far future.",
     questId: 'mq_orphanage',
-    minChapter: 12,
+    minChapter: 11,
     maxChapter: 15,
   },
   {
@@ -2213,7 +2213,7 @@ export const NPCS: NPC[] = ([
     dialogue: { text: "Ultimecia has fled into time compression. You must follow her — through the distortion of time itself — and end this once and for all." },
     storyLogText: 'Edea reveals that Ultimecia has fled into time compression. To stop her, you must ride the compression itself into the far future.',
     questId: 'mq_time_compression',
-    minChapter: 17,
+    minChapter: 16,
     maxChapter: 18,
   },
 
@@ -2246,7 +2246,7 @@ export const NPCS: NPC[] = ([
     dialogue: { text: "So you're the one from the dreams, huh? I'm Laguna — President of Esthar. Long story. Lunatic Pandora has appeared. I'm too old for this... but you're not." },
     storyLogText: "You finally meet Laguna Loire in person — he's the President of Esthar. He explains his past and the threat of Lunatic Pandora.",
     questId: 'mq_lunatic_pandora',
-    minChapter: 13,
+    minChapter: 15,
     maxChapter: 16,
   },
 
@@ -2333,7 +2333,7 @@ export const NPCS: NPC[] = ([
     dialogue: { text: "We don't want soldiers here. FH is a pacifist settlement. But... if you must stay while your Garden is repaired, at least prove your skills are more than warfare." },
     storyLogText: "Mayor Dobe reluctantly allows you to stay at Fisherman's Horizon while the Garden is repaired. He challenges you to prove card skills aren't just about fighting.",
     questId: 'mq_the_bridge',
-    minChapter: 8,
+    minChapter: 7,
     maxChapter: 9,
   },
 
@@ -2346,8 +2346,8 @@ export const NPCS: NPC[] = ([
     dialogue: { text: "Garden Master NORG has turned against Cid. There's civil war in the basement — NORG wants to hand us over to the Sorceress. You need to stop him." },
     storyLogText: "Xu warns that Garden Master NORG has betrayed Headmaster Cid. A civil war rages in the Garden basement.",
     questId: 'mq_garden_crisis',
-    minChapter: 7,
-    maxChapter: 7,
+    minChapter: 6,
+    maxChapter: 8,
   },
 
   // --- DR. ODINE ---
@@ -2359,7 +2359,7 @@ export const NPCS: NPC[] = ([
     dialogue: { text: "Ze Deep Sea Research Centre! Zere iz ancient Centra technology hidden below. You must retrieve it — for science, of course!" },
     storyLogText: 'Dr. Odine rambles excitedly about ancient Centra technology hidden in the Deep Sea Research Centre.',
     questId: 'mq_deep_sea',
-    minChapter: 15,
+    minChapter: 14,
     maxChapter: 16,
   },
 
@@ -2372,7 +2372,7 @@ export const NPCS: NPC[] = ([
     dialogue: { text: "The Sorceress has been taken to the Lunar Base. You must go to space and stop her before the Lunar Cry is triggered." },
     storyLogText: 'An Esthar Official delivers urgent news — the Sorceress has been taken to the Lunar Base. You must reach space before the Lunar Cry is triggered.',
     questId: 'mq_lunar_cry',
-    minChapter: 13,
+    minChapter: 12,
     maxChapter: 14,
   },
 
@@ -2419,7 +2419,7 @@ export const NPCS: NPC[] = ([
     dialogue: { text: "I am General Caraway. The assassination plan is mine. During the parade, we'll trap the Sorceress's float at the city gate. Your sniper will have one shot." },
     storyLogText: "General Caraway — Rinoa's estranged father — briefs you on the assassination plan. One shot during the parade is all you'll get.",
     questId: 'mq_assassination',
-    minChapter: 5,
+    minChapter: 4,
     maxChapter: 5,
   },
 

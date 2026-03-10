@@ -111,9 +111,20 @@ export function DungeonView({ location, worldState, onStartFloor, onBack }: Dung
                 )}
 
                 {isDefeated && (
-                  <span className="wm-floor-status defeated-text">
-                    Defeated {wins > 1 ? `(${wins}x)` : ''}
-                  </span>
+                  <div className="wm-floor-actions-row">
+                    <span className="wm-floor-status defeated-text">
+                      Defeated {wins > 1 ? `(${wins}x)` : ''}
+                    </span>
+                    {(allFloorsBeaten || isCurrent) && (
+                      <button
+                        type="button"
+                        className="wm-floor-rematch-btn"
+                        onClick={() => onStartFloor(floor)}
+                      >
+                        Rematch
+                      </button>
+                    )}
+                  </div>
                 )}
 
                 {isCurrent && !isDefeated && (
@@ -123,16 +134,6 @@ export function DungeonView({ location, worldState, onStartFloor, onBack }: Dung
                     onClick={() => onStartFloor(floor)}
                   >
                     {isBoss ? 'Challenge Boss' : 'Challenge'}
-                  </button>
-                )}
-
-                {isDefeated && (allFloorsBeaten || isCurrent) && (
-                  <button
-                    type="button"
-                    className="wm-floor-rematch-btn"
-                    onClick={() => onStartFloor(floor)}
-                  >
-                    Rematch
                   </button>
                 )}
               </div>

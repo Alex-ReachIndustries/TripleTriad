@@ -8,6 +8,7 @@ import { TownView } from './TownView'
 import { DungeonView } from './DungeonView'
 import { NpcInteraction } from './NpcInteraction'
 import { QuestLog } from './QuestLog'
+import { StoryCutscene, CUTSCENE_MAP, DUNGEON_ENTER_CUTSCENE_MAP } from '../StoryCutscene'
 
 export type WorldScreen =
   | { type: 'map' }
@@ -26,6 +27,7 @@ export interface WorldModeCallbacks {
   onSpreadRule?: (rule: SpecialRule, regionId: string) => void
   onAbolishRule?: (rule: SpecialRule, regionId: string) => void
   onNpcInteract?: (npc: NPC) => void
+  onMarkCutsceneSeen?: (cutsceneId: string) => void
 }
 
 interface WorldModeProps extends WorldModeCallbacks {
@@ -43,9 +45,11 @@ export function WorldMode({
   onSpreadRule,
   onAbolishRule,
   onNpcInteract,
+  onMarkCutsceneSeen,
 }: WorldModeProps) {
   const [screen, setScreen] = useState<WorldScreen>({ type: 'map' })
   const [selectedNpc, setSelectedNpc] = useState<NPC | null>(null)
+  const [dungeonCutscene, setDungeonCutscene] = useState<string | null>(null)
 
   const handleSelectRegion = useCallback((region: Region) => {
     setScreen({ type: 'region', regionId: region.id })
@@ -61,8 +65,15 @@ export function WorldMode({
 
   const handleSelectLocation = useCallback((location: Location) => {
     const screenType = location.type === 'dungeon' ? 'dungeon' : 'town'
+    // Check for dungeon entrance cutscene
+    if (location.type === 'dungeon') {
+      const cutsceneId = DUNGEON_ENTER_CUTSCENE_MAP[location.id]
+      if (cutsceneId && !worldState.seenCutscenes.includes(cutsceneId)) {
+        setDungeonCutscene(cutsceneId)
+      }
+    }
     setScreen({ type: screenType, locationId: location.id, regionId: location.regionId })
-  }, [])
+  }, [worldState.seenCutscenes])
 
   const handleSelectNpc = useCallback((npc: NPC) => {
     setSelectedNpc(npc)
@@ -121,6 +132,19 @@ export function WorldMode({
       onAbolishRule={onAbolishRule}
     />
   ) : null
+
+  // Dungeon entrance cutscene overlay
+  if (dungeonCutscene && CUTSCENE_MAP[dungeonCutscene]) {
+    return (
+      <StoryCutscene
+        panels={CUTSCENE_MAP[dungeonCutscene]}
+        onComplete={() => {
+          onMarkCutsceneSeen?.(dungeonCutscene)
+          setDungeonCutscene(null)
+        }}
+      />
+    )
+  }
 
   switch (screen.type) {
     case 'map':

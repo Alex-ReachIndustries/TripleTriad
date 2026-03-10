@@ -55,6 +55,11 @@ export function NpcInteraction({
           {'\u2715'}
         </button>
         <div className="wm-npc-modal-header">
+          {npc.portrait && (
+            <div className="wm-npc-modal-portrait">
+              <img src={npc.portrait} alt={npc.name} />
+            </div>
+          )}
           <h3 className="wm-npc-modal-name">{npc.name}</h3>
         </div>
         <div className="wm-npc-modal-body">
