@@ -11,6 +11,7 @@ function sourceLabel(source: StoryLogSource): string {
     case 'quest_accept': return 'Quest'
     case 'quest_complete': return 'Milestone'
     case 'dungeon_clear': return 'Victory'
+    default: return source
   }
 }
 

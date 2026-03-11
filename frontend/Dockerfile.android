@@ -44,8 +44,9 @@ COPY . .
 # Build web app and sync to Android
 RUN npm run build && npx cap sync android
 
-# Build APK (compileSdk 36 from variables.gradle; platforms;android-36 installed above) (Gradle uses ANDROID_HOME from ENV)
-RUN chmod +x android/gradlew \
+# Fix CRLF line endings on gradlew (Windows checkout) then build APK
+RUN sed -i 's/\r$//' android/gradlew \
+    && chmod +x android/gradlew \
     && cd android \
     && ./gradlew assembleDebug --no-daemon --stacktrace \
     && ls -la app/build/outputs/apk/debug/
