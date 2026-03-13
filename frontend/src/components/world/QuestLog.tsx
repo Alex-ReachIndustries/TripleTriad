@@ -11,6 +11,7 @@ function sourceLabel(source: StoryLogSource): string {
     case 'quest_accept': return 'Quest'
     case 'quest_complete': return 'Milestone'
     case 'dungeon_clear': return 'Victory'
+    case 'cutscene': return 'Cutscene'
     default: return source
   }
 }
@@ -76,7 +77,7 @@ export function QuestLog({ worldState, onBack }: QuestLogProps) {
           <div className="ql-story-entries">
             {storyEntries.map(entry => (
               <div key={entry.id} className="ql-story-entry">
-                <span className={`ql-story-source ${entry.source}`}>{sourceLabel(entry.source)}</span>
+                <span className={`ql-story-source ql-source-${entry.source}`}>{sourceLabel(entry.source)}</span>
                 <p className="ql-story-text">{entry.text}</p>
               </div>
             ))}

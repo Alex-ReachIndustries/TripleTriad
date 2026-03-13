@@ -348,8 +348,10 @@ export function BattleScreen({
       isDungeonBoss: !!(npc?.isBoss && winner === 0),
       dungeonLocationId: npc?.isBoss && winner === 0 ? locationId : null,
     }
-    setBattleResult(result)
-  }, [tradeResult, selectedTradeIndices, localGameState, npc, npcId, tournamentPrize])
+    // Skip redundant reward screen — apply rewards immediately
+    if (region) onDuelRegionUpdate(region.id)
+    onMatchComplete(result)
+  }, [tradeResult, selectedTradeIndices, localGameState, npc, npcId, tournamentPrize, region, onDuelRegionUpdate, onMatchComplete, locationId])
 
   const toggleTradeCard = useCallback((index: number) => {
     if (!tradeResult) return
@@ -558,6 +560,7 @@ export function BattleScreen({
                 >
                   <img src={`/cards/${card.id}.png`} alt={card.name} className="battle-trade-card-img" />
                   <span className="battle-trade-card-name">{card.name}</span>
+                  <span className="battle-trade-card-inv">x{worldPlayerInventory[card.id] ?? 0}</span>
                 </button>
               ))}
             </div>
@@ -632,7 +635,7 @@ export function BattleScreen({
 
           <div className="battle-reward-actions">
             <button type="button" className="battle-reward-btn primary" onClick={handleDismissReward}>
-              {battleResult.winner === 0 ? 'Claim Rewards' : 'Continue'}
+              Continue
             </button>
             <button type="button" className="battle-reward-btn" onClick={handleRematch}>
               Rematch
