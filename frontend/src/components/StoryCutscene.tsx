@@ -20,7 +20,7 @@ const OPENING_PANELS: CutscenePanel[] = [
   { text: "You are a cadet at Balamb Garden. Your weapon isn't a gunblade — it's a deck of cards. In this world, Triple Triad isn't just a game. It's how conflicts are settled, alliances are formed, and legends are made.", bg: '/locations/balamb_garden.png' },
   { speaker: 'Quistis', text: "Before you can become SeeD, you must pass the Fire Cavern prerequisite. Instructor Quistis is waiting to guide you.", bg: '/locations/balamb_garden.png', portrait: '/portraits/quistis_garden_ch1.png' },
   { text: "Armed with five basic cards and 500 gil, your journey begins. From Balamb to Esthar, from the depths of the ocean to the far reaches of space — your cards will carry you through it all.", bg: '/locations/balamb_garden.png' },
-  { text: "Good luck, cadet. The Sorceress War is coming, and the world needs its greatest card player." },
+  { text: "Good luck, cadet. The Sorceress War is coming, and the world needs its greatest card player.", bg: '/locations/balamb_garden.png' },
 ]
 
 const FIRE_CAVERN_ENTER_PANELS: CutscenePanel[] = [
