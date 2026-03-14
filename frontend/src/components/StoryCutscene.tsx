@@ -45,7 +45,7 @@ const SEED_BALL_PANELS: CutscenePanel[] = [
 const LAGUNA_DREAM_PANELS: CutscenePanel[] = [
   { speaker: 'Dream Sequence', text: "On the train to Timber, exhaustion overtakes you. You dream of someone else's life...", bg: '/locations/deling_city.png' },
   { text: "You are Laguna Loire — a Galbadian soldier with a terrible sense of direction and a worse leg cramp. Tonight, you're visiting a pianist named Julia at the Deling City hotel.", bg: '/locations/deling_city.png', portrait: '/portraits/laguna_dream_1.png' },
-  { speaker: 'Julia', text: "She plays 'Eyes On Me' just for you. The melody is hauntingly beautiful. Laguna's heart is pounding — and somehow, so is yours.", bg: '/locations/deling_city.png' },
+  { speaker: 'Julia', text: "She plays 'Eyes On Me' just for you. The melody is hauntingly beautiful. Laguna's heart is pounding — and somehow, so is yours.", bg: '/locations/deling_city.png', portrait: '/characters/julia.png' },
 ]
 
 const SORCERESS_PARADE_PANELS: CutscenePanel[] = [

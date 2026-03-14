@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { WorldPlayerState } from '../../data/worldState'
 import { QUESTS } from '../../data/quests'
 import { getQuestStatus, isQuestAccessible } from '../../data/quests'
@@ -16,13 +17,16 @@ function sourceLabel(source: StoryLogSource): string {
   }
 }
 
+type QuestTab = 'available' | 'accepted' | 'completed'
+
 interface QuestLogProps {
   worldState: WorldPlayerState
   onBack: () => void
 }
 
 export function QuestLog({ worldState, onBack }: QuestLogProps) {
-  // Only consider quests whose giver NPC + location are currently accessible
+  const [questTab, setQuestTab] = useState<QuestTab>('accepted')
+
   const accessible = QUESTS.filter(q => isQuestAccessible(q, worldState))
   const mainQuests = accessible.filter(q => q.isMainQuest)
   const sideQuests = accessible.filter(q => !q.isMainQuest)
@@ -30,26 +34,36 @@ export function QuestLog({ worldState, onBack }: QuestLogProps) {
   // Story log: sorted by order
   const storyEntries = [...(worldState.storyLog ?? [])].sort((a, b) => a.order - b.order)
 
-  // Active quests — already accepted, giver still accessible
-  const activeMain = mainQuests.filter(q =>
+  // Accepted (active) quests
+  const acceptedMain = mainQuests.filter(q =>
     getQuestStatus(q.id, worldState.activeQuests, worldState.completedQuests) === 'active'
   )
-  const activeSide = sideQuests.filter(q =>
+  const acceptedSide = sideQuests.filter(q =>
     getQuestStatus(q.id, worldState.activeQuests, worldState.completedQuests) === 'active'
   )
+  const accepted = [...acceptedMain, ...acceptedSide]
 
-  // Available quests — not yet accepted, giver accessible at current chapter
+  // Available quests
   const availableMain = mainQuests.filter(q =>
     getQuestStatus(q.id, worldState.activeQuests, worldState.completedQuests) === 'available'
   )
   const availableSide = sideQuests.filter(q =>
     getQuestStatus(q.id, worldState.activeQuests, worldState.completedQuests) === 'available'
   )
+  const available = [...availableMain, ...availableSide]
 
-  // Completed side quests (show regardless of current accessibility)
-  const completedSide = QUESTS.filter(q =>
-    !q.isMainQuest && getQuestStatus(q.id, worldState.activeQuests, worldState.completedQuests) === 'completed'
+  // Completed quests (all, not just accessible)
+  const completed = QUESTS.filter(q =>
+    getQuestStatus(q.id, worldState.activeQuests, worldState.completedQuests) === 'completed'
   )
+
+  const tabQuests: Quest[] = questTab === 'available' ? available
+    : questTab === 'accepted' ? accepted
+    : completed
+
+  const tabStatus: QuestStatus = questTab === 'available' ? 'available'
+    : questTab === 'accepted' ? 'active'
+    : 'completed'
 
   return (
     <div className="ql-container">
@@ -65,73 +79,69 @@ export function QuestLog({ worldState, onBack }: QuestLogProps) {
         </div>
       </div>
 
-      {/* Story Log — granular entries from NPCs, quests, dungeons */}
-      <section className="ql-section">
-        <h3 className="ql-section-title">
-          <span className="ql-section-icon">&#x1F4D6;</span>
-          Story Log
-        </h3>
-        {storyEntries.length === 0 ? (
-          <p className="ql-empty">Your story has just begun...</p>
-        ) : (
-          <div className="ql-story-entries">
-            {storyEntries.map(entry => (
-              <div key={entry.id} className="ql-story-entry">
-                <span className={`ql-story-source ql-source-${entry.source}`}>{sourceLabel(entry.source)}</span>
-                <p className="ql-story-text">{entry.text}</p>
+      <div className="ql-split">
+        {/* Left panel: Story Log */}
+        <section className="ql-panel ql-story-panel">
+          <h3 className="ql-panel-title">Story Log</h3>
+          <div className="ql-panel-scroll">
+            {storyEntries.length === 0 ? (
+              <p className="ql-empty">Your story has just begun...</p>
+            ) : (
+              <div className="ql-story-entries">
+                {storyEntries.map(entry => (
+                  <div key={entry.id} className="ql-story-entry">
+                    <span className={`ql-story-source ql-source-${entry.source}`}>{sourceLabel(entry.source)}</span>
+                    <p className="ql-story-text">{entry.text}</p>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* Active Quests */}
-      <section className="ql-section">
-        <h3 className="ql-section-title">
-          <span className="ql-section-icon">&#x2694;&#xFE0F;</span>
-          Active Quests
-          {(activeMain.length + activeSide.length) > 0 && (
-            <span className="ql-count">{activeMain.length + activeSide.length}</span>
-          )}
-        </h3>
-        {activeMain.length === 0 && activeSide.length === 0 ? (
-          <p className="ql-empty">No active quests. Talk to NPCs to find new quests!</p>
-        ) : (
-          <div className="ql-quest-list">
-            {activeMain.map(q => <QuestCard key={q.id} quest={q} status="active" />)}
-            {activeSide.map(q => <QuestCard key={q.id} quest={q} status="active" />)}
-          </div>
-        )}
-      </section>
-
-      {/* Available Quests */}
-      {(availableMain.length + availableSide.length) > 0 && (
-        <section className="ql-section">
-          <h3 className="ql-section-title">
-            <span className="ql-section-icon">&#x2753;</span>
-            Available Quests
-            <span className="ql-count">{availableMain.length + availableSide.length}</span>
-          </h3>
-          <div className="ql-quest-list">
-            {availableMain.map(q => <QuestCard key={q.id} quest={q} status="available" />)}
-            {availableSide.map(q => <QuestCard key={q.id} quest={q} status="available" />)}
+            )}
           </div>
         </section>
-      )}
 
-      {/* Completed Side Quests */}
-      {completedSide.length > 0 && (
-        <section className="ql-section">
-          <h3 className="ql-section-title">
-            <span className="ql-section-icon">&#x2705;</span>
-            Completed
-            <span className="ql-count">{completedSide.length}</span>
-          </h3>
-          <div className="ql-quest-list">
-            {completedSide.map(q => <QuestCard key={q.id} quest={q} status="completed" />)}
+        {/* Right panel: Quests with tabs */}
+        <section className="ql-panel ql-quest-panel">
+          <div className="ql-tabs">
+            <button
+              type="button"
+              className={`ql-tab ${questTab === 'available' ? 'active' : ''}`}
+              onClick={() => setQuestTab('available')}
+            >
+              Available
+              {available.length > 0 && <span className="ql-tab-count">{available.length}</span>}
+            </button>
+            <button
+              type="button"
+              className={`ql-tab ${questTab === 'accepted' ? 'active' : ''}`}
+              onClick={() => setQuestTab('accepted')}
+            >
+              Accepted
+              {accepted.length > 0 && <span className="ql-tab-count">{accepted.length}</span>}
+            </button>
+            <button
+              type="button"
+              className={`ql-tab ${questTab === 'completed' ? 'active' : ''}`}
+              onClick={() => setQuestTab('completed')}
+            >
+              Completed
+              {completed.length > 0 && <span className="ql-tab-count">{completed.length}</span>}
+            </button>
+          </div>
+          <div className="ql-panel-scroll">
+            {tabQuests.length === 0 ? (
+              <p className="ql-empty">
+                {questTab === 'available' ? 'No available quests right now.'
+                  : questTab === 'accepted' ? 'No active quests. Talk to NPCs to find new quests!'
+                  : 'No completed quests yet.'}
+              </p>
+            ) : (
+              <div className="ql-quest-list">
+                {tabQuests.map(q => <QuestCard key={q.id} quest={q} status={tabStatus} />)}
+              </div>
+            )}
           </div>
         </section>
-      )}
+      </div>
     </div>
   )
 }

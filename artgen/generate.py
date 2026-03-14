@@ -12,8 +12,10 @@ from PIL import Image
 OUTPUT_DIR = "/output"
 LOCATIONS_DIR = os.path.join(OUTPUT_DIR, "locations")
 PORTRAITS_DIR = os.path.join(OUTPUT_DIR, "portraits")
+CHARACTERS_DIR = os.path.join(OUTPUT_DIR, "characters")
 os.makedirs(LOCATIONS_DIR, exist_ok=True)
 os.makedirs(PORTRAITS_DIR, exist_ok=True)
+os.makedirs(CHARACTERS_DIR, exist_ok=True)
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Location prompts — FF8-faithful backgrounds
@@ -370,6 +372,43 @@ def main():
                 guidance_scale=0.0,
                 width=512,
                 height=512,
+            ).images[0]
+            image.save(out_path)
+            total_generated += 1
+
+    # ── Generate character images (world page) ────────────────────────
+    if mode in ("all", "characters"):
+        CHARACTER_PROMPTS = {
+            "squall": "Squall Leonhart from FF8, young man with brown hair falling across face and iconic scar between eyes, fur-trimmed leather jacket, serious brooding expression, gunblade warrior, Balamb Garden",
+            "rinoa": "Rinoa Heartilly from FF8, young woman with black hair and warm brown eyes, blue duster outfit with angel wing design on back, gentle confident smile, dog Angelo nearby",
+            "quistis": "Quistis Trepe from FF8, beautiful young woman with long blonde hair pinned up and glasses, blue eyes, elegant SeeD instructor uniform, poised intelligent expression, whip weapon at side",
+            "selphie": "Selphie Tilmitt from FF8, cheerful petite girl with flipped outward brown hair, bright green eyes, yellow dress, infectious smile, holding nunchaku, energetic pose",
+            "irvine": "Irvine Kinneas from FF8, tall lean young man with long auburn hair in ponytail, wide-brimmed cowboy hat, long brown trench coat, confident charming smirk, sniper rifle slung over shoulder",
+            "laguna": "Laguna Loire from FF8, middle-aged man with long black hair and kind weathered face, wearing Esthar presidential suit, warm fatherly smile, machine gun at side",
+            "cid": "Headmaster Cid Kramer from FF8, older man with round glasses and short receding brown hair, warm grandfatherly expression, formal suit, Balamb Garden headmaster",
+            "zell": "Zell Dincht from FF8, energetic young man with tall spiky blonde hair and distinctive tribal face tattoo, blue eyes, SeeD uniform with fingerless gloves, fists raised, martial artist",
+            "fh_master": "elderly master card player at Fisherman's Horizon, weathered face with knowing smile, worn fishing hat, sitting at card table on ocean bridge, sunset light, years of wisdom",
+            "shumi_elder": "Shumi Elder from FF8, tall gentle alien creature with elongated body and long graceful arms, kind oval face with wise ancient eyes, flowing robes, underground village with warm golden light",
+            "esthar_scientist": "Esthar scientist from FF8, person in sleek white futuristic lab coat, holographic data displays floating nearby, analytical focused expression, advanced technology lab",
+            "julia": "Julia Heartilly from FF8, beautiful young woman with long dark hair, elegant black evening dress, sitting at grand piano, soft spotlight, melancholic romantic expression, Deling City hotel lounge",
+        }
+
+        print(f"\n=== Generating {len(CHARACTER_PROMPTS)} character images ===")
+        for char_id, prompt in CHARACTER_PROMPTS.items():
+            out_path = os.path.join(CHARACTERS_DIR, f"{char_id}.png")
+            if os.path.exists(out_path):
+                print(f"  [skip] {char_id} (already exists)")
+                continue
+            full_prompt = "full body character art, " + prompt + ", anime art style, Final Fantasy VIII aesthetic, high quality, detailed"
+
+            print(f"  [{total_generated+1}] {char_id}: {prompt[:60]}...")
+            image = pipe(
+                prompt=full_prompt,
+                negative_prompt=neg_prompt,
+                num_inference_steps=4,
+                guidance_scale=0.0,
+                width=512,
+                height=768,
             ).images[0]
             image.save(out_path)
             total_generated += 1
