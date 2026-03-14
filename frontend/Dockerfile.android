@@ -52,4 +52,4 @@ RUN sed -i 's/\r$//' android/gradlew \
     && ls -la app/build/outputs/apk/debug/
 
 # Default: print APK path (caller can copy out via volume or docker cp)
-CMD ["sh", "-c", "echo APK at /app/android/app/build/outputs/apk/debug/app-debug.apk && cp /app/android/app/build/outputs/apk/debug/app-debug.apk /out/app-debug.apk 2>/dev/null || true"]
+CMD ["sh", "-c", "VERSION=$(grep versionName /app/android/app/build.gradle | head -1 | sed 's/.*\"\\(.*\\)\"/\\1/') && echo \"APK v${VERSION}\" && cp /app/android/app/build/outputs/apk/debug/app-debug.apk /out/TripleTriad-v${VERSION}.apk 2>/dev/null || true"]

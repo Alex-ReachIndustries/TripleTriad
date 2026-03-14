@@ -688,14 +688,14 @@
   background: url('/map/world.jpg') center/cover no-repeat;
   background-size: cover;
   background-position: center;
-  filter: blur(3px) brightness(0.45) saturate(0.8);
+  filter: blur(2px) brightness(0.7) saturate(0.9);
   transform: scale(1.1);
   transition: background-image 0.4s ease;
 }
 .cutscene-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(15, 20, 25, 0.55) 0%, rgba(15, 20, 25, 0.35) 40%, rgba(15, 20, 25, 0.55) 100%);
+  background: linear-gradient(180deg, rgba(15, 20, 25, 0.35) 0%, rgba(15, 20, 25, 0.15) 40%, rgba(15, 20, 25, 0.45) 100%);
 }
 .cutscene-content {
   position: relative;
