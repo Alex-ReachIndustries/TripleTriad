@@ -868,6 +868,35 @@ export const NPCS: NPC[] = ([
     ],
   },
 
+  {
+    id: 'fake_president',
+    name: 'Fake President',
+    locationId: 'timber',
+    type: 'duel',
+    dialogue: {
+      challenge:
+        "I am President Deling! You dare challenge me? Very well — I'll crush you at cards, just as I've crushed the resistance.",
+      defeated:
+        "What?! Impossible! This face... it's melting?! I'm not the real president — I'm just a body double!",
+      rematch:
+        "They gave me another disguise. This time I won't be exposed so easily!",
+    },
+    difficultyTier: 2,
+    deckPool: [
+      'forbidden',
+      'armadodo',
+      'tri_face',
+      'grand_mantis',
+      'jelleye',
+      'gayla',
+      'gesper',
+      'fastitocalon',
+    ],
+    gilReward: 200,
+    minChapter: 3,
+    maxChapter: 5,
+  },
+
   // ── Galbadia Garden ──────────────────────────────────────────────────────
   {
     id: 'galbadia_student',
@@ -1284,6 +1313,15 @@ export const NPCS: NPC[] = ([
       'sam08g', 'death_claw', 'cactuar', 'tonberry', 'abyss_worm', 'turtapod', 'vysage', 't_rexaur', 'bomb', 'blitz',
     ],
     gilReward: 500,
+  },
+
+  {
+    id: 'fh_fisherman',
+    name: 'Old Fisherman',
+    locationId: 'fishermans_horizon',
+    type: 'dialogue',
+    dialogue: { text: "I've been fishing off this bridge for forty years. Never caught a Fastitocalon, though. If you find one of those cards, I'd pay good money for it." },
+    questId: 'fishers_catch',
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
