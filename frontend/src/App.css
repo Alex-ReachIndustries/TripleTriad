@@ -2720,22 +2720,21 @@
 .wm-floor-node {
   position: relative;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 1rem;
   padding: 0.75rem 1rem 0.75rem 0;
   margin-left: 1.5rem;
 }
 
-/* Vertical connector line — centered on the marker column */
+/* Vertical connector line — connects this node's marker to the one below */
 .wm-floor-connector {
   position: absolute;
   left: 20px; /* center of 40px marker */
-  bottom: 0;
+  top: 50%;
   width: 2px;
   height: 100%;
   background: var(--border);
   z-index: 0;
-  transform: translateX(-50%);
 }
 .wm-floor-node.boss .wm-floor-connector {
   left: 24px; /* center of 48px boss marker */

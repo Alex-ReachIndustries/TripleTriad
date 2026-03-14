@@ -24,10 +24,10 @@ export function GameBoard({ state, myPlayer, onPlace, onPlayAgain, onReturnToWor
   const opponentHand = state.hands[opponentId]
   const isOpenRule = state.activeRules.includes('Open')
 
-  // Score: hand cards + board cards owned by each player
+  // Score: only cards on the board owned by each player (starts 0-0)
   const boardCells = state.board.flat()
-  const myScore = hand.length + boardCells.filter((c) => c?.owner === myPlayer).length
-  const opponentScore = state.hands[opponentId].length + boardCells.filter((c) => c?.owner === opponentId).length
+  const myScore = boardCells.filter((c) => c?.owner === myPlayer).length
+  const opponentScore = boardCells.filter((c) => c?.owner === opponentId).length
 
   // Placement animation: detect card going from null → non-null on the board
   useEffect(() => {
