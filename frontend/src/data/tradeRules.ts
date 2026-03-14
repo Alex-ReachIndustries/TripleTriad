@@ -35,6 +35,11 @@ export function computeTradeResult(
     return empty
   }
 
+  // Perfect game: if all 9 board cards belong to one player, use All trade
+  if (isPerfectGame(finalState)) {
+    return computeAllTrade(winner, playerHand, aiHand)
+  }
+
   const { capturedByPlayer0, capturedByPlayer1 } = getCapturedCards(finalState)
 
   switch (tradeRule) {
@@ -44,6 +49,20 @@ export function computeTradeResult(
     case 'All': return computeAllTrade(winner, playerHand, aiHand)
     default: return empty
   }
+}
+
+/** A perfect game is when all 9 board cards belong to a single player. */
+function isPerfectGame(finalState: GameState): boolean {
+  let count0 = 0, count1 = 0
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      const cell = finalState.board[r][c]
+      if (!cell) return false
+      if (cell.owner === 0) count0++
+      else count1++
+    }
+  }
+  return count0 === 9 || count1 === 9
 }
 
 function computeOneTrade(
