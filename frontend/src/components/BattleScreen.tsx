@@ -559,6 +559,7 @@ export function BattleScreen({
                   onClick={() => toggleTradeCard(i)}
                 >
                   <img src={`/cards/${card.id}.png`} alt={card.name} className="battle-trade-card-img" />
+                  <span className="battle-trade-card-lv">Lv.{card.level}</span>
                   <span className="battle-trade-card-name">{card.name}</span>
                   <span className="battle-trade-card-inv">x{worldPlayerInventory[card.id] ?? 0}</span>
                 </button>
@@ -593,7 +594,10 @@ export function BattleScreen({
           {prizeCard && (
             <div className="battle-reward-card gained">
               <p className="battle-reward-card-label">Prize Card</p>
-              <img src={`/cards/${prizeCard.id}.png`} alt={prizeCard.name} className="battle-reward-card-img" />
+              <div className="battle-reward-card-img-wrap">
+                <img src={`/cards/${prizeCard.id}.png`} alt={prizeCard.name} className="battle-reward-card-img" />
+                <span className="battle-reward-card-lv">Lv.{prizeCard.level}</span>
+              </div>
               <span className="battle-reward-card-name">{prizeCard.name}</span>
               <span className="battle-reward-card-owned">Owned: {(worldPlayerInventory[prizeCard.id] ?? 0) + 1}</span>
             </div>
@@ -605,7 +609,10 @@ export function BattleScreen({
               <div className="battle-reward-cards-row">
                 {gainedCards.map((card, i) => (
                   <div key={`gain-${card.id}-${i}`} className="battle-reward-card gained">
-                    <img src={`/cards/${card.id}.png`} alt={card.name} className="battle-reward-card-img" />
+                    <div className="battle-reward-card-img-wrap">
+                      <img src={`/cards/${card.id}.png`} alt={card.name} className="battle-reward-card-img" />
+                      <span className="battle-reward-card-lv">Lv.{card.level}</span>
+                    </div>
                     <span className="battle-reward-card-name">{card.name}</span>
                     <span className="battle-reward-card-owned">Owned: {(worldPlayerInventory[card.id] ?? 0) + 1}</span>
                   </div>
@@ -620,7 +627,10 @@ export function BattleScreen({
               <div className="battle-reward-cards-row">
                 {lostCards.map((card, i) => (
                   <div key={`loss-${card.id}-${i}`} className="battle-reward-card lost">
-                    <img src={`/cards/${card.id}.png`} alt={card.name} className="battle-reward-card-img" />
+                    <div className="battle-reward-card-img-wrap">
+                      <img src={`/cards/${card.id}.png`} alt={card.name} className="battle-reward-card-img" />
+                      <span className="battle-reward-card-lv">Lv.{card.level}</span>
+                    </div>
                     <span className="battle-reward-card-name">{card.name}</span>
                     <span className="battle-reward-card-owned">Owned: {Math.max(0, (worldPlayerInventory[card.id] ?? 0) - 1)}</span>
                   </div>
