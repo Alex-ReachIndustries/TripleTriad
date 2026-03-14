@@ -249,7 +249,8 @@ const SIDE_QUESTS: Quest[] = [
     giverNpcId: 'quistis_garden_ch1',
     type: 'beat_npc',
     targetId: 'cc_club_jack',
-    reward: { gil: 0, cardId: 'thrustaevis' },
+    reward: { gil: 100, cardId: 'thrustaevis' },
+    storyText: 'You defeated CC Jack, the lowest-ranked member of the Card Club. He hinted at stronger members hiding in the Garden.',
   },
   {
     id: 'queens_favour',
@@ -326,8 +327,8 @@ const SIDE_QUESTS: Quest[] = [
   {
     id: 'tonberrys_treasure',
     name: "Tonberry's Treasure",
-    description: 'A mysterious researcher in the deep sea needs a Tonberry King card.',
-    giverNpcId: 'deep_sea_researcher',
+    description: 'Dr. Odine needs a Tonberry King card for his deep sea research.',
+    giverNpcId: 'dr_odine',
     type: 'find_card',
     targetId: 'tonberry_king',
     reward: { gil: 800, cardId: 'wedge_biggs' },
@@ -349,17 +350,6 @@ const SIDE_QUESTS: Quest[] = [
     type: 'clear_dungeon',
     targetId: 'lunar_base',
     reward: { gil: 2000, cardId: 'mobile_type_8' },
-  },
-  // CC Group quest chain
-  {
-    id: 'sq_cc_jack',
-    name: 'CC Group: Jack',
-    description: 'Defeat CC Jack in Balamb Garden.',
-    giverNpcId: 'cc_club_jack',
-    type: 'beat_npc',
-    targetId: 'cc_club_jack',
-    reward: { gil: 100 },
-    storyText: 'You defeated CC Jack, the lowest-ranked member of the Card Club. He hinted at stronger members hiding in the Garden.',
   },
 ]
 
