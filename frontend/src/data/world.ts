@@ -3436,10 +3436,14 @@ export function getLocationsByParentTown(townId: string): Location[] {
   return getLocations().filter((l) => l.parentTownId === townId)
 }
 
-/** Get NPCs visible at the current story chapter. Filters by minChapter/maxChapter. */
-export function getVisibleNpcs(locationId: string, storyChapter: number): NPC[] {
+/** Get NPCs visible at the current story chapter. Filters by minChapter/maxChapter.
+ *  NPCs whose IDs are in `pinnedNpcIds` remain visible even if their chapter window has passed
+ *  (used to keep quest givers visible while the player has an active quest from them). */
+export function getVisibleNpcs(locationId: string, storyChapter: number, pinnedNpcIds?: Set<string>): NPC[] {
   return NPCS.filter((n) => {
     if (n.locationId !== locationId) return false
+    // Always show pinned NPCs (active quest givers)
+    if (pinnedNpcIds?.has(n.id)) return true
     if (n.minChapter !== undefined && storyChapter < n.minChapter) return false
     if (n.maxChapter !== undefined && storyChapter > n.maxChapter) return false
     return true

@@ -4,7 +4,7 @@ import { getActiveRegionRules } from '../../data/worldState'
 import type { WorldPlayerState } from '../../data/worldState'
 import { getRegionById, getVisibleNpcs, getLocationsByParentTown, formatRules } from '../../data/world'
 import { isLocationUnlocked } from '../../data/unlock'
-import { getQuestsByNpc, getQuestStatus } from '../../data/quests'
+import { getQuestsByNpc, getQuestStatus, getActiveQuestGiverNpcIds } from '../../data/quests'
 
 /** NPC type → human-readable label */
 const NPC_TYPE_LABEL: Record<string, string> = {
@@ -61,7 +61,8 @@ interface TownViewProps {
 export function TownView({ location, worldState, onSelectNpc, onSelectLocation, onBack }: TownViewProps) {
   const [hoveredNpc, setHoveredNpc] = useState<string | null>(null)
   const region = getRegionById(location.regionId)
-  const npcs = getVisibleNpcs(location.id, worldState.storyChapter)
+  const pinnedNpcIds = getActiveQuestGiverNpcIds(worldState.activeQuests)
+  const npcs = getVisibleNpcs(location.id, worldState.storyChapter, pinnedNpcIds)
 
   // TD (Town-Dungeon) child locations that are accessed from this town
   const tdLocations = getLocationsByParentTown(location.id)

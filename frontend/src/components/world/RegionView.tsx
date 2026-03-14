@@ -2,6 +2,7 @@ import type { Region, Location } from '../../types/world'
 import { getActiveRegionRules } from '../../data/worldState'
 import type { WorldPlayerState } from '../../data/worldState'
 import { getLocationsByRegion, formatRules, getVisibleNpcs } from '../../data/world'
+import { getActiveQuestGiverNpcIds } from '../../data/quests'
 import { isLocationUnlocked } from '../../data/unlock'
 import { getLocationMarkers } from '../../data/markers'
 
@@ -15,6 +16,7 @@ interface RegionViewProps {
 export function RegionView({ region, worldState, onSelectLocation, onBack }: RegionViewProps) {
   const locations = getLocationsByRegion(region.id)
   const bbox = getPolygonBBox(region.mapBounds)
+  const pinnedNpcIds = getActiveQuestGiverNpcIds(worldState.activeQuests)
 
   const padding = 6
   const vx = Math.max(0, bbox.x1 - padding)
@@ -111,7 +113,7 @@ export function RegionView({ region, worldState, onSelectLocation, onBack }: Reg
             const absX = bbox.x1 + (loc.mapX / 100) * regionW
             const absY = bbox.y1 + (loc.mapY / 100) * regionH
             const unlocked = isLocationUnlocked(loc, worldState)
-            const npcCount = getVisibleNpcs(loc.id, worldState.storyChapter).length
+            const npcCount = getVisibleNpcs(loc.id, worldState.storyChapter, pinnedNpcIds).length
             const isDungeon = loc.type === 'dungeon'
 
             return (
@@ -233,7 +235,7 @@ export function RegionView({ region, worldState, onSelectLocation, onBack }: Reg
       <div className="wm-region-loc-list">
         {locations.map(loc => {
           const unlocked = isLocationUnlocked(loc, worldState)
-          const npcCount = getVisibleNpcs(loc.id, worldState.storyChapter).length
+          const npcCount = getVisibleNpcs(loc.id, worldState.storyChapter, pinnedNpcIds).length
           return (
             <button
               key={loc.id}

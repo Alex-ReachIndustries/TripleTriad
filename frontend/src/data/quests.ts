@@ -371,6 +371,16 @@ export function getQuestById(id: string): Quest | undefined {
   return QUESTS.find((q) => q.id === id)
 }
 
+/** Get the set of NPC IDs that are givers for currently active quests. */
+export function getActiveQuestGiverNpcIds(activeQuests: string[]): Set<string> {
+  const ids = new Set<string>()
+  for (const qid of activeQuests) {
+    const q = QUESTS.find(quest => quest.id === qid)
+    if (q) ids.add(q.giverNpcId)
+  }
+  return ids
+}
+
 /** Get all quests offered by a specific NPC. */
 export function getQuestsByNpc(npcId: string): Quest[] {
   return QUESTS.filter((q) => q.giverNpcId === npcId)
@@ -417,8 +427,12 @@ export function getQuestStatus(
  * A quest is accessible when:
  * 1. Its giver NPC exists and is visible (within minChapter/maxChapter range)
  * 2. The giver NPC's location is unlocked
+ * Active quests are always considered accessible (giver stays pinned).
  */
 export function isQuestAccessible(quest: Quest, worldState: WorldPlayerState): boolean {
+  // Active quests are always accessible — the giver NPC stays pinned
+  if (worldState.activeQuests.includes(quest.id)) return true
+
   const npc = getNpcById(quest.giverNpcId)
   if (!npc) return false
 
