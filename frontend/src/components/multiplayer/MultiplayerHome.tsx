@@ -9,12 +9,15 @@ import type { PlayerId } from '../../game/types'
 import type { WorldPlayerState } from '../../data/worldState'
 import type { SavedDeck } from '../../data/deckManager'
 import { getOrCreateProfile, saveProfile, recordMatch } from '../../data/profile'
+import { getTutorialsForRules } from '../../data/tutorials'
+import type { TutorialDef } from '../../data/tutorials'
 import { createLobby } from '../../api/client'
 import { useLobby } from '../../hooks/useLobby'
 import { ProfileCard } from './ProfileCard'
 import { ProfileEditor } from './ProfileEditor'
 import { WaitingRoom } from './WaitingRoom'
 import { LobbyBrowser } from './LobbyBrowser'
+import { TutorialPopup } from '../TutorialPopup'
 import { GameBoard } from '../GameBoard'
 import './MultiplayerHome.css'
 
@@ -36,11 +39,15 @@ export function MultiplayerHome({
   onBack,
   savedDecks,
   onUpdateDecks,
+  seenTutorials,
+  onMarkTutorialSeen,
 }: MultiplayerHomeProps) {
   const [screen, setScreen] = useState<Screen>('home')
   const [profile, setProfile] = useState<PlayerProfile>(getOrCreateProfile)
   const [error, setError] = useState<string | null>(null)
   const [isHost, setIsHost] = useState(false)
+  const [tutorialQueue, setTutorialQueue] = useState<TutorialDef[]>([])
+  const [showingTutorial, setShowingTutorial] = useState(false)
 
   const lobby = useLobby(profile)
 
@@ -52,12 +59,24 @@ export function MultiplayerHome({
     return null
   }, [lobby.state.activeDuel, profile.id])
 
-  // Switch to duel screen when duel starts
+  // Switch to duel screen when duel starts — check for tutorials first
   useEffect(() => {
     if (lobby.state.phase === 'duelling' && lobby.state.duelGameState) {
+      // Check for unseen tutorials for the active rules
+      const isFirstDuel = !seenTutorials.includes('tut_basic_gameplay')
+      const tutorials = getTutorialsForRules(
+        lobby.state.config.specialRules,
+        lobby.state.config.tradeRule,
+        seenTutorials,
+        isFirstDuel,
+      )
+      if (tutorials.length > 0) {
+        setTutorialQueue(tutorials)
+        setShowingTutorial(true)
+      }
       setScreen('duel')
     }
-  }, [lobby.state.phase, lobby.state.duelGameState])
+  }, [lobby.state.phase, lobby.state.duelGameState, seenTutorials, lobby.state.config])
 
   // Return to waiting room after duel ends and return_to_waiting received
   useEffect(() => {
@@ -179,6 +198,24 @@ export function MultiplayerHome({
 
   if (screen === 'duel' && lobby.state.duelGameState) {
     const isDuellist = myDuelRole !== null
+
+    // Show tutorial overlay before duel
+    if (showingTutorial && tutorialQueue.length > 0) {
+      return (
+        <div className="mp-duel-screen">
+          <TutorialPopup
+            tutorial={tutorialQueue[0]}
+            onComplete={() => {
+              onMarkTutorialSeen(tutorialQueue[0].id)
+              const remaining = tutorialQueue.slice(1)
+              setTutorialQueue(remaining)
+              if (remaining.length === 0) setShowingTutorial(false)
+            }}
+          />
+        </div>
+      )
+    }
+
     return (
       <div className="mp-duel-screen">
         {!isDuellist && (

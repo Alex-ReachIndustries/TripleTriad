@@ -250,6 +250,18 @@ export const TUTORIALS: TutorialDef[] = [
       },
     ],
   },
+  {
+    id: 'tut_trade_friendly',
+    title: 'Friendly Trade Rule',
+    trigger: { type: 'trade_rule', rule: 'Friendly' },
+    pages: [
+      {
+        icon: '\u{1F91D}',
+        heading: 'Friendly Match',
+        body: 'This is a friendly duel \u2014 no cards will be exchanged after the match! Play without fear of losing your best cards.',
+      },
+    ],
+  },
 ]
 
 /** Get a tutorial by ID. */

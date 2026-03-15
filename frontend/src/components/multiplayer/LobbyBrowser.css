@@ -133,3 +133,48 @@
   background: rgba(201, 168, 76, 0.15);
   color: #c9a84c;
 }
+
+/* BLE section */
+.lobby-browser__ble-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.lobby-browser__ble-scan {
+  width: 100%;
+  padding: 10px;
+  background: rgba(100, 149, 237, 0.15);
+  border: 1px solid rgba(100, 149, 237, 0.3);
+  color: #6495ed;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.lobby-browser__ble-scan:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.lobby-browser__ble-device {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(100, 149, 237, 0.2);
+  border-radius: 6px;
+  margin-bottom: 6px;
+}
+
+.lobby-browser__ble-join {
+  background: rgba(100, 149, 237, 0.2);
+  border: 1px solid #6495ed;
+  color: #6495ed;
+  padding: 4px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}

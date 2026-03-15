@@ -13,13 +13,14 @@ import { HomePage } from './components/HomePage'
 import { StoryCutscene, OPENING_PANELS, CUTSCENE_MAP, QUEST_CUTSCENE_MAP, CUTSCENE_STORY_LOG } from './components/StoryCutscene'
 import { TutorialsMenu } from './components/TutorialsMenu'
 import { SettingsScreen, loadSettings, applySettingsToDOM } from './components/SettingsScreen'
+import { PlayerRecords } from './components/PlayerRecords'
 import { useAudio, useTrack } from './audio/useAudio'
 import { getLocationTrack, getCutsceneTrack, getBattleTrack, TRACK_TITLE, TRACK_WORLD_MAP } from './audio/trackMap'
 import type { WorldScreen } from './components/world/WorldMode'
 // @capacitor/app is imported dynamically — only available in Capacitor builds
 import './App.css'
 
-type AppView = 'title' | 'howto' | 'home' | 'game' | 'cutscene' | 'settings'
+type AppView = 'title' | 'howto' | 'home' | 'game' | 'cutscene' | 'settings' | 'records'
 type GameTab = 'world' | 'deck' | 'quests' | 'duel' | 'battle' | 'guide'
 
 const STORAGE_KEY = 'tripletriad-world'
@@ -53,7 +54,7 @@ function App() {
   // Compute desired music track based on current game state
   const desiredTrack = (() => {
     // Title, howto, settings, home → title music
-    if (view === 'title' || view === 'howto' || view === 'settings' || view === 'home') {
+    if (view === 'title' || view === 'howto' || view === 'settings' || view === 'home' || view === 'records') {
       return TRACK_TITLE
     }
     // Opening cutscene
@@ -355,6 +356,7 @@ function App() {
             onContinue={handleContinue}
             onHowToPlay={() => setView('howto')}
             on2PDuel={handle2PDuel}
+            onRecords={() => setView('records')}
             onSettings={() => setView('settings')}
             hasSaveData={saveExists}
           />
@@ -397,6 +399,17 @@ function App() {
         <a href="#main-content" className="skip-link">Skip to main content</a>
         <main id="main-content">
           <SettingsScreen onBack={() => setView('title')} />
+        </main>
+      </div>
+    )
+  }
+
+  if (view === 'records') {
+    return (
+      <div className="app">
+        <a href="#main-content" className="skip-link">Skip to main content</a>
+        <main id="main-content">
+          <PlayerRecords worldState={worldState} onBack={() => setView('title')} />
         </main>
       </div>
     )

@@ -5,6 +5,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { LobbyInfo } from '../../types/multiplayer'
 import { listLobbies } from '../../api/client'
+import { isNativePlatform, isBleAvailable } from '../../transport'
 import './LobbyBrowser.css'
 
 interface LobbyBrowserProps {
@@ -16,6 +17,16 @@ export function LobbyBrowser({ onJoin, onBack }: LobbyBrowserProps) {
   const [lobbies, setLobbies] = useState<LobbyInfo[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [bleAvailable, setBleAvailable] = useState(false)
+  const [bleDevices, setBleDevices] = useState<{ id: string; name: string }[]>([])
+  const [bleScanning, setBleScanning] = useState(false)
+
+  // Check BLE availability on mount
+  useEffect(() => {
+    if (isNativePlatform()) {
+      isBleAvailable().then(setBleAvailable).catch(() => {})
+    }
+  }, [])
 
   const refresh = useCallback(async () => {
     setLoading(true)
@@ -83,6 +94,56 @@ export function LobbyBrowser({ onJoin, onBack }: LobbyBrowserProps) {
             </div>
           </button>
         ))}
+
+        {/* BLE scan (Android only) */}
+        {bleAvailable && (
+          <div className="lobby-browser__ble-section">
+            <button
+              type="button"
+              className="lobby-browser__ble-scan"
+              onClick={async () => {
+                setBleScanning(true)
+                setBleDevices([])
+                try {
+                  const { BleTransport } = await import('../../transport/BleTransport')
+                  await BleTransport.scanForLobbies((device) => {
+                    setBleDevices(prev =>
+                      prev.some(d => d.id === device.id) ? prev : [...prev, device]
+                    )
+                  }, 5000)
+                  setTimeout(() => setBleScanning(false), 5000)
+                } catch {
+                  setBleScanning(false)
+                }
+              }}
+              disabled={bleScanning}
+            >
+              {bleScanning ? 'Scanning...' : 'Scan Bluetooth'}
+            </button>
+            {bleDevices.map(device => (
+              <div key={device.id} className="lobby-browser__ble-device">
+                <span>{device.name}</span>
+                <button
+                  type="button"
+                  className="lobby-browser__ble-join"
+                  onClick={() => {
+                    // BLE join creates a fake LobbyInfo for the transport layer
+                    onJoin({
+                      id: `ble:${device.id}`,
+                      hostName: device.name,
+                      playerCount: 0,
+                      maxPlayers: 30,
+                      config: { specialRules: [], tradeRule: 'Friendly' },
+                      phase: 'waiting',
+                    })
+                  }}
+                >
+                  Join
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

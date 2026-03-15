@@ -1,0 +1,189 @@
+/* PlayerRecords screen */
+
+.records-screen {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px;
+  min-height: 100vh;
+  background: #1a1a2e;
+  color: #e8e0d8;
+}
+
+.records-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.records-back {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #e8e0d8;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.records-back:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.records-title {
+  font-size: 22px;
+  margin: 0;
+  color: #c9a84c;
+}
+
+.records-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.records-profile {
+  display: flex;
+  justify-content: center;
+}
+
+/* Sections */
+.records-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.records-section-title {
+  font-size: 13px;
+  color: #a8a0a0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0;
+}
+
+/* Stat grid */
+.records-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.records-stat {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 12px 8px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.records-stat-value {
+  font-size: 22px;
+  font-weight: bold;
+  color: #e8e0d8;
+}
+
+.records-stat-label {
+  font-size: 11px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.records-stat--win .records-stat-value {
+  color: #4caf50;
+}
+
+.records-stat--loss .records-stat-value {
+  color: #ef5350;
+}
+
+/* Progress bar */
+.records-progress {
+  position: relative;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.records-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #c9a84c, #e8c84c);
+  border-radius: 12px;
+  transition: width 0.5s ease;
+}
+
+.records-progress-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: bold;
+  color: #1a1a2e;
+  text-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
+}
+
+/* Match history */
+.records-history {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.records-match {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.records-match-result {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.records-match--win .records-match-result {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4caf50;
+}
+
+.records-match--loss .records-match-result {
+  background: rgba(239, 83, 80, 0.2);
+  color: #ef5350;
+}
+
+.records-match--draw .records-match-result {
+  background: rgba(139, 134, 130, 0.2);
+  color: #8b8682;
+}
+
+.records-match-opponent {
+  flex: 1;
+}
+
+.records-match-date {
+  color: #666;
+  font-size: 11px;
+}
+
+@media (max-width: 500px) {
+  .records-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

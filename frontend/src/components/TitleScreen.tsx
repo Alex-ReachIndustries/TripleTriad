@@ -5,6 +5,7 @@ interface TitleScreenProps {
   onContinue: () => void
   onHowToPlay: () => void
   on2PDuel: () => void
+  onRecords: () => void
   onSettings: () => void
   hasSaveData: boolean
 }
@@ -99,7 +100,7 @@ function SwipeConfirmDialog({ onConfirm, onCancel }: { onConfirm: () => void; on
   )
 }
 
-export function TitleScreen({ onNewGame, onContinue, onHowToPlay, on2PDuel, onSettings, hasSaveData }: TitleScreenProps) {
+export function TitleScreen({ onNewGame, onContinue, onHowToPlay, on2PDuel, onRecords, onSettings, hasSaveData }: TitleScreenProps) {
   const [visible, setVisible] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
 
@@ -154,6 +155,9 @@ export function TitleScreen({ onNewGame, onContinue, onHowToPlay, on2PDuel, onSe
           </button>
           <button type="button" className="ts-menu-btn" onClick={on2PDuel}>
             2P Duel
+          </button>
+          <button type="button" className="ts-menu-btn" onClick={onRecords}>
+            Records
           </button>
           <button type="button" className="ts-menu-btn" onClick={onSettings}>
             Settings
