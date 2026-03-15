@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { AudioManager } from '../audio/AudioManager'
+import { isNativePlatform } from '../transport'
 
 const SETTINGS_KEY = 'tripletriad-settings'
 
@@ -202,6 +203,40 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
             </>
           )}
         </section>
+
+        {/* Server URL (Android only — needed for 2P lobbies) */}
+        {isNativePlatform() && (
+          <section className="settings-section">
+            <h2 className="settings-section-title">Game Server</h2>
+            <p style={{ fontSize: '0.8rem', color: '#888', margin: '0 0 8px' }}>
+              Enter the URL of the game server for 2P lobbies (e.g. http://192.168.1.100:3000)
+            </p>
+            <input
+              type="text"
+              className="settings-server-input"
+              placeholder="http://192.168.1.x:3000"
+              defaultValue={localStorage.getItem('tripletriad-server-url') || ''}
+              onChange={e => {
+                const val = e.target.value.trim()
+                if (val) {
+                  localStorage.setItem('tripletriad-server-url', val)
+                } else {
+                  localStorage.removeItem('tripletriad-server-url')
+                }
+              }}
+              style={{
+                width: '100%',
+                padding: '8px 12px',
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.2)',
+                borderRadius: '6px',
+                color: '#e8e0d8',
+                fontSize: '14px',
+                boxSizing: 'border-box',
+              }}
+            />
+          </section>
+        )}
 
         <button type="button" className="settings-reset-btn" onClick={() => setSettings(DEFAULT_SETTINGS)}>
           Reset to Defaults

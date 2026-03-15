@@ -12,6 +12,7 @@ import { getOrCreateProfile, saveProfile, recordMatch } from '../../data/profile
 import { getTutorialsForRules } from '../../data/tutorials'
 import type { TutorialDef } from '../../data/tutorials'
 import { createLobby } from '../../api/client'
+import { isNativePlatform } from '../../transport'
 import { useLobby } from '../../hooks/useLobby'
 import { ProfileCard } from './ProfileCard'
 import { ProfileEditor } from './ProfileEditor'
@@ -89,12 +90,16 @@ export function MultiplayerHome({
     setError(null)
     try {
       const result = await createLobby(profile)
-
       setIsHost(true)
       await lobby.connect(result.lobbyId)
       setScreen('waiting-room')
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to create lobby')
+      const msg = e instanceof Error ? e.message : 'Failed to create lobby'
+      if (isNativePlatform() && msg.includes('fetch')) {
+        setError('Cannot reach game server. Set the server URL in Settings, or connect to the same network as the host.')
+      } else {
+        setError(msg)
+      }
     }
   }, [profile, lobby])
 

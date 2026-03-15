@@ -11,6 +11,7 @@ Endpoints:
 
 import os
 import io
+import threading
 import torch
 from typing import Optional
 
@@ -24,24 +25,48 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# ── Lazy model loading ───────────────────────────────────────────────────────
+# ── Model loading ─────────────────────────────────────────────────────────────
 
 _pipe = None
+_pipe_lock = threading.Lock()
+_model_ready = threading.Event()
 
 
-def _get_pipe():
+def _load_model():
+    """Load the SDXL-Turbo model. Called once at startup in a background thread."""
     global _pipe
-    if _pipe is None:
-        print("Loading SDXL-Turbo model (first request)...")
-        from diffusers import AutoPipelineForText2Image
+    print("Loading SDXL-Turbo model...", flush=True)
+    from diffusers import AutoPipelineForText2Image
+    try:
+        _pipe = AutoPipelineForText2Image.from_pretrained(
+            "stabilityai/sdxl-turbo",
+            torch_dtype=torch.float16,
+            variant="fp16",
+            local_files_only=True,
+        )
+    except Exception:
+        print("Local cache miss, downloading model...", flush=True)
         _pipe = AutoPipelineForText2Image.from_pretrained(
             "stabilityai/sdxl-turbo",
             torch_dtype=torch.float16,
             variant="fp16",
         )
-        _pipe.to("cuda")
-        print("Model loaded.")
+    _pipe.to("cuda")
+    _model_ready.set()
+    print("Model loaded and ready.", flush=True)
+
+
+def _get_pipe():
+    """Return the pipeline, waiting for startup loading to finish."""
+    _model_ready.wait()
     return _pipe
+
+
+@app.on_event("startup")
+def startup_event():
+    """Start model loading in a daemon thread so it doesn't block health checks."""
+    t = threading.Thread(target=_load_model, daemon=True)
+    t.start()
 
 
 # ── Request models ───────────────────────────────────────────────────────────
@@ -106,8 +131,8 @@ def generate(req: GenerateRequest):
     )
 
     if req.filename:
-        os.makedirs("/output", exist_ok=True)
         path = f"/output/{req.filename}.png"
+        os.makedirs(os.path.dirname(path), exist_ok=True)
         img.save(path)
         return JSONResponse({"status": "ok", "path": path})
 

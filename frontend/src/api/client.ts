@@ -1,7 +1,24 @@
 import type { PlayerProfile, LobbyInfo } from '../types/multiplayer'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
-const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3000'
+// On Android (Capacitor), localhost refers to the device itself, not the dev machine.
+// Use the saved server URL from settings, or fall back to env vars / localhost.
+function getServerUrl(): { api: string; ws: string } {
+  try {
+    const saved = localStorage.getItem('tripletriad-server-url')
+    if (saved) {
+      const url = saved.replace(/\/$/, '')
+      return {
+        api: url.replace(/^ws/, 'http'),
+        ws: url.replace(/^http/, 'ws'),
+      }
+    }
+  } catch { /* ignore */ }
+  const api = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+  const ws = import.meta.env.VITE_WS_URL || 'ws://localhost:3000'
+  return { api, ws }
+}
+
+const { api: API_URL, ws: WS_URL } = getServerUrl()
 
 // ─── Legacy room endpoints (backward compat) ───
 
