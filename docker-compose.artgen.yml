@@ -1,0 +1,21 @@
+# Art generation service (SDXL-Turbo GPU).
+# Start:  docker compose -f docker-compose.yml -f docker-compose.artgen.yml up artgen
+# Stop:   docker compose -f docker-compose.yml -f docker-compose.artgen.yml down
+# API:    http://localhost:8091/docs
+
+services:
+  artgen:
+    build:
+      context: ./artgen
+      dockerfile: Dockerfile
+    ports:
+      - "8091:8091"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    volumes:
+      - ./frontend/public:/output

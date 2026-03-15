@@ -6433,6 +6433,36 @@
   margin: 0;
 }
 
+.settings-toggle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.4rem 0;
+}
+
+.settings-toggle-btn {
+  padding: 0.35rem 1rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  font-family: var(--font);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  min-width: 3.5rem;
+}
+
+.settings-toggle-btn.active {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+}
+
+.settings-toggle-btn:hover {
+  border-color: var(--accent);
+}
+
 .settings-reset-btn {
   background: transparent;
   color: var(--text-muted);

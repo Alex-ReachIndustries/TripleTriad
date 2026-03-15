@@ -1,15 +1,20 @@
 import { useState, useEffect } from 'react'
+import { AudioManager } from '../audio/AudioManager'
 
 const SETTINGS_KEY = 'tripletriad-settings'
 
 export interface AppSettings {
   textScale: number       // 0.8 – 1.4, default 1.0
   cardOverlayScale: number // 0 – 1.5, default 1.0 (0 = hidden)
+  musicVolume: number     // 0 – 1, default 0.5
+  musicEnabled: boolean   // default true
 }
 
 const DEFAULT_SETTINGS: AppSettings = {
   textScale: 1.0,
   cardOverlayScale: 1.0,
+  musicVolume: 0.5,
+  musicEnabled: true,
 }
 
 export function loadSettings(): AppSettings {
@@ -20,6 +25,8 @@ export function loadSettings(): AppSettings {
     return {
       textScale: typeof parsed.textScale === 'number' ? parsed.textScale : DEFAULT_SETTINGS.textScale,
       cardOverlayScale: typeof parsed.cardOverlayScale === 'number' ? parsed.cardOverlayScale : DEFAULT_SETTINGS.cardOverlayScale,
+      musicVolume: typeof parsed.musicVolume === 'number' ? parsed.musicVolume : DEFAULT_SETTINGS.musicVolume,
+      musicEnabled: typeof parsed.musicEnabled === 'boolean' ? parsed.musicEnabled : DEFAULT_SETTINGS.musicEnabled,
     }
   } catch {
     return DEFAULT_SETTINGS
@@ -30,12 +37,16 @@ export function saveSettings(settings: AppSettings) {
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings))
 }
 
-/** Apply settings as CSS custom properties on :root */
+/** Apply settings as CSS custom properties on :root + AudioManager config */
 export function applySettingsToDOM(settings: AppSettings) {
   const root = document.documentElement
   root.style.setProperty('--text-scale', String(settings.textScale))
   root.style.setProperty('--card-overlay-scale', String(settings.cardOverlayScale))
   root.style.setProperty('--card-overlay-display', settings.cardOverlayScale === 0 ? 'none' : 'block')
+  // Sync audio settings
+  const audio = AudioManager.getInstance()
+  audio.setVolume(settings.musicVolume)
+  audio.setMuted(!settings.musicEnabled)
 }
 
 interface SettingsScreenProps {
@@ -58,8 +69,17 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
     setSettings(prev => ({ ...prev, cardOverlayScale: value }))
   }
 
+  const updateMusicVolume = (value: number) => {
+    setSettings(prev => ({ ...prev, musicVolume: value }))
+  }
+
+  const toggleMusic = () => {
+    setSettings(prev => ({ ...prev, musicEnabled: !prev.musicEnabled }))
+  }
+
   const textScalePercent = Math.round(settings.textScale * 100)
   const overlayPercent = Math.round(settings.cardOverlayScale * 100)
+  const volumePercent = Math.round(settings.musicVolume * 100)
 
   return (
     <div className="settings-screen">
@@ -145,6 +165,42 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
               }
             </p>
           </div>
+        </section>
+
+        {/* Music */}
+        <section className="settings-section">
+          <h2 className="settings-section-title">Music</h2>
+          <div className="settings-toggle-row">
+            <span>Background Music</span>
+            <button
+              type="button"
+              className={`settings-toggle-btn ${settings.musicEnabled ? 'active' : ''}`}
+              onClick={toggleMusic}
+              aria-label="Toggle music"
+            >
+              {settings.musicEnabled ? 'ON' : 'OFF'}
+            </button>
+          </div>
+          {settings.musicEnabled && (
+            <>
+              <h2 className="settings-section-title" style={{ marginTop: '0.5rem' }}>Volume — {volumePercent}%</h2>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.05"
+                value={settings.musicVolume}
+                onChange={e => updateMusicVolume(parseFloat(e.target.value))}
+                className="settings-slider"
+                aria-label="Music volume"
+              />
+              <div className="settings-slider-labels">
+                <span>0%</span>
+                <span>50%</span>
+                <span>100%</span>
+              </div>
+            </>
+          )}
         </section>
 
         <button type="button" className="settings-reset-btn" onClick={() => setSettings(DEFAULT_SETTINGS)}>

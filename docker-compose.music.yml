@@ -1,0 +1,34 @@
+# Music generation service (ACE-Step 1.5 GPU).
+# Start:  docker compose -f docker-compose.yml -f docker-compose.music.yml up musicgen
+# Stop:   docker compose -f docker-compose.yml -f docker-compose.music.yml down
+# API:    http://localhost:8090 (submit: POST /release_task, poll: POST /query_result)
+#
+# Model weights are stored in a Docker volume (not on the Windows drive) to avoid disk space issues.
+# Generated audio files are written directly to frontend/public/music/ via bind mount.
+
+services:
+  musicgen:
+    image: ghcr.io/dotnetautor/ace-step-1.5-docker:latest
+    ports:
+      - "8090:8090"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    volumes:
+      # Generated audio → host filesystem (persist artefacts)
+      - ./frontend/public/music:/workspace/ace_music_platform/source_tree/.cache/acestep/tmp/api_audio
+      # Model checkpoints → Docker volume (stays in vhdx, not Windows drive)
+      - musicgen-checkpoints:/workspace/ace_music_platform/source_tree/checkpoints
+    environment:
+      - PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+    command: >
+      uv run acestep-api
+      --port 8090
+      --host 0.0.0.0
+
+volumes:
+  musicgen-checkpoints:

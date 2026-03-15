@@ -13,6 +13,9 @@ import { HomePage } from './components/HomePage'
 import { StoryCutscene, OPENING_PANELS, CUTSCENE_MAP, QUEST_CUTSCENE_MAP, CUTSCENE_STORY_LOG } from './components/StoryCutscene'
 import { TutorialsMenu } from './components/TutorialsMenu'
 import { SettingsScreen, loadSettings, applySettingsToDOM } from './components/SettingsScreen'
+import { useAudio, useTrack } from './audio/useAudio'
+import { getLocationTrack, getCutsceneTrack, getBattleTrack, TRACK_TITLE, TRACK_WORLD_MAP } from './audio/trackMap'
+import type { WorldScreen } from './components/world/WorldMode'
 // @capacitor/app is imported dynamically — only available in Capacitor builds
 import './App.css'
 
@@ -42,6 +45,50 @@ function App() {
   const [battleContext, setBattleContext] = useState<BattleContext | null>(null)
   const [saveExists, setSaveExists] = useState(hasSaveData)
   const [pendingCutscene, setPendingCutscene] = useState<string | null>(null)
+  const [worldScreen, setWorldScreen] = useState<WorldScreen>({ type: 'map' })
+
+  // Audio system setup (autoplay unlock + visibility pause/resume)
+  useAudio()
+
+  // Compute desired music track based on current game state
+  const desiredTrack = (() => {
+    // Title, howto, settings, home → title music
+    if (view === 'title' || view === 'howto' || view === 'settings' || view === 'home') {
+      return TRACK_TITLE
+    }
+    // Opening cutscene
+    if (view === 'cutscene') {
+      return getCutsceneTrack('opening') ?? TRACK_TITLE
+    }
+    // In-game cutscenes triggered by quests
+    if (pendingCutscene) {
+      return getCutsceneTrack(pendingCutscene) ?? TRACK_WORLD_MAP
+    }
+    // Battle tab
+    if (tab === 'battle' && battleContext) {
+      const npc = getNpcById(battleContext.npcId)
+      const isBoss = !!(npc?.isBoss)
+      return getBattleTrack(worldState.storyChapter, isBoss)
+    }
+    // 2P duel → use mid-game battle theme
+    if (tab === 'duel') {
+      return 'battle_mid'
+    }
+    // World mode — depends on sub-screen
+    if (tab === 'world') {
+      if (worldScreen.type === 'map' || worldScreen.type === 'region' || worldScreen.type === 'quest_log') {
+        return TRACK_WORLD_MAP
+      }
+      if (worldScreen.type === 'town' || worldScreen.type === 'dungeon') {
+        return getLocationTrack(worldScreen.locationId) ?? TRACK_WORLD_MAP
+      }
+    }
+    // Deck, quests, guide tabs → world map music
+    return TRACK_WORLD_MAP
+  })()
+
+  // Reactive track switching
+  useTrack(desiredTrack)
 
   // Apply saved settings on mount
   useEffect(() => {
@@ -409,6 +456,7 @@ function App() {
             onSpreadRule={handleSpreadRule}
             onAbolishRule={handleAbolishRule}
             onNpcInteract={handleNpcInteract}
+            onScreenChange={setWorldScreen}
             onMarkCutsceneSeen={(cutsceneId) => setWorldState(prev => {
               let next = {
                 ...prev,

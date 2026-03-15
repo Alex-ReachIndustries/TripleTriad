@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import type { Region, Location, NPC, SpecialRule } from '../../types/world'
 import type { WorldPlayerState } from '../../data/worldState'
 import { getRegionById, getLocationById } from '../../data/world'
@@ -28,6 +28,7 @@ export interface WorldModeCallbacks {
   onAbolishRule?: (rule: SpecialRule, regionId: string) => void
   onNpcInteract?: (npc: NPC) => void
   onMarkCutsceneSeen?: (cutsceneId: string) => void
+  onScreenChange?: (screen: WorldScreen) => void
 }
 
 interface WorldModeProps extends WorldModeCallbacks {
@@ -46,8 +47,14 @@ export function WorldMode({
   onAbolishRule,
   onNpcInteract,
   onMarkCutsceneSeen,
+  onScreenChange,
 }: WorldModeProps) {
   const [screen, setScreen] = useState<WorldScreen>({ type: 'map' })
+
+  // Report screen changes for music routing
+  useEffect(() => {
+    onScreenChange?.(screen)
+  }, [screen, onScreenChange])
   const [selectedNpc, setSelectedNpc] = useState<NPC | null>(null)
   const [dungeonCutscene, setDungeonCutscene] = useState<string | null>(null)
 

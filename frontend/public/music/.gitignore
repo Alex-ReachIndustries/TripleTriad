@@ -1,0 +1,2 @@
+# Ignore UUID-named byproduct files from the musicgen Docker service
+*-*-*-*-*.mp3

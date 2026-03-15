@@ -12,6 +12,8 @@ import { getTutorialsForRules, TUTORIALS } from '../data/tutorials'
 import type { TutorialDef } from '../data/tutorials'
 import { TutorialPopup } from './TutorialPopup'
 import { GameBoard } from './GameBoard'
+import { AudioManager } from '../audio/AudioManager'
+import { TRACK_VICTORY, TRACK_DEFEAT } from '../audio/trackMap'
 import cardsData from '../data/cards.json'
 
 const allCards: Card[] = cardsData.cards as Card[]
@@ -324,6 +326,14 @@ export function BattleScreen({
         dungeonLocationId: npc?.isBoss && winner === 0 ? locationId : null,
       }
       setBattleResult(result)
+    }
+
+    // Play victory/defeat fanfare
+    const audio = AudioManager.getInstance()
+    if (winner === 0) {
+      audio.playOneShot(TRACK_VICTORY)
+    } else if (winner === 1) {
+      audio.playOneShot(TRACK_DEFEAT)
     }
 
     const timer = setTimeout(() => setPhase('reward'), 1500)
