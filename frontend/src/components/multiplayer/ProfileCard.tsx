@@ -63,10 +63,21 @@ export function ProfileCard({
             src={charIcon.src}
             alt={charIcon.name}
             className="profile-card__icon-img"
+            onError={(e) => {
+              // Fallback to initial-based avatar if image fails to load
+              const target = e.currentTarget
+              target.style.display = 'none'
+              const fallback = target.parentElement?.querySelector('.profile-card__icon-fallback') as HTMLElement | null
+              if (fallback) fallback.style.display = 'flex'
+            }}
           />
-        ) : (
-          <div className="profile-card__icon-placeholder">?</div>
-        )}
+        ) : null}
+        <div
+          className="profile-card__icon-fallback"
+          style={{ display: charIcon ? 'none' : 'flex' }}
+        >
+          {profile.name.charAt(0).toUpperCase()}
+        </div>
       </div>
       <div className="profile-card__info">
         <div className="profile-card__name">{profile.name}</div>

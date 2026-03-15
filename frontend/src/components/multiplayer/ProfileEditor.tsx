@@ -137,7 +137,19 @@ export function ProfileEditor({ profile, worldState, onSave, onBack }: ProfileEd
                   title={unlocked ? icon.name : getUnlockHint(icon.unlockCondition)}
                 >
                   {unlocked ? (
-                    <img src={icon.src} alt={icon.name} className="profile-editor__icon-img" />
+                    <img
+                      src={icon.src}
+                      alt={icon.name}
+                      className="profile-editor__icon-img"
+                      onError={(e) => {
+                        const target = e.currentTarget
+                        target.style.display = 'none'
+                        const fallback = document.createElement('div')
+                        fallback.className = 'profile-editor__icon-initial'
+                        fallback.textContent = icon.name.charAt(0)
+                        target.parentElement?.appendChild(fallback)
+                      }}
+                    />
                   ) : (
                     <div className="profile-editor__icon-locked">
                       <span className="profile-editor__lock-icon">&#128274;</span>
