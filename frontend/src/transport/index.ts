@@ -17,10 +17,19 @@ export function isNativePlatform(): boolean {
 }
 
 export async function isBleAvailable(): Promise<boolean> {
-  if (!isNativePlatform()) return false
+  // Native Capacitor BLE (Android)
+  if (isNativePlatform()) {
+    try {
+      const { BleTransport } = await import('./BleTransport')
+      return BleTransport.isAvailable()
+    } catch {
+      return false
+    }
+  }
+  // Web Bluetooth (Chrome desktop — central/client only)
   try {
-    const { BleTransport } = await import('./BleTransport')
-    return BleTransport.isAvailable()
+    const { WebBleTransport } = await import('./WebBleTransport')
+    return WebBleTransport.isAvailable()
   } catch {
     return false
   }
@@ -28,8 +37,13 @@ export async function isBleAvailable(): Promise<boolean> {
 
 export async function createTransport(mode: TransportMode): Promise<ITransport> {
   if (mode === 'ble') {
-    const { BleTransport } = await import('./BleTransport')
-    return new BleTransport()
+    if (isNativePlatform()) {
+      const { BleTransport } = await import('./BleTransport')
+      return new BleTransport()
+    }
+    // Web Bluetooth for desktop browsers
+    const { WebBleTransport } = await import('./WebBleTransport')
+    return new WebBleTransport()
   }
   return new WebSocketTransport()
 }

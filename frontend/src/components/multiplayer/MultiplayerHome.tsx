@@ -113,11 +113,19 @@ export function MultiplayerHome({
     try {
       setIsHost(false)
       if (selectedLobby.id.startsWith('ble:')) {
-        // BLE join: connect to the BLE device
-        const { BleTransport } = await import('../../transport/BleTransport')
-        const bleClient = new BleTransport()
-        const deviceId = selectedLobby.id.replace('ble:', '')
-        await bleClient.connect(deviceId)
+        // BLE join: use native BleTransport on Android, WebBleTransport on desktop
+        const { isNativePlatform } = await import('../../transport')
+        let bleClient
+        if (isNativePlatform()) {
+          const { BleTransport } = await import('../../transport/BleTransport')
+          bleClient = new BleTransport()
+          const deviceId = selectedLobby.id.replace('ble:', '')
+          await bleClient.connect(deviceId)
+        } else {
+          const { WebBleTransport } = await import('../../transport/WebBleTransport')
+          bleClient = new WebBleTransport()
+          await bleClient.connect('') // triggers browser device picker
+        }
         await lobby.connectWithTransport(bleClient)
       } else {
         // WebSocket join
