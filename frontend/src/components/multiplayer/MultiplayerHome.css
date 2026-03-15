@@ -1,0 +1,146 @@
+/* MultiplayerHome: 2P Hub */
+
+.mp-home {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  min-height: 100vh;
+  background: #1a1a2e;
+  color: #e8e0d8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.mp-home__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 30px;
+}
+
+.mp-home__back {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #e8e0d8;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.mp-home__back:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.mp-home__title {
+  font-size: 28px;
+  margin: 0;
+  color: #c9a84c;
+  flex: 1;
+  text-align: center;
+}
+
+.mp-home__profile-display {
+  margin-bottom: 30px;
+}
+
+.mp-home__error {
+  background: rgba(239, 83, 80, 0.15);
+  border: 1px solid rgba(239, 83, 80, 0.3);
+  color: #ef5350;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  width: 100%;
+  max-width: 340px;
+  text-align: center;
+}
+
+.mp-home__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 280px;
+}
+
+.mp-home__btn {
+  padding: 14px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+  text-align: center;
+}
+
+.mp-home__btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.mp-home__btn--primary {
+  background: linear-gradient(135deg, #c9a84c, #8a7030);
+  color: #1a1a2e;
+}
+
+.mp-home__btn--secondary {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #e8e0d8;
+}
+
+.mp-home__btn--secondary:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+/* Duel Screen */
+.mp-duel-screen {
+  position: relative;
+  min-height: 100vh;
+  background: #1a1a2e;
+}
+
+.mp-spectator-banner {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 152, 0, 0.8);
+  color: white;
+  padding: 4px 16px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+  z-index: 10;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.mp-spectator-result {
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  color: #c9a84c;
+  padding: 12px;
+}
+
+.mp-return-btn {
+  display: block;
+  margin: 12px auto;
+  padding: 10px 24px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #e8e0d8;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.mp-return-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+}

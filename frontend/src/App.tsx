@@ -3,7 +3,7 @@ import { loadWorldState, saveWorldState, addToInventory, markDiscovered, isStart
 import { getTournamentAtLocation } from './data/shops'
 import { getNpcById, getLocationById } from './data/world'
 import { DeckManager } from './components/DeckManager'
-import { PlayPage } from './components/PlayPage'
+import { MultiplayerHome } from './components/multiplayer/MultiplayerHome'
 import { BattleScreen, type BattleResult } from './components/BattleScreen'
 import { WorldMode } from './components/world/WorldMode'
 import { QuestLog } from './components/world/QuestLog'
@@ -331,6 +331,20 @@ function App() {
     setView('game')
   }, [])
 
+  // 2P inventory changes (from lobby duel trades)
+  const handle2PInventoryChange = useCallback((deltas: { gained: string[]; lost: string[] }) => {
+    setWorldState((prev) => {
+      let next = prev
+      for (const cardId of deltas.gained) {
+        next = { ...next, inventory: addToInventory(next.inventory, cardId), discoveredCards: markDiscovered(next.discoveredCards, cardId) }
+      }
+      for (const cardId of deltas.lost) {
+        next = removeCardAndCleanHand(next, cardId)
+      }
+      return next
+    })
+  }, [])
+
   if (view === 'title') {
     return (
       <div className="app">
@@ -492,13 +506,17 @@ function App() {
           />
         )}
         {tab === 'duel' && (
-          <PlayPage
-            worldPlayerInventory={worldState.inventory}
-            discoveredCards={worldState.discoveredCards}
+          <MultiplayerHome
+            worldState={worldState}
+            onInventoryChange={handle2PInventoryChange}
+            onBack={() => setView('title')}
             savedDecks={worldState.savedDecks}
-            lastDeckId={worldState.lastDeckId}
-            onSetLastDeckId={(deckId) => setWorldState(prev => ({ ...prev, lastDeckId: deckId }))}
             onUpdateDecks={(decks) => setWorldState(prev => ({ ...prev, savedDecks: decks }))}
+            seenTutorials={worldState.seenTutorials}
+            onMarkTutorialSeen={(tutorialId) => setWorldState(prev => ({
+              ...prev,
+              seenTutorials: prev.seenTutorials.includes(tutorialId) ? prev.seenTutorials : [...prev.seenTutorials, tutorialId],
+            }))}
           />
         )}
         {tab === 'guide' && (

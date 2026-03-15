@@ -1,0 +1,135 @@
+/* LobbyBrowser */
+
+.lobby-browser {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px;
+  min-height: 100vh;
+  background: #1a1a2e;
+  color: #e8e0d8;
+}
+
+.lobby-browser__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.lobby-browser__back,
+.lobby-browser__refresh {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #e8e0d8;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.lobby-browser__back:hover,
+.lobby-browser__refresh:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.lobby-browser__refresh:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.lobby-browser__title {
+  flex: 1;
+  font-size: 22px;
+  margin: 0;
+  color: #c9a84c;
+}
+
+.lobby-browser__error {
+  background: rgba(239, 83, 80, 0.15);
+  border: 1px solid rgba(239, 83, 80, 0.3);
+  color: #ef5350;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+
+.lobby-browser__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lobby-browser__empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+  font-size: 14px;
+}
+
+.lobby-browser__card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 14px;
+  cursor: pointer;
+  text-align: left;
+  color: #e8e0d8;
+  transition: all 0.15s;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.lobby-browser__card:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(201, 168, 76, 0.4);
+  transform: translateY(-1px);
+}
+
+.lobby-browser__card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.lobby-browser__host-name {
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.lobby-browser__player-count {
+  font-size: 13px;
+  color: #a8a0a0;
+}
+
+.lobby-browser__card-details {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: #888;
+}
+
+.lobby-browser__status {
+  font-size: 12px;
+  font-weight: 600;
+  width: fit-content;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.lobby-browser__status--waiting {
+  background: rgba(76, 175, 80, 0.15);
+  color: #4caf50;
+}
+
+.lobby-browser__status--duelling {
+  background: rgba(255, 152, 0, 0.15);
+  color: #ff9800;
+}
+
+.lobby-browser__status--rewards {
+  background: rgba(201, 168, 76, 0.15);
+  color: #c9a84c;
+}
