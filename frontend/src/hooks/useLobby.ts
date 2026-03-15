@@ -1,11 +1,12 @@
 /**
- * useLobby: manages lobby WebSocket connection, state, and message handling.
+ * useLobby: manages lobby connection, state, and message handling.
+ * Transport-agnostic — works with WebSocket or BLE transports.
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react'
 import type {
   PlayerProfile, DuelConfig, LobbyPlayerInfo, LobbyPhase,
-  LobbyInfo, ServerMessage, ActiveDuelInfo,
+  LobbyInfo, ServerMessage, ActiveDuelInfo, ITransport,
 } from '../types/multiplayer'
 import type { GameState } from '../game/types'
 import { WebSocketTransport } from '../transport/WebSocketTransport'
@@ -39,129 +40,148 @@ const initialState: LobbyState = {
   tradeResult: null,
 }
 
+function setupMessageHandler(transport: ITransport, setState: React.Dispatch<React.SetStateAction<LobbyState>>) {
+  transport.onMessage((msg: ServerMessage) => {
+    switch (msg.type) {
+      case 'lobby_state':
+        setState(prev => ({
+          ...prev,
+          lobby: msg.lobby,
+          players: msg.players,
+          config: msg.config,
+          phase: msg.phase,
+          activeDuel: msg.activeDuel,
+          selectedDuellists: (msg as any).selectedDuellists || [],
+          error: null,
+        }))
+        break
+
+      case 'player_joined':
+        setState(prev => ({
+          ...prev,
+          players: prev.players.some(p => p.id === msg.player.id)
+            ? prev.players.map(p => p.id === msg.player.id ? msg.player : p)
+            : [...prev.players, msg.player],
+        }))
+        break
+
+      case 'player_left':
+        setState(prev => ({
+          ...prev,
+          players: prev.players.filter(p => p.id !== msg.playerId),
+        }))
+        break
+
+      case 'config_updated':
+        setState(prev => ({ ...prev, config: msg.config }))
+        break
+
+      case 'hand_locked':
+        setState(prev => ({
+          ...prev,
+          players: prev.players.map(p =>
+            p.id === msg.playerId ? { ...p, isReady: true } : p
+          ),
+        }))
+        break
+
+      case 'duel_starting':
+        setState(prev => ({
+          ...prev,
+          phase: 'duelling',
+          activeDuel: {
+            player0Id: msg.player0.id,
+            player1Id: msg.player1.id,
+            gameState: null as any,
+          },
+        }))
+        break
+
+      case 'duel_state':
+        setState(prev => ({
+          ...prev,
+          duelGameState: msg.gameState,
+          phase: 'duelling',
+        }))
+        break
+
+      case 'duel_ended':
+        setState(prev => ({
+          ...prev,
+          phase: 'rewards',
+          duelWinner: msg.winner,
+          tradeResult: msg.tradeResult,
+        }))
+        break
+
+      case 'return_to_waiting':
+        setState(prev => ({
+          ...prev,
+          phase: 'waiting',
+          activeDuel: null,
+          duelGameState: null,
+          duelWinner: null,
+          tradeResult: null,
+          selectedDuellists: [],
+        }))
+        break
+
+      case 'error':
+        setState(prev => ({ ...prev, error: msg.message }))
+        break
+
+      default: {
+        const anyMsg = msg as any
+        if (anyMsg.type === 'duellists_selected') {
+          setState(prev => ({
+            ...prev,
+            selectedDuellists: [anyMsg.player0Id, anyMsg.player1Id],
+          }))
+        }
+      }
+    }
+  })
+
+  transport.onDisconnect(() => {
+    setState(prev => ({ ...prev, connected: false }))
+  })
+}
+
 export function useLobby(profile: PlayerProfile) {
   const [state, setState] = useState<LobbyState>(initialState)
-  const transportRef = useRef<WebSocketTransport | null>(null)
+  const transportRef = useRef<ITransport | null>(null)
   const profileRef = useRef(profile)
   profileRef.current = profile
 
+  /** Connect via WebSocket to a backend-hosted lobby */
   const connect = useCallback(async (lobbyId: string) => {
     const transport = new WebSocketTransport()
     transportRef.current = transport
-
-    transport.onMessage((msg: ServerMessage) => {
-      switch (msg.type) {
-        case 'lobby_state':
-          setState(prev => ({
-            ...prev,
-            lobby: msg.lobby,
-            players: msg.players,
-            config: msg.config,
-            phase: msg.phase,
-            activeDuel: msg.activeDuel,
-            selectedDuellists: (msg as any).selectedDuellists || [],
-            error: null,
-          }))
-          break
-
-        case 'player_joined':
-          setState(prev => ({
-            ...prev,
-            players: prev.players.some(p => p.id === msg.player.id)
-              ? prev.players.map(p => p.id === msg.player.id ? msg.player : p)
-              : [...prev.players, msg.player],
-          }))
-          break
-
-        case 'player_left':
-          setState(prev => ({
-            ...prev,
-            players: prev.players.filter(p => p.id !== msg.playerId),
-          }))
-          break
-
-        case 'config_updated':
-          setState(prev => ({ ...prev, config: msg.config }))
-          break
-
-        case 'hand_locked':
-          setState(prev => ({
-            ...prev,
-            players: prev.players.map(p =>
-              p.id === msg.playerId ? { ...p, isReady: true } : p
-            ),
-          }))
-          break
-
-        case 'duel_starting':
-          setState(prev => ({
-            ...prev,
-            phase: 'duelling',
-            activeDuel: {
-              player0Id: msg.player0.id,
-              player1Id: msg.player1.id,
-              gameState: null as any,
-            },
-          }))
-          break
-
-        case 'duel_state':
-          setState(prev => ({
-            ...prev,
-            duelGameState: msg.gameState,
-            phase: 'duelling',
-          }))
-          break
-
-        case 'duel_ended':
-          setState(prev => ({
-            ...prev,
-            phase: 'rewards',
-            duelWinner: msg.winner,
-            tradeResult: msg.tradeResult,
-          }))
-          break
-
-        case 'return_to_waiting':
-          setState(prev => ({
-            ...prev,
-            phase: 'waiting',
-            activeDuel: null,
-            duelGameState: null,
-            duelWinner: null,
-            tradeResult: null,
-            selectedDuellists: [],
-          }))
-          break
-
-        case 'error':
-          setState(prev => ({ ...prev, error: msg.message }))
-          break
-
-        default: {
-          // Handle duellists_selected from server
-          const anyMsg = msg as any
-          if (anyMsg.type === 'duellists_selected') {
-            setState(prev => ({
-              ...prev,
-              selectedDuellists: [anyMsg.player0Id, anyMsg.player1Id],
-            }))
-          }
-        }
-      }
-    })
-
-    transport.onDisconnect(() => {
-      setState(prev => ({ ...prev, connected: false }))
-    })
+    setupMessageHandler(transport, setState)
 
     try {
       const url = getLobbyWsUrl(lobbyId, profileRef.current.id)
       await transport.connect(url)
       setState(prev => ({ ...prev, connected: true, error: null }))
-
-      // Send join message
       transport.send({ type: 'join', profile: profileRef.current })
+    } catch (e) {
+      setState(prev => ({ ...prev, error: e instanceof Error ? e.message : 'Connection failed' }))
+    }
+  }, [])
+
+  /** Connect using a pre-created transport (e.g. BleHostTransport or BleTransport) */
+  const connectWithTransport = useCallback(async (transport: ITransport) => {
+    transportRef.current = transport
+    setupMessageHandler(transport, setState)
+
+    try {
+      await transport.connect('')  // BLE transports handle their own connection target
+      setState(prev => ({ ...prev, connected: true, error: null }))
+      // For BLE host, the join is handled internally by BleHostTransport
+      // For BLE client, send join after connecting
+      if (transport.type === 'ble') {
+        transport.send({ type: 'join', profile: profileRef.current })
+      }
     } catch (e) {
       setState(prev => ({ ...prev, error: e instanceof Error ? e.message : 'Connection failed' }))
     }
@@ -198,7 +218,6 @@ export function useLobby(profile: PlayerProfile) {
     transportRef.current?.send({ type: 'return_to_lobby' })
   }, [])
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       transportRef.current?.disconnect()
@@ -208,6 +227,7 @@ export function useLobby(profile: PlayerProfile) {
   return {
     state,
     connect,
+    connectWithTransport,
     disconnect,
     setConfig,
     selectHand,

@@ -184,7 +184,7 @@ export class BleTransport implements ITransport {
   static async isAvailable(): Promise<boolean> {
     try {
       const { BleClient } = await import('@capacitor-community/bluetooth-le')
-      await BleClient.initialize()
+      await BleClient.initialize({ androidNeverForLocation: true })
       const enabled = await BleClient.isEnabled()
       return enabled
     } catch {

@@ -89,26 +89,40 @@ export function MultiplayerHome({
   const handleHost = useCallback(async () => {
     setError(null)
     try {
-      const result = await createLobby(profile)
-      setIsHost(true)
-      await lobby.connect(result.lobbyId)
-      setScreen('waiting-room')
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : 'Failed to create lobby'
-      if (isNativePlatform() && msg.includes('fetch')) {
-        setError('Cannot reach game server. Set the server URL in Settings, or connect to the same network as the host.')
+      if (isNativePlatform()) {
+        // Android: host via BLE (no backend needed)
+        const { BleHostTransport } = await import('../../transport/BleHostTransport')
+        const bleHost = new BleHostTransport(profile)
+        setIsHost(true)
+        await lobby.connectWithTransport(bleHost)
+        setScreen('waiting-room')
       } else {
-        setError(msg)
+        // Web: host via backend WebSocket
+        const result = await createLobby(profile)
+        setIsHost(true)
+        await lobby.connect(result.lobbyId)
+        setScreen('waiting-room')
       }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to create lobby')
     }
   }, [profile, lobby])
 
   const handleJoinLobby = useCallback(async (selectedLobby: LobbyInfo) => {
     setError(null)
     try {
-
       setIsHost(false)
-      await lobby.connect(selectedLobby.id)
+      if (selectedLobby.id.startsWith('ble:')) {
+        // BLE join: connect to the BLE device
+        const { BleTransport } = await import('../../transport/BleTransport')
+        const bleClient = new BleTransport()
+        const deviceId = selectedLobby.id.replace('ble:', '')
+        await bleClient.connect(deviceId)
+        await lobby.connectWithTransport(bleClient)
+      } else {
+        // WebSocket join
+        await lobby.connect(selectedLobby.id)
+      }
       setScreen('waiting-room')
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to join lobby')
