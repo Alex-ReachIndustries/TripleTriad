@@ -9,8 +9,8 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
-      // BLE plugin only available in Capacitor Android builds, not web
-      external: ['@capacitor-community/bluetooth-le'],
+      // BLE plugin is lazy-loaded via dynamic import() — no need to externalize.
+      // Capacitor native bridge provides the actual BLE implementation on Android.
     },
   },
 })
