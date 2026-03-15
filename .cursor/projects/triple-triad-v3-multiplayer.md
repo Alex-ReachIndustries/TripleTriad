@@ -68,7 +68,7 @@ Tasks:
 ---
 
 ### Phase 2: Player Profile System
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 Goal: Implement profile data model, customisation UI, and unlock system. Generate default + unlockable art assets.
 
@@ -83,7 +83,7 @@ Todos:
 ---
 
 ### Phase 3: Lobby System (Backend)
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 Goal: Extend the backend to support persistent lobbies with multiple players, host controls, spectating, and configurable rules.
 
@@ -96,7 +96,7 @@ Todos:
 ---
 
 ### Phase 4: Lobby System (Frontend)
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 Goal: Build the complete lobby UI flow — from the 2P home screen through lobby creation, waiting room, duel, and back.
 
@@ -110,7 +110,7 @@ Todos:
 ---
 
 ### Phase 5: Bluetooth LE Transport (Android)
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 Goal: Implement BLE-based local multiplayer for Android via Capacitor plugin. One device hosts (peripheral), others scan and join (central).
 
@@ -124,7 +124,7 @@ Todos:
 ---
 
 ### Phase 6: Player Records Screen
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 Goal: New "Player Records" option on the title screen showing interesting single-player and 2P statistics.
 
@@ -135,7 +135,7 @@ Todos:
 ---
 
 ### Phase 7: Tutorial Integration for 2P
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 Goal: Ensure all 14 tutorial popups fire correctly during 2P duels, using the same trigger logic as 1P.
 
@@ -145,7 +145,7 @@ Todos:
 ---
 
 ### Phase 8: Polish, Testing & Build
-**Status:** [ ] Not Started
+**Status:** [ ] In Progress
 
 Goal: End-to-end testing, mobile responsiveness, APK build, and final report.
 
