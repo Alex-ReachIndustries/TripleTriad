@@ -12,6 +12,9 @@ import com.getcapacitor.BridgeActivity;
 public class MainActivity extends BridgeActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Register custom BLE server plugin
+        registerPlugin(BleServerPlugin.class);
+
         super.onCreate(savedInstanceState);
 
         // Edge-to-edge: draw behind system bars

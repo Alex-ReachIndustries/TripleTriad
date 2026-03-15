@@ -2,26 +2,36 @@
  * BLE Host Transport: Android peripheral role.
  * Advertises a lobby, accepts BLE connections, runs lobby logic locally via LocalLobbyManager.
  * Connected clients send/receive LobbyMessages via BLE characteristic writes/notifications.
+ *
+ * Uses the custom BleServer Capacitor plugin (BleServerPlugin.java) for GATT server functionality.
  */
 
 import type { ITransport, ClientMessage, ServerMessage, PlayerProfile } from '../types/multiplayer'
+import type { PluginListenerHandle } from '@capacitor/core'
 import { LocalLobbyManager } from './LocalLobbyManager'
 import { BLE_SERVICE_UUID, BLE_LOBBY_CHAR_UUID } from './BleTransport'
+import { BleServer } from './ble-server-plugin'
 
-function encodeMessage(msg: ServerMessage): DataView {
+function encodeToBase64(msg: ServerMessage): string {
   const json = JSON.stringify(msg)
   const encoder = new TextEncoder()
   const bytes = encoder.encode(json)
-  const buffer = new ArrayBuffer(bytes.length)
-  const view = new Uint8Array(buffer)
-  view.set(bytes)
-  return new DataView(buffer)
+  let binary = ''
+  for (let i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i])
+  }
+  return btoa(binary)
 }
 
-function decodeMessage(data: DataView): ClientMessage | null {
+function decodeFromBase64(b64: string): ClientMessage | null {
   try {
+    const binary = atob(b64)
+    const bytes = new Uint8Array(binary.length)
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i)
+    }
     const decoder = new TextDecoder()
-    const json = decoder.decode(data.buffer)
+    const json = decoder.decode(bytes)
     return JSON.parse(json) as ClientMessage
   } catch {
     return null
@@ -40,7 +50,7 @@ export class BleHostTransport implements ITransport {
   private _connected = false
   private connectedDevices = new Set<string>()
   private hostProfile: PlayerProfile
-  private bleServerModule: any = null
+  private listeners: PluginListenerHandle[] = []
 
   constructor(hostProfile: PlayerProfile) {
     this.hostProfile = hostProfile
@@ -55,11 +65,8 @@ export class BleHostTransport implements ITransport {
   }
 
   async connect(_target: string): Promise<void> {
-    const mod = await import('@capacitor-community/bluetooth-le')
-    this.bleServerModule = mod.BleServer
-
     // Initialize BLE server (peripheral) mode
-    await this.bleServerModule.initialize()
+    await BleServer.initialize()
 
     // Create the lobby manager
     this.lobbyManager = new LocalLobbyManager(
@@ -82,7 +89,7 @@ export class BleHostTransport implements ITransport {
     )
 
     // Add BLE service with lobby characteristic
-    await this.bleServerModule.addService({
+    await BleServer.addService({
       uuid: BLE_SERVICE_UUID,
       characteristics: [{
         uuid: BLE_LOBBY_CHAR_UUID,
@@ -96,30 +103,39 @@ export class BleHostTransport implements ITransport {
     })
 
     // Handle writes from clients (incoming messages)
-    this.bleServerModule.onWrite((event: any) => {
-      if (event.characteristic === BLE_LOBBY_CHAR_UUID) {
-        const msg = decodeMessage(event.value)
-        if (msg && this.lobbyManager) {
-          // Determine player ID from the message (join messages include profile)
-          const senderId = msg.type === 'join' ? msg.profile.id : this.getPlayerIdForDevice(event.deviceId)
-          if (senderId) {
-            this.lobbyManager.handleMessage(senderId, msg)
+    const writeListener = await BleServer.addListener(
+      'characteristicWriteRequest',
+      (event) => {
+        if (event.characteristic === BLE_LOBBY_CHAR_UUID) {
+          const msg = decodeFromBase64(event.value)
+          if (msg && this.lobbyManager) {
+            // Determine player ID from the message (join messages include profile)
+            if (msg.type === 'join') {
+              this.devicePlayerMap.set(event.deviceId, msg.profile.id)
+            }
+            const senderId = msg.type === 'join' ? msg.profile.id : this.getPlayerIdForDevice(event.deviceId)
+            if (senderId) {
+              this.lobbyManager.handleMessage(senderId, msg)
+            }
           }
         }
-      }
-    })
+      },
+    )
+    this.listeners.push(writeListener)
 
-    // Track connected/disconnected devices
-    this.bleServerModule.onSubscribed((event: any) => {
+    // Track subscribed devices
+    const subListener = await BleServer.addListener('subscribed', (event) => {
       this.connectedDevices.add(event.deviceId)
     })
+    this.listeners.push(subListener)
 
-    this.bleServerModule.onUnsubscribed((event: any) => {
+    const unsubListener = await BleServer.addListener('unsubscribed', (event) => {
       this.connectedDevices.delete(event.deviceId)
     })
+    this.listeners.push(unsubListener)
 
     // Start advertising
-    await this.bleServerModule.startAdvertising({
+    await BleServer.startAdvertising({
       services: [BLE_SERVICE_UUID],
       localName: this.hostProfile.name.slice(0, 20),
     })
@@ -134,11 +150,15 @@ export class BleHostTransport implements ITransport {
   }
 
   disconnect(): void {
-    if (this.bleServerModule) {
-      this.bleServerModule.stopAdvertising().catch(() => {})
+    BleServer.closeServer().catch(() => {})
+    for (const listener of this.listeners) {
+      listener.remove()
     }
+    this.listeners = []
     this._connected = false
     this.lobbyManager = null
+    this.connectedDevices.clear()
+    this.devicePlayerMap.clear()
     this.disconnectHandler?.()
   }
 
@@ -158,12 +178,10 @@ export class BleHostTransport implements ITransport {
   }
 
   private async notifyClient(msg: ServerMessage): Promise<void> {
-    if (!this.bleServerModule || this.connectedDevices.size === 0) return
+    if (this.connectedDevices.size === 0) return
     try {
-      await this.bleServerModule.notifyCharacteristic({
-        service: BLE_SERVICE_UUID,
-        characteristic: BLE_LOBBY_CHAR_UUID,
-        value: encodeMessage(msg),
+      await BleServer.notifyCharacteristic({
+        value: encodeToBase64(msg),
       })
     } catch { /* ignore notification failures */ }
   }
