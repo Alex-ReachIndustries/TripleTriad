@@ -34,6 +34,7 @@ import java.util.UUID;
     permissions = {
         @Permission(strings = { Manifest.permission.BLUETOOTH_ADVERTISE }, alias = "advertise"),
         @Permission(strings = { Manifest.permission.BLUETOOTH_CONNECT }, alias = "connect"),
+        @Permission(strings = { Manifest.permission.BLUETOOTH_SCAN }, alias = "scan"),
     }
 )
 public class BleServerPlugin extends Plugin {
@@ -131,8 +132,38 @@ public class BleServerPlugin extends Plugin {
         }
     };
 
+    private PluginCall pendingInitCall;
+
     @PluginMethod
     public void initialize(PluginCall call) {
+        // Request runtime permissions first (Android 12+)
+        if (!allPermissionsGranted()) {
+            pendingInitCall = call;
+            requestAllPermissions(call, "onPermissionResult");
+            return;
+        }
+        completeInitialize(call);
+    }
+
+    @com.getcapacitor.annotation.PermissionCallback
+    private void onPermissionResult(PluginCall call) {
+        if (call == null) call = pendingInitCall;
+        pendingInitCall = null;
+
+        if (!allPermissionsGranted()) {
+            call.reject("Bluetooth permissions were denied");
+            return;
+        }
+        completeInitialize(call);
+    }
+
+    private boolean allPermissionsGranted() {
+        return getPermissionState("advertise") == com.getcapacitor.PermissionState.GRANTED
+            && getPermissionState("connect") == com.getcapacitor.PermissionState.GRANTED
+            && getPermissionState("scan") == com.getcapacitor.PermissionState.GRANTED;
+    }
+
+    private void completeInitialize(PluginCall call) {
         bluetoothManager = (BluetoothManager) getContext().getSystemService(Context.BLUETOOTH_SERVICE);
         if (bluetoothManager == null) {
             call.reject("BluetoothManager not available");
