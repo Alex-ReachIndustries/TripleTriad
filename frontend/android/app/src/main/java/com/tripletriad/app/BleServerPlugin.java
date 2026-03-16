@@ -325,6 +325,8 @@ public class BleServerPlugin extends Plugin {
         call.resolve();
     }
 
+    private static final int MAX_NOTIFY_SIZE = 512;
+
     @PluginMethod
     public void notifyCharacteristic(PluginCall call) {
         String valueBase64 = call.getString("value");
@@ -333,14 +335,39 @@ public class BleServerPlugin extends Plugin {
             return;
         }
 
-        byte[] value = Base64.decode(valueBase64, Base64.NO_WRAP);
-        lobbyCharacteristic.setValue(value);
+        byte[] fullValue = Base64.decode(valueBase64, Base64.NO_WRAP);
 
-        for (BluetoothDevice device : subscribedDevices) {
-            try {
-                gattServer.notifyCharacteristicChanged(device, lobbyCharacteristic, false);
-            } catch (SecurityException e) {
-                Log.e(TAG, "Notify failed for " + device.getAddress() + ": " + e.getMessage());
+        // BLE notifications have a max size. Chunk large payloads.
+        // Chunk format: [chunkIndex, totalChunks, ...payload]
+        int payloadPerChunk = MAX_NOTIFY_SIZE - 2;
+        int totalChunks = (int) Math.ceil((double) fullValue.length / payloadPerChunk);
+        if (totalChunks < 1) totalChunks = 1;
+
+        for (int chunkIdx = 0; chunkIdx < totalChunks; chunkIdx++) {
+            int start = chunkIdx * payloadPerChunk;
+            int end = Math.min(start + payloadPerChunk, fullValue.length);
+            int payloadLen = end - start;
+
+            byte[] chunk = new byte[payloadLen + 2];
+            chunk[0] = (byte) chunkIdx;
+            chunk[1] = (byte) totalChunks;
+            System.arraycopy(fullValue, start, chunk, 2, payloadLen);
+
+            lobbyCharacteristic.setValue(chunk);
+
+            for (BluetoothDevice device : subscribedDevices) {
+                try {
+                    gattServer.notifyCharacteristicChanged(device, lobbyCharacteristic, false);
+                } catch (SecurityException e) {
+                    Log.e(TAG, "Notify failed for " + device.getAddress() + ": " + e.getMessage());
+                } catch (IllegalArgumentException e) {
+                    Log.e(TAG, "Notify too large for " + device.getAddress() + ": " + e.getMessage());
+                }
+            }
+
+            // Small delay between chunks to avoid overwhelming the BLE stack
+            if (totalChunks > 1 && chunkIdx < totalChunks - 1) {
+                try { Thread.sleep(20); } catch (InterruptedException ignored) {}
             }
         }
 

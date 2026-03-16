@@ -122,9 +122,11 @@ export function MultiplayerHome({
           const deviceId = selectedLobby.id.replace('ble:', '')
           await bleClient.connect(deviceId)
         } else {
+          // Web Bluetooth: device was already picked via pickDevice() in the
+          // click handler (user gesture). connect() retrieves the cached device.
           const { WebBleTransport } = await import('../../transport/WebBleTransport')
           bleClient = new WebBleTransport()
-          await bleClient.connect('') // triggers browser device picker
+          await bleClient.connect('')
         }
         await lobby.connectWithTransport(bleClient)
       } else {

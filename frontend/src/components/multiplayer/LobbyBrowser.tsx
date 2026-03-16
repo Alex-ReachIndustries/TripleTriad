@@ -144,21 +144,27 @@ export function LobbyBrowser({ onJoin, onBack }: LobbyBrowserProps) {
                 ))}
               </>
             ) : (
-              /* Web Bluetooth: browser device picker */
+              /* Web Bluetooth: browser device picker — must call requestDevice in click handler */
               <button
                 type="button"
                 className="lobby-browser__ble-scan"
                 onClick={() => {
-                  // Web Bluetooth uses requestDevice() which shows a browser picker.
-                  // We pass a dummy lobby ID — WebBleTransport.connect() triggers the picker.
-                  onJoin({
-                    id: 'ble:web-bluetooth',
-                    hostName: 'Bluetooth Device',
-                    playerCount: 0,
-                    maxPlayers: 30,
-                    config: { specialRules: [], tradeRule: 'Friendly' },
-                    phase: 'waiting',
-                  })
+                  // requestDevice MUST run synchronously from click — no awaits before it
+                  const BLE_SVC = '0000ff00-0000-1000-8000-00805f9b34fb'
+                  navigator.bluetooth.requestDevice({ filters: [{ services: [BLE_SVC] }] })
+                    .then(device => {
+                      // Cache device globally for WebBleTransport.connect() to retrieve
+                      (window as any).__blePickedDevice = device
+                      onJoin({
+                        id: `ble:web:${device.id}`,
+                        hostName: device.name || 'Bluetooth Device',
+                        playerCount: 0,
+                        maxPlayers: 30,
+                        config: { specialRules: [], tradeRule: 'Friendly' },
+                        phase: 'waiting',
+                      })
+                    })
+                    .catch((e: unknown) => console.warn('BLE pick failed:', e))
                 }}
               >
                 Connect via Bluetooth
